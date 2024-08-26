@@ -1,5 +1,40 @@
-import { Text } from '@mantine/core'
+import { Stack } from '@mantine/core'
+import Rune from '~/components/RuneTablet/Rune'
 
 export default function RuneTabletPage() {
-	return <Text>Rune Tablet</Text>
+	return (
+		<Stack>
+			<Rune
+				colour='red'
+				shape={[
+					['X', 'X', 'X'],
+					[' ', ' ', 'X']
+				]}
+			/>
+			<Rune
+				colour='red'
+				shape={[
+					['X', 'X', ' '],
+					[' ', 'X', 'X']
+				]}
+			/>
+			<Rune
+				colour='red'
+				shape={[
+					['X', 'X', 'X', 'X'],
+					[' ', ' ', 'X', ' ']
+				]}
+			/>
+			<Rune
+				colour='red'
+				shape={[
+					['X', 'X', 'X'],
+					[' ', ' ', 'X'],
+					[' ', ' ', 'X'],
+					[' ', ' ', 'X'],
+					[' ', 'X', 'X']
+				]}
+			/>
+		</Stack>
+	)
 }
