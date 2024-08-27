@@ -1,27 +1,29 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 
-import { Box } from '@mantine/core'
+import { Box, type BoxProps } from '@mantine/core'
+import { type ForwardedRef, forwardRef } from 'react'
+import { RUNE_SQUARE_SIZE } from '~/data/constants'
+import { type Rune } from '~/data/runes'
 
-const SQUARE_SIZE = 48
-
-type RuneProps = {
-	colour: string
-	shape: (' ' | 'X')[][]
+export type RuneProps = {
+	runeData: Rune
 }
 
-export default function Rune({ colour, shape }: RuneProps) {
+export default forwardRef(function Rune({ runeData: { colour, shape }, ...props }: RuneProps & BoxProps, ref: ForwardedRef<HTMLDivElement>) {
 	return (
 		<Box
-			h={`${shape.length * SQUARE_SIZE}px`}
-			w={`${shape[0].length * SQUARE_SIZE}px`}
-			style={{ position: 'relative' }}
+			ref={ref}
+			h={`${shape.length * RUNE_SQUARE_SIZE}px`}
+			w={`${shape[0].length * RUNE_SQUARE_SIZE}px`}
+			pos='relative'
+			{...props}
 		>
 			{
 				shape.map((row, rowIndex) => {
 					return row.map((square, squareIndex) => {
 						if (square === ' ') return null
 						return (
-							<Square
+							<RuneSquare
 								key={`${rowIndex}-${squareIndex}`}
 								colour={colour}
 								left={squareIndex}
@@ -33,26 +35,24 @@ export default function Rune({ colour, shape }: RuneProps) {
 			}
 		</Box>
 	)
-}
+})
 
-type SquareProps = {
+type RuneSquareProps = {
 	colour: string
 	left: number
 	top: number
 }
 
-function Square({ colour, left, top }: SquareProps) {
+function RuneSquare({ colour, left, top }: RuneSquareProps) {
 	return (
 		<Box
 			bg={colour}
-			h={`${SQUARE_SIZE}px`}
-			w={`${SQUARE_SIZE}px`}
+			h={`${RUNE_SQUARE_SIZE}px`}
+			w={`${RUNE_SQUARE_SIZE}px`}
 			bd='black 1px solid'
-			style={{
-				position: 'absolute',
-				left: `${SQUARE_SIZE * left}px`,
-				top: `${SQUARE_SIZE * top}px`
-			}}
+			pos='absolute'
+			left={`${RUNE_SQUARE_SIZE * left}px`}
+			top={`${RUNE_SQUARE_SIZE * top}px`}
 		/>
 	)
 }
