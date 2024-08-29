@@ -1,12 +1,10 @@
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-
 import { useDroppable } from '@dnd-kit/core'
 import { Box, Group } from '@mantine/core'
 import { TABLET_SQUARE_SIZE } from '~/data/constants'
-import tableSize from '~/data/tablet'
+import { getTabletShape } from '~/data/tablet'
 
 export default function Tablet() {
-	const tabletShape = tableSize[5].shape
+	const tabletShape = getTabletShape(38)
 
 	return (
 		<Group justify='center' style={{ flex: 1 }}>
@@ -17,12 +15,12 @@ export default function Tablet() {
 			>
 				{
 					tabletShape.map((row, rowIndex) => {
-						return row.map((square, squareIndex) => {
+						return row.map((square, columnIndex) => {
 							if (square === ' ') return null
 							return (
 								<TabletSquare
-									key={`${rowIndex}-${squareIndex}`}
-									left={squareIndex}
+									key={`${rowIndex}-${columnIndex}`}
+									left={columnIndex}
 									top={rowIndex}
 								/>
 							)

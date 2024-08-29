@@ -1,56 +1,35 @@
+type TabletData = ' ' | 'X'
+type TabletRow = TabletData[]
+type TabletShape = TabletRow[]
+
 export type TabletSize = {
 	level: number
-	shape: (' ' | 'X')[][]
+	shape: TabletShape
 }
 
-const tableSize: TabletSize[] = [
-	{
-		level: 1,
-		shape: [
-			['X', 'X'],
-			['X', 'X']
-		]
-	},
-	{
-		level: 2,
-		shape: [
-			['X', ' '],
-			['X', 'X'],
-			['X', 'X']
-		]
-	},
-	{
-		level: 3,
-		shape: [
-			['X', 'X'],
-			['X', 'X'],
-			['X', 'X']
-		]
-	},
-	{
-		level: 4,
-		shape: [
-			['X', 'X', ' '],
-			['X', 'X', ' '],
-			['X', 'X', 'X']
-		]
-	},
-	{
-		level: 5,
-		shape: [
-			['X', 'X', ' '],
-			['X', 'X', 'X'],
-			['X', 'X', 'X']
-		]
-	},
-	{
-		level: 6,
-		shape: [
-			['X', 'X', 'X'],
-			['X', 'X', 'X'],
-			['X', 'X', 'X']
-		]
-	}
-]
+export function getTabletShape(level: number) {
+	const baseSize = ~~Math.sqrt(level + 3)
+	const shape = Array.from({ length: baseSize }, _ => {
+		return Array.from({ length: baseSize }, _ => 'X')
+	})
+	const remainder = (level + 3) - (baseSize * baseSize)
 
-export default tableSize
+	if (remainder < baseSize) {
+		const topRow = new Array<TabletData>(baseSize)
+		for (let i = 0; i < baseSize; i++) {
+			topRow[i] = i < remainder ? 'X' : ' '
+		}
+		shape.unshift(topRow)
+	} else {
+		for (let i = 0; i < baseSize; i++) {
+			shape[i].push(i >= remainder - baseSize ? ' ' : 'X')
+		}
+		shape.reverse()
+
+		const topRow = new Array<TabletData>(baseSize + 1).fill('X')
+		topRow[topRow.length - 1] = ' '
+		shape.unshift(topRow)
+	}
+
+	return shape
+}

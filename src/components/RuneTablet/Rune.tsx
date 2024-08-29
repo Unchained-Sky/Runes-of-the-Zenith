@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-
 import { Box, type BoxProps } from '@mantine/core'
 import { type ForwardedRef, forwardRef } from 'react'
 import { RUNE_SQUARE_SIZE } from '~/data/constants'
@@ -20,13 +18,13 @@ export default forwardRef(function Rune({ runeData: { colour, shape }, ...props 
 		>
 			{
 				shape.map((row, rowIndex) => {
-					return row.map((square, squareIndex) => {
+					return row.map((square, columnIndex) => {
 						if (square === ' ') return null
 						return (
 							<RuneSquare
-								key={`${rowIndex}-${squareIndex}`}
+								key={`${rowIndex}-${columnIndex}`}
 								colour={colour}
-								left={squareIndex}
+								left={columnIndex}
 								top={rowIndex}
 							/>
 						)
