@@ -12,16 +12,18 @@
   "dependencies": {
     "@mantine/core": "^7.12.1",
     "@mantine/hooks": "^7.12.1",
+    "@unchainedsky/react-drawline": "^1.2.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.26.1",
+    "react-zoom-pan-pinch": "^3.6.1",
     "zustand": "^4.5.5"
   },
   "devDependencies": {
     "@nabla/vite-plugin-eslint": "^2.0.4",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
-    "@unchainedsky/eslint-config": "^2.0.2",
+    "@unchainedsky/eslint-config": "^2.1.0",
     "@vitejs/plugin-react": "^4.3.1",
     "eslint": "^9.9.0",
     "postcss": "^8.4.41",
