@@ -6,8 +6,8 @@ const holyTalentNodes: TalentNodeData[] = [
 		nodeType: 'Stat',
 		nodeText: 'Int +1',
 		pos: {
-			xPos: 100,
-			yPos: 100
+			xPos: 0,
+			yPos: 0
 		}
 	},
 	{
@@ -15,7 +15,7 @@ const holyTalentNodes: TalentNodeData[] = [
 		nodeType: 'Stat',
 		nodeText: 'Int +1',
 		pos: {
-			xPos: 250,
+			xPos: 1000,
 			yPos: 100
 		}
 	},
@@ -24,7 +24,7 @@ const holyTalentNodes: TalentNodeData[] = [
 		nodeType: 'Rune',
 		nodeText: 'Radiant Blast',
 		pos: {
-			xPos: 400,
+			xPos: -1000,
 			yPos: 100
 		}
 	}
