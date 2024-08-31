@@ -10,7 +10,7 @@ export type TabletSize = {
 export function getTabletShape(level: number) {
 	const baseSize = ~~Math.sqrt(level + 3)
 	const shape = Array.from({ length: baseSize }, _ => {
-		return Array.from({ length: baseSize }, _ => 'X')
+		return Array.from<unknown, TabletData>({ length: baseSize }, _ => 'X')
 	})
 	const remainder = (level + 3) - (baseSize * baseSize)
 

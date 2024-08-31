@@ -1,34 +1,32 @@
 import { useDroppable } from '@dnd-kit/core'
-import { Box, Group } from '@mantine/core'
+import { Box } from '@mantine/core'
 import { TABLET_SQUARE_SIZE } from '~/data/constants'
-import { getTabletShape } from '~/data/tablet'
+import { useRuneTabletStore } from '~/state/useRuneTabletStore'
 
 export default function Tablet() {
-	const tabletShape = getTabletShape(38)
+	const tabletShape = useRuneTabletStore(state => state.tablet)
 
 	return (
-		<Group justify='center' style={{ flex: 1 }}>
-			<Box
-				h={`${tabletShape.length * TABLET_SQUARE_SIZE}px`}
-				w={`${tabletShape[0].length * TABLET_SQUARE_SIZE}px`}
-				pos='relative'
-			>
-				{
-					tabletShape.map((row, rowIndex) => {
-						return row.map((square, columnIndex) => {
-							if (square === ' ') return null
-							return (
-								<TabletSquare
-									key={`${rowIndex}-${columnIndex}`}
-									left={columnIndex}
-									top={rowIndex}
-								/>
-							)
-						})
+		<Box
+			h={`${tabletShape.length * TABLET_SQUARE_SIZE}px`}
+			w={`${tabletShape[0].length * TABLET_SQUARE_SIZE}px`}
+			pos='relative'
+		>
+			{
+				tabletShape.map((row, rowIndex) => {
+					return row.map((square, columnIndex) => {
+						if (square === ' ') return null
+						return (
+							<TabletSquare
+								key={`${rowIndex}-${columnIndex}`}
+								left={columnIndex}
+								top={rowIndex}
+							/>
+						)
 					})
-				}
-			</Box>
-		</Group>
+				})
+			}
+		</Box>
 	)
 }
 
