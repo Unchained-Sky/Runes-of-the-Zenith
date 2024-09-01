@@ -1,0 +1,33 @@
+import { talentTuple, type TalentNodeData } from '../../talents'
+
+const holyTalentNodes: TalentNodeData[] = [
+	{
+		nodeId: 0,
+		nodeType: 'Stat',
+		nodeText: 'Int +1',
+		pos: {
+			xPos: 0,
+			yPos: 0
+		}
+	},
+	{
+		nodeId: 1,
+		nodeType: 'Stat',
+		nodeText: 'Int +1',
+		pos: {
+			xPos: 1000,
+			yPos: 100
+		}
+	},
+	{
+		nodeId: 2,
+		nodeType: 'Rune',
+		nodeText: 'Radiant Blast',
+		pos: {
+			xPos: -1000,
+			yPos: 100
+		}
+	}
+]
+
+export default talentTuple(holyTalentNodes, 'Celestial', 'Holy')
