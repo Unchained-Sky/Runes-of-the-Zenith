@@ -2,7 +2,7 @@ import { type CategoryKey } from '~/types/categories'
 
 export type RuneData = RuneInternal<RuneName>
 
-type RuneName = (typeof runeArray)[number]['name']
+export type RuneName = (typeof runeArray)[number]['name']
 
 type RuneInternal<T extends string = string> = {
 	name: T
@@ -60,4 +60,8 @@ export function getRune(runeName: RuneName) {
 	if (!runeMap.has(runeName)) throw new Error(`Rune not found: ${runeName}`)
 	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 	return runeMap.get(runeName)!
+}
+
+export function getAllRuneNames() {
+	return runeArray.map(({ name }) => name)
 }
