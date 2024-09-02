@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
-import { getTabletShape } from '~/data/tablet'
+import { getTabletShape } from '~/utils/getTableSize'
 import { createActionName, persistStoreName, type Slice } from './storeTypes'
 
 type TabletSquareData = 'X' | ' '

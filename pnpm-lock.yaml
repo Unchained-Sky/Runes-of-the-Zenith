@@ -49,8 +49,8 @@ importers:
         specifier: ^18.3.0
         version: 18.3.0
       '@unchainedsky/eslint-config':
-        specifier: ^2.1.0
-        version: 2.1.0(eslint@9.9.1)(typescript@5.5.4)
+        specifier: ^2.1.1
+        version: 2.1.1(eslint@9.9.1)(typescript@5.5.4)
       '@vitejs/plugin-react':
         specifier: ^4.3.1
         version: 4.3.1(vite@5.4.2(sugarss@4.0.1(postcss@8.4.41)))
@@ -668,8 +668,8 @@ packages:
     resolution: {integrity: sha512-RmZwrTbQ9QveF15m/Cl28n0LXD6ea2CjkhH5rQ55ewz3H24w+AMCJHPVYaZ8/0HoG8Z3cLLFFycRXxeO2tz9FA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@unchainedsky/eslint-config@2.1.0':
-    resolution: {integrity: sha512-6aGkCm5nlKIrEr4Gd4yESA2IQUVXkWAEzy8AIVaddcfVJG5AHCbfmb0Yx20VfxFFQF9FE0e19DG670ySJ3ohUg==}
+  '@unchainedsky/eslint-config@2.1.1':
+    resolution: {integrity: sha512-NwtZq11H/P+dGtRM+TWQoetZgQPRtT19Wk/vx1XL/NCl/TBWv20HCIiGeyJOBjYwHr5U88uUFL8lfhIAggZWOQ==}
     peerDependencies:
       eslint: '>= 9'
 
@@ -2479,7 +2479,7 @@ snapshots:
       '@typescript-eslint/types': 8.3.0
       eslint-visitor-keys: 3.4.3
 
-  '@unchainedsky/eslint-config@2.1.0(eslint@9.9.1)(typescript@5.5.4)':
+  '@unchainedsky/eslint-config@2.1.1(eslint@9.9.1)(typescript@5.5.4)':
     dependencies:
       '@eslint/js': 9.9.1
       '@stylistic/eslint-plugin': 2.6.4(eslint@9.9.1)(typescript@5.5.4)

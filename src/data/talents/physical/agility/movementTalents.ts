@@ -4,4 +4,4 @@ const movementTalentNodes: TalentNodeData[] = [
 
 ]
 
-export default talentTuple(movementTalentNodes, 'Agility', 'Movement')
+export default talentTuple(movementTalentNodes, 'agility', 'movement')

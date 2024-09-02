@@ -4,4 +4,4 @@ const unarmedTalentNodes: TalentNodeData[] = [
 
 ]
 
-export default talentTuple(unarmedTalentNodes, 'Unarmed', 'Unarmed')
+export default talentTuple(unarmedTalentNodes, 'unarmed', 'unarmed')

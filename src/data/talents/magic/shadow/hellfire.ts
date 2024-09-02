@@ -4,4 +4,4 @@ const hellfireTalentNodes: TalentNodeData[] = [
 
 ]
 
-export default talentTuple(hellfireTalentNodes, 'Shadow', 'Hellfire')
+export default talentTuple(hellfireTalentNodes, 'shadow', 'hellfire')

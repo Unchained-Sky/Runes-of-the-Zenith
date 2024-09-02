@@ -4,4 +4,4 @@ const oneHandTalentNodes: TalentNodeData[] = [
 
 ]
 
-export default talentTuple(oneHandTalentNodes, 'Sword_and_Board', 'One Hand')
+export default talentTuple(oneHandTalentNodes, 'sword_and_board', 'one_hand')

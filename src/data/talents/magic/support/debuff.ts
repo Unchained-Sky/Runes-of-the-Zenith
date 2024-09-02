@@ -4,4 +4,4 @@ const debuffTalentNodes: TalentNodeData[] = [
 
 ]
 
-export default talentTuple(debuffTalentNodes, 'Support', 'Debuff')
+export default talentTuple(debuffTalentNodes, 'support', 'debuff')

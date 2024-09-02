@@ -4,4 +4,4 @@ const plantTalentNodes: TalentNodeData[] = [
 
 ]
 
-export default talentTuple(plantTalentNodes, 'Nature', 'Plant')
+export default talentTuple(plantTalentNodes, 'nature', 'plant')

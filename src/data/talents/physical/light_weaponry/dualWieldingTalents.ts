@@ -4,4 +4,4 @@ const dualWieldingTalentNodes: TalentNodeData[] = [
 
 ]
 
-export default talentTuple(dualWieldingTalentNodes, 'Light_Weaponry', 'Dual')
+export default talentTuple(dualWieldingTalentNodes, 'light_weaponry', 'dual')

@@ -4,4 +4,4 @@ const bloodthirstTalentNodes: TalentNodeData[] = [
 
 ]
 
-export default talentTuple(bloodthirstTalentNodes, 'Bloodthirst', 'Bloodthirst')
+export default talentTuple(bloodthirstTalentNodes, 'bloodthirst', 'bloodthirst')

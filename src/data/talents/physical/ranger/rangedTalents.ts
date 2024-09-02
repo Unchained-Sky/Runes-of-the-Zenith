@@ -4,4 +4,4 @@ const rangedTalentNodes: TalentNodeData[] = [
 
 ]
 
-export default talentTuple(rangedTalentNodes, 'Ranger', 'Ranged')
+export default talentTuple(rangedTalentNodes, 'ranger', 'ranged')

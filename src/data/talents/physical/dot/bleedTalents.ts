@@ -4,4 +4,4 @@ const bleedTalentNodes: TalentNodeData[] = [
 
 ]
 
-export default talentTuple(bleedTalentNodes, 'DoT', 'Bleed')
+export default talentTuple(bleedTalentNodes, 'dot', 'bleed')

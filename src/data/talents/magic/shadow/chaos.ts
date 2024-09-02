@@ -4,4 +4,4 @@ const chaosTalentNodes: TalentNodeData[] = [
 
 ]
 
-export default talentTuple(chaosTalentNodes, 'Shadow', 'Chaos')
+export default talentTuple(chaosTalentNodes, 'shadow', 'chaos')

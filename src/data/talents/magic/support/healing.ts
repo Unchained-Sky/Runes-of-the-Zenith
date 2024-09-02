@@ -4,4 +4,4 @@ const healingTalentNodes: TalentNodeData[] = [
 
 ]
 
-export default talentTuple(healingTalentNodes, 'Support', 'Healing')
+export default talentTuple(healingTalentNodes, 'support', 'healing')

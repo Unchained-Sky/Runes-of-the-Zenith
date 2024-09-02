@@ -4,4 +4,4 @@ const arcaneTalentNodes: TalentNodeData[] = [
 
 ]
 
-export default talentTuple(arcaneTalentNodes, 'Arcane', 'Arcane')
+export default talentTuple(arcaneTalentNodes, 'arcane', 'arcane')

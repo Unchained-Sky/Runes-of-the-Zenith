@@ -4,4 +4,4 @@ const armourTalentNodes: TalentNodeData[] = [
 
 ]
 
-export default talentTuple(armourTalentNodes, 'Armour', 'Armour')
+export default talentTuple(armourTalentNodes, 'armour', 'armour')

@@ -4,4 +4,4 @@ const markingTalentNodes: TalentNodeData[] = [
 
 ]
 
-export default talentTuple(markingTalentNodes, 'Ranger', 'Marking')
+export default talentTuple(markingTalentNodes, 'ranger', 'marking')

@@ -4,4 +4,4 @@ const windTalentNodes: TalentNodeData[] = [
 
 ]
 
-export default talentTuple(windTalentNodes, 'Elemental', 'Wind')
+export default talentTuple(windTalentNodes, 'elemental', 'wind')

@@ -1,10 +1,20 @@
-export type Rune = {
+import { type CategoryKey } from '~/types/categories'
+
+export type RuneData = RuneInternal<RuneName>
+
+type RuneName = (typeof runeArray)[number]['name']
+
+type RuneInternal<T extends string = string> = {
+	name: T
+	category: CategoryKey
 	colour: string
 	shape: (' ' | 'X')[][]
 }
 
-const runes: Rune[] = [
+const runeArray = [
 	{
+		name: 'one',
+		category: 'agility-movement',
 		colour: 'red',
 		shape: [
 			['X', 'X', 'X'],
@@ -12,6 +22,8 @@ const runes: Rune[] = [
 		]
 	},
 	{
+		name: 'two',
+		category: 'bloodthirst-bloodthirst',
 		colour: 'blue',
 		shape: [
 			['X', 'X', ' '],
@@ -19,6 +31,8 @@ const runes: Rune[] = [
 		]
 	},
 	{
+		name: 'three',
+		category: 'elemental-fire',
 		colour: 'green',
 		shape: [
 			['X', 'X', 'X', 'X'],
@@ -26,6 +40,8 @@ const runes: Rune[] = [
 		]
 	},
 	{
+		name: 'four',
+		category: 'shadow-hellfire',
 		colour: 'purple',
 		shape: [
 			['X', 'X', 'X'],
@@ -35,6 +51,13 @@ const runes: Rune[] = [
 			[' ', 'X', 'X']
 		]
 	}
-] as const
+] as const satisfies RuneInternal[]
 
-export default runes
+const runeMap = new Map<RuneName, RuneData>()
+runeArray.forEach(rune => runeMap.set(rune.name, rune))
+
+export function getRune(runeName: RuneName) {
+	if (!runeMap.has(runeName)) throw new Error(`Rune not found: ${runeName}`)
+	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+	return runeMap.get(runeName)!
+}

@@ -4,4 +4,4 @@ const totemTalentNodes: TalentNodeData[] = [
 
 ]
 
-export default talentTuple(totemTalentNodes, 'Nature', 'Totem')
+export default talentTuple(totemTalentNodes, 'nature', 'totem')

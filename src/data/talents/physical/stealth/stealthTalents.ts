@@ -4,4 +4,4 @@ const stealthTalentNodes: TalentNodeData[] = [
 
 ]
 
-export default talentTuple(stealthTalentNodes, 'Stealth', 'Stealth')
+export default talentTuple(stealthTalentNodes, 'stealth', 'stealth')

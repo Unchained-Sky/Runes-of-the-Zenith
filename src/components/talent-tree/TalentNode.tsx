@@ -1,8 +1,8 @@
 import { Stack, Text } from '@mantine/core'
-import { type NodeType, type TalentNodeData } from '~/data/talents/talents'
+import { type TalentNodeData } from '~/data/talents/talents'
 
 const size = '100px'
-const nodeTypeTextColour: Record<NodeType, string> = {
+const nodeTypeTextColour: Record<TalentNodeData['nodeType'], string> = {
 	Start: '#09ded7',
 	Rune: '#4509de',
 	Stat: '#deb009'

@@ -4,4 +4,4 @@ const waterTalentNodes: TalentNodeData[] = [
 
 ]
 
-export default talentTuple(waterTalentNodes, 'Elemental', 'Water')
+export default talentTuple(waterTalentNodes, 'elemental', 'water')

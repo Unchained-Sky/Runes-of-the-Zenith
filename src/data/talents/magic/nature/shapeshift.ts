@@ -4,4 +4,4 @@ const shapeshiftTalentNodes: TalentNodeData[] = [
 
 ]
 
-export default talentTuple(shapeshiftTalentNodes, 'Nature', 'Shapeshift')
+export default talentTuple(shapeshiftTalentNodes, 'nature', 'shapeshift')

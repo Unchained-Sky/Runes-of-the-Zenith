@@ -4,4 +4,4 @@ const heavyWeaponryTalentNodes: TalentNodeData[] = [
 
 ]
 
-export default talentTuple(heavyWeaponryTalentNodes, 'Heavy_Weaponry', 'Heavy_Weaponry')
+export default talentTuple(heavyWeaponryTalentNodes, 'heavy_weaponry', 'heavy_weaponry')

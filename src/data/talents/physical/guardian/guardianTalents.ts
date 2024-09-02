@@ -4,4 +4,4 @@ const guardianTalentNodes: TalentNodeData[] = [
 
 ]
 
-export default talentTuple(guardianTalentNodes, 'Guardian', 'Guardian')
+export default talentTuple(guardianTalentNodes, 'guardian', 'guardian')

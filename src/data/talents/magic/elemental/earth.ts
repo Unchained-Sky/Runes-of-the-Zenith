@@ -2,4 +2,4 @@ import { talentTuple, type TalentNodeData } from '../../talents'
 
 const earthTalentNodes: TalentNodeData[] = []
 
-export default talentTuple(earthTalentNodes, 'Elemental', 'Earth')
+export default talentTuple(earthTalentNodes, 'elemental', 'earth')

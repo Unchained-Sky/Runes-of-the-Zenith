@@ -4,4 +4,4 @@ const psychicTalentNodes: TalentNodeData[] = [
 
 ]
 
-export default talentTuple(psychicTalentNodes, 'Psychic', 'Psychic')
+export default talentTuple(psychicTalentNodes, 'psychic', 'psychic')

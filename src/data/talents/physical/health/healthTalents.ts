@@ -4,4 +4,4 @@ const healthTalentNodes: TalentNodeData[] = [
 
 ]
 
-export default talentTuple(healthTalentNodes, 'Health', 'Health')
+export default talentTuple(healthTalentNodes, 'health', 'health')

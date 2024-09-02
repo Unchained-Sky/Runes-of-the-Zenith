@@ -4,4 +4,4 @@ const dodgeTalentNodes: TalentNodeData[] = [
 
 ]
 
-export default talentTuple(dodgeTalentNodes, 'Agility', 'Dodge')
+export default talentTuple(dodgeTalentNodes, 'agility', 'dodge')

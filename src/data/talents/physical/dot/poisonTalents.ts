@@ -4,4 +4,4 @@ const poisonTalentNodes: TalentNodeData[] = [
 
 ]
 
-export default talentTuple(poisonTalentNodes, 'DoT', 'Poison')
+export default talentTuple(poisonTalentNodes, 'dot', 'poison')

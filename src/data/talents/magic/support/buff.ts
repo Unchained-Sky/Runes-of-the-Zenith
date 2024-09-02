@@ -4,4 +4,4 @@ const buffTalentNodes: TalentNodeData[] = [
 
 ]
 
-export default talentTuple(buffTalentNodes, 'Support', 'Buff')
+export default talentTuple(buffTalentNodes, 'support', 'buff')

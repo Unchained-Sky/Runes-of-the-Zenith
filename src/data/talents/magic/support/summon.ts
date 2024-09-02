@@ -4,4 +4,4 @@ const summonTalentNodes: TalentNodeData[] = [
 
 ]
 
-export default talentTuple(summonTalentNodes, 'Support', 'Summon')
+export default talentTuple(summonTalentNodes, 'support', 'summon')

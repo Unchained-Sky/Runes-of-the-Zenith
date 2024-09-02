@@ -4,4 +4,4 @@ const warCryTalentNodes: TalentNodeData[] = [
 
 ]
 
-export default talentTuple(warCryTalentNodes, 'War_Cry', 'War Cry')
+export default talentTuple(warCryTalentNodes, 'war_cry', 'war_cry')

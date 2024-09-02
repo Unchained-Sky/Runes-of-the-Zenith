@@ -1,10 +1,10 @@
 import { Box, type BoxProps } from '@mantine/core'
 import { type ForwardedRef, forwardRef } from 'react'
 import { RUNE_SQUARE_SIZE } from '~/data/constants'
-import { type Rune } from '~/data/runes'
+import { type RuneData } from '~/data/runes'
 
 export type RuneProps = {
-	runeData: Rune
+	runeData: RuneData
 }
 
 export default forwardRef(function Rune({ runeData: { colour, shape }, ...props }: RuneProps & BoxProps, ref: ForwardedRef<HTMLDivElement>) {

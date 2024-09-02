@@ -4,4 +4,4 @@ const shieldTalentNodes: TalentNodeData[] = [
 
 ]
 
-export default talentTuple(shieldTalentNodes, 'Sword_and_Board', 'Shield')
+export default talentTuple(shieldTalentNodes, 'sword_and_board', 'shield')

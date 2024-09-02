@@ -30,4 +30,4 @@ const holyTalentNodes: TalentNodeData[] = [
 	}
 ]
 
-export default talentTuple(holyTalentNodes, 'Celestial', 'Holy')
+export default talentTuple(holyTalentNodes, 'celestial', 'holy')

@@ -5,7 +5,7 @@ import { type CSSProperties } from 'react'
 import Rune, { type RuneProps } from '~/components/RuneTablet/Rune'
 import Tablet from '~/components/RuneTablet/Tablet'
 import { RUNE_SQUARE_SIZE } from '~/data/constants'
-import runes from '~/data/runes'
+import { getRune } from '~/data/runes'
 import { useRuneTabletStore } from '~/state/useRuneTabletStore'
 
 export default function RuneTabletPage() {
@@ -37,6 +37,13 @@ export default function RuneTabletPage() {
 }
 
 function Pouch() {
+	const runes = [
+		getRune('one'),
+		getRune('two'),
+		getRune('three'),
+		getRune('four')
+	]
+
 	return (
 		<Stack w={`${RUNE_SQUARE_SIZE * 6}px`} align='center' justify='center'>
 			{
