@@ -36,9 +36,15 @@ const createRuneTabletActions: Slice<RuneTabletStore, RuneTabletActions> = (set,
 		const runeHeight = runeData.shape.length
 		if (tabletSquareRootCords.x + runeHeight > get().tablet.length) return
 
-		const runeWidth = runeData.shape[0].length
-		const row = get().tablet[tabletSquareRootCords.x].filter(data => data !== ' ')
-		if (tabletSquareRootCords.y + runeWidth > row.length) return
+		const isClear = runeData.shape.every((row, rowIndex) => {
+			return row.every((square, columnIndex) => {
+				if (square === ' ') return true
+				const x = rowIndex + tabletSquareRootCords.x
+				const y = columnIndex + tabletSquareRootCords.y
+				return get().tablet[x][y] === 'X'
+			})
+		})
+		if (!isClear) return
 
 		runeData.shape.forEach((row, rowIndex) => {
 			row.forEach((square, columnIndex) => {
