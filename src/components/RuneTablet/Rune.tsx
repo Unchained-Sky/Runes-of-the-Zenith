@@ -5,16 +5,19 @@ import { getRune, type RuneName } from '~/data/runes'
 
 export type RuneProps = {
 	runeName: RuneName
+	scale?: number
 }
 
-export default forwardRef(function Rune({ runeName, ...props }: RuneProps & BoxProps, ref: ForwardedRef<HTMLDivElement>) {
+export default forwardRef(function Rune({ runeName, scale = 1, ...props }: RuneProps & BoxProps, ref: ForwardedRef<HTMLDivElement>) {
 	const { shape, colour } = getRune(runeName)
+
+	const squareSize = RUNE_SQUARE_SIZE * scale
 
 	return (
 		<Box
 			ref={ref}
-			h={`${shape.length * RUNE_SQUARE_SIZE}px`}
-			w={`${shape[0].length * RUNE_SQUARE_SIZE}px`}
+			h={`${shape.length * squareSize}px`}
+			w={`${shape[0].length * squareSize}px`}
 			pos='relative'
 			{...props}
 		>
@@ -28,6 +31,7 @@ export default forwardRef(function Rune({ runeName, ...props }: RuneProps & BoxP
 								colour={colour}
 								left={columnIndex}
 								top={rowIndex}
+								size={squareSize}
 							/>
 						)
 					})
@@ -41,18 +45,19 @@ type RuneSquareProps = {
 	colour: string
 	left: number
 	top: number
+	size: number
 }
 
-function RuneSquare({ colour, left, top }: RuneSquareProps) {
+function RuneSquare({ colour, left, top, size }: RuneSquareProps) {
 	return (
 		<Box
 			bg={colour}
-			h={`${RUNE_SQUARE_SIZE}px`}
-			w={`${RUNE_SQUARE_SIZE}px`}
+			h={`${size}px`}
+			w={`${size}px`}
 			bd='black 1px solid'
 			pos='absolute'
-			left={`${RUNE_SQUARE_SIZE * left}px`}
-			top={`${RUNE_SQUARE_SIZE * top}px`}
+			left={`${size * left}px`}
+			top={`${size * top}px`}
 		/>
 	)
 }

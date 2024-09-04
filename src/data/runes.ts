@@ -36,6 +36,7 @@ const runeArray = [
 		colour: 'green',
 		shape: [
 			['X', 'X', 'X', 'X'],
+			[' ', ' ', 'X', ' '],
 			[' ', ' ', 'X', ' ']
 		]
 	},
