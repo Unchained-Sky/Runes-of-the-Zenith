@@ -29,8 +29,8 @@ export default forwardRef(function Rune({ runeName, scale = 1, ...props }: RuneP
 							<RuneSquare
 								key={`${rowIndex}-${columnIndex}`}
 								colour={colour}
-								left={columnIndex}
-								top={rowIndex}
+								x={rowIndex}
+								y={columnIndex}
 								size={squareSize}
 							/>
 						)
@@ -43,12 +43,12 @@ export default forwardRef(function Rune({ runeName, scale = 1, ...props }: RuneP
 
 type RuneSquareProps = {
 	colour: string
-	left: number
-	top: number
+	x: number
+	y: number
 	size: number
 }
 
-function RuneSquare({ colour, left, top, size }: RuneSquareProps) {
+function RuneSquare({ colour, x, y, size }: RuneSquareProps) {
 	return (
 		<Box
 			bg={colour}
@@ -56,8 +56,8 @@ function RuneSquare({ colour, left, top, size }: RuneSquareProps) {
 			w={`${size}px`}
 			bd='black 1px solid'
 			pos='absolute'
-			left={`${size * left}px`}
-			top={`${size * top}px`}
+			left={`${size * y}px`}
+			top={`${size * x}px`}
 		/>
 	)
 }

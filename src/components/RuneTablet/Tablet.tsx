@@ -1,4 +1,4 @@
-import { useDroppable } from '@dnd-kit/core'
+import { useDndMonitor, useDroppable } from '@dnd-kit/core'
 import { Box } from '@mantine/core'
 import { useMemo } from 'react'
 import { TABLE_SCALE, TABLET_SQUARE_SIZE } from '~/data/constants'
@@ -7,13 +7,15 @@ import { useRuneTabletStore } from '~/state/useRuneTabletStore'
 import { type DraggableRuneData } from './DraggableRune'
 import Rune from './Rune'
 
-type TableCords = {
-	left: number
-	top: number
+export type TabletCords = {
+	x: number
+	y: number
 }
 
 export default function Tablet() {
 	const tabletShape = useRuneTabletStore(state => state.tablet)
+
+	useDropRune()
 
 	return (
 		<Box
@@ -28,8 +30,8 @@ export default function Tablet() {
 						return (
 							<TabletSquare
 								key={`${rowIndex}-${columnIndex}`}
-								left={columnIndex}
-								top={rowIndex}
+								x={rowIndex}
+								y={columnIndex}
 							/>
 						)
 					})
@@ -39,18 +41,34 @@ export default function Tablet() {
 	)
 }
 
-type TabletSquareProps = TableCords
+type TabletSquareProps = TabletCords
+
+type DroppableTabletSquareData = TabletCords
 
 function testDataIsRune(current: Record<string, unknown> = {}): current is DraggableRuneData {
 	return Object.hasOwn(current, 'runeName')
 }
 
-function TabletSquare({ left, top }: TabletSquareProps) {
+function testDataIsTableSquare(current: Record<string, unknown> = {}): current is DroppableTabletSquareData {
+	return Object.hasOwn(current, 'x') && Object.hasOwn(current, 'y')
+}
+
+function TabletSquare({ x, y }: TabletSquareProps) {
+	const squareData = useRuneTabletStore(state => state.tablet[x][y])
+	const backgroundColour = useMemo(() => {
+		if (squareData === 'X' || squareData === ' ') return 'dark.8'
+		return getRune(squareData).colour
+	}, [squareData])
+
 	const { isOver, active, setNodeRef } = useDroppable({
-		id: `tablet-${left}-${top}`
+		id: `tablet-${x}-${y}`,
+		data: {
+			x,
+			y
+		} satisfies DroppableTabletSquareData
 	})
 
-	const runeData = useMemo(() => {
+	const heldRuneData = useMemo(() => {
 		const draggableRuneData = active?.data.current
 		if (!testDataIsRune(draggableRuneData)) return null
 		return getRune(draggableRuneData.runeName)
@@ -62,15 +80,33 @@ function TabletSquare({ left, top }: TabletSquareProps) {
 			h={`${TABLET_SQUARE_SIZE}px`}
 			w={`${TABLET_SQUARE_SIZE}px`}
 			bd='black 1px solid'
+			bg={backgroundColour}
 			pos='absolute'
-			left={`${TABLET_SQUARE_SIZE * left}px`}
-			top={`${TABLET_SQUARE_SIZE * top}px`}
+			top={`${TABLET_SQUARE_SIZE * x}px`}
+			left={`${TABLET_SQUARE_SIZE * y}px`}
 		>
 			{
-				isOver && runeData && (
-					<Rune runeName={runeData.name} scale={TABLE_SCALE} />
+				isOver && heldRuneData && (
+					<Rune runeName={heldRuneData.name} scale={TABLE_SCALE} style={{ zIndex: '2' }} />
 				)
 			}
 		</Box>
 	)
+}
+
+function useDropRune() {
+	const placeRune = useRuneTabletStore(state => state.placeRune)
+
+	useDndMonitor({
+		onDragEnd: event => {
+			if (!event.over) return
+			const draggableRuneData = event.active.data.current
+			if (!testDataIsRune(draggableRuneData)) return
+
+			const droppableTabletSquareData = event.over.data.current
+			if (!testDataIsTableSquare(droppableTabletSquareData)) return
+
+			placeRune(draggableRuneData.runeName, droppableTabletSquareData)
+		}
+	})
 }
