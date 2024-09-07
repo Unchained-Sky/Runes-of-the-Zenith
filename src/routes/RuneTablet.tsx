@@ -28,7 +28,7 @@ export default function RuneTabletPage() {
 				<Pouch />
 			</Group>
 
-			<DragOverlay />
+			<DragOverlay style={{ cursor: 'grabbing' }} />
 		</DndContext>
 	)
 }

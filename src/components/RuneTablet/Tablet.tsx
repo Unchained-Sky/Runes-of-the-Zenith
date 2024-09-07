@@ -4,7 +4,7 @@ import { useMemo } from 'react'
 import { TABLE_SCALE, TABLET_SQUARE_SIZE } from '~/data/constants'
 import { getRune } from '~/data/runes'
 import { useRuneTabletStore } from '~/state/useRuneTabletStore'
-import { type DraggableRuneData } from './DraggableRune'
+import DraggableRune, { type DraggableRuneData } from './DraggableRune'
 import Rune from './Rune'
 
 export type TabletCords = {
@@ -26,7 +26,7 @@ export default function Tablet() {
 			{
 				tabletShape.map((row, rowIndex) => {
 					return row.map((square, columnIndex) => {
-						if (square === ' ') return null
+						if (square.state === ' ') return null
 						return (
 							<TabletSquare
 								key={`${rowIndex}-${columnIndex}`}
@@ -54,11 +54,7 @@ function testDataIsTableSquare(current: Record<string, unknown> = {}): current i
 }
 
 function TabletSquare({ x, y }: TabletSquareProps) {
-	const squareData = useRuneTabletStore(state => state.tablet[x][y])
-	const backgroundColour = useMemo(() => {
-		if (squareData === 'X' || squareData === ' ') return 'dark.8'
-		return getRune(squareData).colour
-	}, [squareData])
+	const runeRoot = useRuneTabletStore(state => state.tablet[x][y].runeRoot)
 
 	const { isOver, active, setNodeRef } = useDroppable({
 		id: `tablet-${x}-${y}`,
@@ -80,7 +76,6 @@ function TabletSquare({ x, y }: TabletSquareProps) {
 			h={`${TABLET_SQUARE_SIZE}px`}
 			w={`${TABLET_SQUARE_SIZE}px`}
 			bd='black 1px solid'
-			bg={backgroundColour}
 			pos='absolute'
 			top={`${TABLET_SQUARE_SIZE * x}px`}
 			left={`${TABLET_SQUARE_SIZE * y}px`}
@@ -89,6 +84,11 @@ function TabletSquare({ x, y }: TabletSquareProps) {
 				isOver && heldRuneData && (
 					<Rune runeName={heldRuneData.name} scale={TABLE_SCALE} style={{ zIndex: '2' }} />
 				)
+			}
+			{
+				runeRoot.map(runeName => {
+					return <DraggableRune key={runeName} runeName={runeName} scale={TABLE_SCALE} />
+				})
 			}
 		</Box>
 	)

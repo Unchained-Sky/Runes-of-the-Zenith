@@ -51,6 +51,16 @@ const runeArray = [
 			[' ', ' ', 'X'],
 			[' ', 'X', 'X']
 		]
+	},
+	{
+		name: 'five',
+		category: 'elemental-earth',
+		colour: 'yellow',
+		shape: [
+			[' ', 'X', ' ', 'X'],
+			[' ', 'X', 'X', 'X'],
+			['X', 'X', ' ', 'X']
+		]
 	}
 ] as const satisfies RuneInternal[]
 
