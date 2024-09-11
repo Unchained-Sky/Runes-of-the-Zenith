@@ -26,5 +26,14 @@ export default function DraggableRune({ runeName, scale = 1 }: RuneProps) {
 			zIndex: '2'
 		}) satisfies CSSProperties
 
-	return <Rune runeName={runeName} scale={transform ? TABLE_SCALE : scale} ref={setNodeRef} style={style} {...listeners} {...attributes} />
+	return (
+		<Rune
+			runeName={runeName}
+			scale={transform ? TABLE_SCALE : scale}
+			ref={setNodeRef}
+			style={style}
+			{...listeners}
+			{...attributes}
+		/>
+	)
 }

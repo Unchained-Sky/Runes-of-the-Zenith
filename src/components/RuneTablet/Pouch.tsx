@@ -1,29 +1,21 @@
-import { MultiSelect, Stack } from '@mantine/core'
-import { useMemo, useState } from 'react'
+import { Button, Stack } from '@mantine/core'
 import { RUNE_SQUARE_SIZE } from '~/data/constants'
-import { getAllRuneNames, type RuneName } from '~/data/runes'
+import { useRuneTabletStore } from '~/state/useRuneTabletStore'
+import { typedObject } from '~/utils/typedObject'
 import DraggableRune from './DraggableRune'
 
 export default function Pouch() {
-	const allRunes = useMemo(() => getAllRuneNames(), [])
+	const runes = useRuneTabletStore(state => state.runes)
 
-	const [activeRunes, setActiveRunes] = useState<RuneName[]>([])
+	const DEV_FILL_POUCH = useRuneTabletStore(state => state.DEV_FILL_POUCH)
 
 	return (
-		<Stack w={`${RUNE_SQUARE_SIZE * 6}px`} h='100vh' justify='space-between'>
-			<MultiSelect
-				searchable
-				hidePickedOptions
-				data={allRunes}
-				value={activeRunes}
-				onChange={updatedRunes => setActiveRunes(updatedRunes as RuneName[])}
-				label='Rune Pouch'
-				m='md'
-			/>
-
+		<Stack w={`${RUNE_SQUARE_SIZE * 6}px`} h='100vh' py='md'>
 			<Stack align='center' style={{ flex: 1 }}>
+				<Button onClick={DEV_FILL_POUCH}>Fill Pouch</Button>
 				{
-					activeRunes.map(runeName => {
+					typedObject.entries(runes).map(([runeName, runeState]) => {
+						if (runeState.state !== 'pouch') return null
 						return <DraggableRune key={runeName} runeName={runeName} />
 					})
 				}

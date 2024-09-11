@@ -5,7 +5,7 @@ import Pouch from '~/components/RuneTablet/Pouch'
 import Tablet from '~/components/RuneTablet/Tablet'
 import { useRuneTabletStore } from '~/state/useRuneTabletStore'
 
-export default function RuneTabletPage() {
+export default function RuneTablet() {
 	const setSize = useRuneTabletStore(state => state.setSize)
 
 	return (

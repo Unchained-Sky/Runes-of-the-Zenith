@@ -61,6 +61,39 @@ const runeArray = [
 			[' ', 'X', 'X', 'X'],
 			['X', 'X', ' ', 'X']
 		]
+	},
+	{
+		name: 'six',
+		category: 'elemental-earth',
+		colour: 'yellow',
+		shape: [
+			['X', 'X', 'X', 'X'],
+			['X', 'X', 'X', 'X'],
+			['X', 'X', 'X', 'X']
+		]
+	},
+	{
+		name: 'seven',
+		category: 'elemental-earth',
+		colour: 'yellow',
+		shape: [
+			['X', 'X', 'X', 'X'],
+			['X', ' ', ' ', ' '],
+			['X', 'X', 'X', ' ']
+		]
+	},
+	{
+		name: 'eight',
+		category: 'elemental-earth',
+		colour: 'yellow',
+		shape: [
+			[' ', 'X', ' ', 'X'],
+			[' ', 'X', 'X', 'X'],
+			['X', 'X', ' ', 'X'],
+			['X', ' ', ' ', 'X'],
+			['X', ' ', ' ', 'X'],
+			['X', 'X', ' ', 'X']
+		]
 	}
 ] as const satisfies RuneInternal[]
 
