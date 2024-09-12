@@ -1,4 +1,4 @@
-import { talentTuple, type TalentNodeData } from '../../talents'
+import { talentTuple, type TalentNodeData } from '~/data/talents'
 
 const unholyTalentNodes: TalentNodeData[] = [
 

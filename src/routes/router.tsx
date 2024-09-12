@@ -1,6 +1,6 @@
 import { createBrowserRouter } from 'react-router-dom'
-import RuneTablet from '~/RuneTablet'
-import Talents from '~/TalentTree'
+import RuneTablet from '~/RT/index'
+import Talents from '~/TT/index'
 import HomePage from './Home'
 
 export const router = createBrowserRouter([

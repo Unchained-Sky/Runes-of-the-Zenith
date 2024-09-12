@@ -24,8 +24,20 @@
     /* Import Alias */
     "baseUrl": ".",
     "paths": {
-      "~/*": [
-        "./src/*"
+      "~/RT/*": [
+        "./src/RuneTablet/*"
+      ],
+      "~/TT/*": [
+        "./src/TalentTree/*"
+      ],
+      "~/components/*": [
+        "./src/components/*"
+      ],
+      "~/data/*": [
+        "./src/data/*"
+      ],
+      "~/utils/*": [
+        "./src/utils/*"
       ]
     }
   },
