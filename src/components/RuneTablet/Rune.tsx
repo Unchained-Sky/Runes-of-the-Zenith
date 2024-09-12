@@ -1,18 +1,23 @@
 import { Box, type BoxProps } from '@mantine/core'
 import { type ForwardedRef, forwardRef } from 'react'
 import { RUNE_SQUARE_SIZE } from '~/data/constants'
-import { type RuneData } from '~/data/runes'
+import { getRune, type RuneName } from '~/data/runes'
 
 export type RuneProps = {
-	runeData: RuneData
+	runeName: RuneName
+	scale?: number
 }
 
-export default forwardRef(function Rune({ runeData: { colour, shape }, ...props }: RuneProps & BoxProps, ref: ForwardedRef<HTMLDivElement>) {
+export default forwardRef(function Rune({ runeName, scale = 1, ...props }: RuneProps & BoxProps, ref: ForwardedRef<HTMLDivElement>) {
+	const { shape, colour } = getRune(runeName)
+
+	const squareSize = RUNE_SQUARE_SIZE * scale
+
 	return (
 		<Box
 			ref={ref}
-			h={`${shape.length * RUNE_SQUARE_SIZE}px`}
-			w={`${shape[0].length * RUNE_SQUARE_SIZE}px`}
+			h={`${shape.length * squareSize}px`}
+			w={`${shape[0].length * squareSize}px`}
 			pos='relative'
 			{...props}
 		>
@@ -24,8 +29,9 @@ export default forwardRef(function Rune({ runeData: { colour, shape }, ...props 
 							<RuneSquare
 								key={`${rowIndex}-${columnIndex}`}
 								colour={colour}
-								left={columnIndex}
-								top={rowIndex}
+								x={rowIndex}
+								y={columnIndex}
+								size={squareSize}
 							/>
 						)
 					})
@@ -37,20 +43,21 @@ export default forwardRef(function Rune({ runeData: { colour, shape }, ...props 
 
 type RuneSquareProps = {
 	colour: string
-	left: number
-	top: number
+	x: number
+	y: number
+	size: number
 }
 
-function RuneSquare({ colour, left, top }: RuneSquareProps) {
+function RuneSquare({ colour, x, y, size }: RuneSquareProps) {
 	return (
 		<Box
 			bg={colour}
-			h={`${RUNE_SQUARE_SIZE}px`}
-			w={`${RUNE_SQUARE_SIZE}px`}
+			h={`${size}px`}
+			w={`${size}px`}
 			bd='black 1px solid'
 			pos='absolute'
-			left={`${RUNE_SQUARE_SIZE * left}px`}
-			top={`${RUNE_SQUARE_SIZE * top}px`}
+			left={`${size * y}px`}
+			top={`${size * x}px`}
 		/>
 	)
 }

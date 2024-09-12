@@ -2,7 +2,7 @@ import { type CategoryKey } from '~/types/categories'
 
 export type RuneData = RuneInternal<RuneName>
 
-type RuneName = (typeof runeArray)[number]['name']
+export type RuneName = (typeof runeArray)[number]['name']
 
 type RuneInternal<T extends string = string> = {
 	name: T
@@ -36,6 +36,7 @@ const runeArray = [
 		colour: 'green',
 		shape: [
 			['X', 'X', 'X', 'X'],
+			[' ', ' ', 'X', ' '],
 			[' ', ' ', 'X', ' ']
 		]
 	},
@@ -50,6 +51,49 @@ const runeArray = [
 			[' ', ' ', 'X'],
 			[' ', 'X', 'X']
 		]
+	},
+	{
+		name: 'five',
+		category: 'elemental-earth',
+		colour: 'yellow',
+		shape: [
+			[' ', 'X', ' ', 'X'],
+			[' ', 'X', 'X', 'X'],
+			['X', 'X', ' ', 'X']
+		]
+	},
+	{
+		name: 'six',
+		category: 'elemental-earth',
+		colour: 'yellow',
+		shape: [
+			['X', 'X', 'X', 'X'],
+			['X', 'X', 'X', 'X'],
+			['X', 'X', 'X', 'X']
+		]
+	},
+	{
+		name: 'seven',
+		category: 'elemental-earth',
+		colour: 'yellow',
+		shape: [
+			['X', 'X', 'X', 'X'],
+			['X', ' ', ' ', ' '],
+			['X', 'X', 'X', ' ']
+		]
+	},
+	{
+		name: 'eight',
+		category: 'elemental-earth',
+		colour: 'yellow',
+		shape: [
+			[' ', 'X', ' ', 'X'],
+			[' ', 'X', 'X', 'X'],
+			['X', 'X', ' ', 'X'],
+			['X', ' ', ' ', 'X'],
+			['X', ' ', ' ', 'X'],
+			['X', 'X', ' ', 'X']
+		]
 	}
 ] as const satisfies RuneInternal[]
 
@@ -60,4 +104,8 @@ export function getRune(runeName: RuneName) {
 	if (!runeMap.has(runeName)) throw new Error(`Rune not found: ${runeName}`)
 	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 	return runeMap.get(runeName)!
+}
+
+export function getAllRuneNames() {
+	return runeArray.map(({ name }) => name)
 }

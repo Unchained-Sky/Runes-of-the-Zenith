@@ -1,10 +1,29 @@
-import { useDroppable } from '@dnd-kit/core'
-import { Box } from '@mantine/core'
-import { TABLET_SQUARE_SIZE } from '~/data/constants'
+import { useDndMonitor } from '@dnd-kit/core'
+import { Box, Portal } from '@mantine/core'
+import { type ForwardedRef, forwardRef, useRef } from 'react'
+import { TABLE_SCALE, TABLET_SQUARE_SIZE } from '~/data/constants'
 import { useRuneTabletStore } from '~/state/useRuneTabletStore'
+import { type MapKey, type MapValue } from '~/utils/mapTypes'
+import { typedObject } from '~/utils/typedObject'
+import testForwardRef from '~/utils/typeGuardForwardRef'
+import { testDataIsRune, testDataIsTableSquare } from '~/utils/typeGuardRuneTablet'
+import DraggableRune from './DraggableRune'
+import TabletSquare from './TabletSquare'
+
+export type TabletCords = {
+	x: number
+	y: number
+}
+
+export type SquareRefMap = Map<`${number}-${number}`, HTMLDivElement>
 
 export default function Tablet() {
 	const tabletShape = useRuneTabletStore(state => state.tablet)
+
+	useDropRune()
+	usePickupRune()
+
+	const squareRefs = useRef(new Map<MapKey<SquareRefMap>, MapValue<SquareRefMap>>())
 
 	return (
 		<Box
@@ -15,41 +34,81 @@ export default function Tablet() {
 			{
 				tabletShape.map((row, rowIndex) => {
 					return row.map((square, columnIndex) => {
-						if (square === ' ') return null
+						if (square.state === ' ') return null
 						return (
 							<TabletSquare
 								key={`${rowIndex}-${columnIndex}`}
-								left={columnIndex}
-								top={rowIndex}
+								x={rowIndex}
+								y={columnIndex}
+								ref={squareRefs}
 							/>
 						)
 					})
 				})
 			}
+
+			<SlottedRunes ref={squareRefs} />
 		</Box>
 	)
 }
 
-type TabletSquareProps = {
-	left: number
-	top: number
-}
+function useDropRune() {
+	const placeRune = useRuneTabletStore(state => state.placeRune)
 
-function TabletSquare({ left, top }: TabletSquareProps) {
-	const { isOver, setNodeRef } = useDroppable({
-		id: `tablet-${left}-${top}`
+	useDndMonitor({
+		onDragEnd: event => {
+			if (!event.over) return
+			const draggableRuneData = event.active.data.current
+			if (!testDataIsRune(draggableRuneData)) return
+
+			const droppableTabletSquareData = event.over.data.current
+			if (!testDataIsTableSquare(droppableTabletSquareData)) return
+
+			placeRune(draggableRuneData.runeName, droppableTabletSquareData)
+		}
 	})
-
-	return (
-		<Box
-			ref={setNodeRef}
-			bg={isOver ? 'green' : 'dark'}
-			h={`${TABLET_SQUARE_SIZE}px`}
-			w={`${TABLET_SQUARE_SIZE}px`}
-			bd='black 1px solid'
-			pos='absolute'
-			left={`${TABLET_SQUARE_SIZE * left}px`}
-			top={`${TABLET_SQUARE_SIZE * top}px`}
-		/>
-	)
 }
+
+function usePickupRune() {
+	const tabletRunes = useRuneTabletStore(state => state.runes)
+	const pickupRune = useRuneTabletStore(state => state.pickupRune)
+	const dropRune = useRuneTabletStore(state => state.dropRune)
+
+	useDndMonitor({
+		onDragStart: event => {
+			const draggableRuneData = event.active.data.current
+			if (!testDataIsRune(draggableRuneData)) return
+
+			const { runeName } = draggableRuneData
+			const runeState = tabletRunes[runeName]
+			if (runeState?.state !== 'slotted') return
+
+			pickupRune(runeName)
+		},
+		onDragEnd: event => {
+			const draggableRuneData = event.active.data.current
+			if (!testDataIsRune(draggableRuneData)) return
+
+			const { runeName } = draggableRuneData
+			if (!event.over) {
+				dropRune(runeName)
+			}
+		}
+	})
+}
+
+const SlottedRunes = forwardRef(function SlottedRunes(_props, ref: ForwardedRef<SquareRefMap>) {
+	const runes = useRuneTabletStore(state => state.runes)
+
+	if (!testForwardRef(ref)) return null
+
+	return typedObject.entries(runes).map(([runeName, runeState]) => {
+		if (runeState.state !== 'slotted' && runeState.state !== 'hovering') return null
+		const squareNode = ref.current.get(`${runeState.data.x}-${runeState.data.y}`)
+		return (
+			<Portal key={`${runeName}-${runeState.data.x},${runeState.data.y}`} target={squareNode}>
+				<DraggableRune runeName={runeName} scale={TABLE_SCALE} />
+			</Portal>
+		)
+	})
+})
