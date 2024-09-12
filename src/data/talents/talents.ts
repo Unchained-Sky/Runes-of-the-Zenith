@@ -1,4 +1,4 @@
-import { type NodeCategories, type NodeCategory } from '~/types/categories'
+import { type NodeCategories, type NodeCategory } from '~/data/categories'
 import magicTalentNodes from './magic/magicTalents'
 import physicalTalentNodes from './physical/physicalTalents'
 

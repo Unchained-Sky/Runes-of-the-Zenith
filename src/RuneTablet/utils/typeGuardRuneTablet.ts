@@ -1,5 +1,5 @@
-import { type DraggableRuneData } from '~/components/RuneTablet/DraggableRune'
-import { type DroppableTabletSquareData } from '~/components/RuneTablet/TabletSquare'
+import { type DraggableRuneData } from '~/RuneTablet/components/DraggableRune'
+import { type DroppableTabletSquareData } from '~/RuneTablet/components/TabletSquare'
 
 export function testDataIsRune(current: Record<string, unknown> = {}): current is DraggableRuneData {
 	return Object.hasOwn(current, 'runeName')

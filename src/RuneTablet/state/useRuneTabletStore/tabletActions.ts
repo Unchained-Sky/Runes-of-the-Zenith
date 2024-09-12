@@ -1,8 +1,8 @@
-import { type TabletCords } from '~/components/RuneTablet/Tablet'
 import { getRune, type RuneName } from '~/data/runes'
-import { getTabletShape } from '~/utils/getTableSize'
+import { type TabletCords } from '~/RuneTablet/components/Tablet'
+import { getTabletShape } from '~/RuneTablet/utils/getTableSize'
+import { createActionName, type Slice } from '~/utils/storeTypes'
 import { typedObject } from '~/utils/typedObject'
-import { createActionName, type Slice } from '../storeTypes'
 import { type RuneTabletActions, type RuneTabletSquareData, type RuneTabletStore } from './useRuneTabletStore'
 
 export type TabletActions = {

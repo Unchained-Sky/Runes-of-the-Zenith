@@ -1,4 +1,4 @@
-import { type CategoryKey } from '~/types/categories'
+import { type CategoryKey } from './categories'
 
 export type RuneData = RuneInternal<RuneName>
 

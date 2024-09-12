@@ -34,17 +34,13 @@ export default function TalentNode({ nodeData: { nodeType, nodeText, pos } }: Ta
 			<Text
 				size='lg'
 				c={nodeTypeTextColour[nodeType]}
-				style={{
-					textAlign: 'center'
-				}}
+				ta='center'
 			>
 				{nodeType}
 			</Text>
 			<Text
 				size='sm'
-				style={{
-					textAlign: 'center'
-				}}
+				ta='center'
 			>
 				{nodeText}
 			</Text>

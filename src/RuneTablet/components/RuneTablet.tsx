@@ -1,9 +1,9 @@
 import { DndContext, DragOverlay } from '@dnd-kit/core'
 import { restrictToWindowEdges } from '@dnd-kit/modifiers'
 import { Group, NumberInput, Stack } from '@mantine/core'
-import Pouch from '~/components/RuneTablet/Pouch'
-import Tablet from '~/components/RuneTablet/Tablet'
-import { useRuneTabletStore } from '~/state/useRuneTabletStore'
+import Pouch from '~/RuneTablet/components/Pouch'
+import Tablet from '~/RuneTablet/components/Tablet'
+import { useRuneTabletStore } from '~/RuneTablet/state/useRuneTabletStore'
 
 export default function RuneTablet() {
 	const setSize = useRuneTabletStore(state => state.setSize)
