@@ -1,39 +1,47 @@
 {
-  "name": "project-no-dice",
+  "name": "runes-of-the-zenith",
   "private": true,
-  "version": "0.0.0",
+  "sideEffects": false,
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --open",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "typescheck": "tsc --project tsconfig.app.json",
-    "preview": "vite preview"
+    "dev": "remix vite:dev --open",
+    "build": "remix vite:build",
+    "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint .",
+    "typescheck": "tsc",
+    "start": "remix-serve ./build/server/index.js",
+    "typecheck": "tsc"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.1.0",
     "@dnd-kit/modifiers": "^7.0.0",
-    "@mantine/core": "^7.12.1",
-    "@mantine/hooks": "^7.12.1",
+    "@mantine/core": "^7.12.2",
+    "@mantine/hooks": "^7.12.2",
+    "@remix-run/node": "^2.12.1",
+    "@remix-run/react": "^2.12.1",
+    "@remix-run/serve": "^2.12.1",
     "@unchainedsky/react-drawline": "^1.2.1",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-router-dom": "^6.26.1",
+    "isbot": "^4.1.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "react-zoom-pan-pinch": "^3.6.1",
     "zustand": "^4.5.5"
   },
   "devDependencies": {
     "@nabla/vite-plugin-eslint": "^2.0.4",
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
-    "@unchainedsky/eslint-config": "^2.1.1",
-    "@vitejs/plugin-react": "^4.3.1",
-    "eslint": "^9.9.0",
-    "postcss": "^8.4.41",
+    "@remix-run/dev": "^2.12.1",
+    "@types/react": "^18.2.20",
+    "@types/react-dom": "^18.2.7",
+    "@unchainedsky/eslint-config": "^2.2.0",
+    "eslint": "^9.11.1",
+    "postcss": "^8.4.47",
     "postcss-preset-mantine": "^1.17.0",
     "postcss-simple-vars": "^7.0.1",
-    "typescript": "^5.5.3",
-    "vite": "^5.4.1",
-    "vite-tsconfig-paths": "^5.0.1"
+    "typescript": "^5.1.6",
+    "vite": "^5.1.0",
+    "vite-tsconfig-paths": "^4.2.1"
+  },
+  "engines": {
+    "node": ">=20.0.0"
   }
 }
