@@ -1,6 +1,6 @@
 import { getAllRuneNames, type RuneName } from '~/data/runes'
-import { createActionName, type Slice } from '~/utils/storeTypes'
-import { typedObject } from '~/utils/typedObject'
+import { createActionName, type Slice } from '~/types/storeTypes'
+import { typedObject } from '~/types/typedObject'
 import { type RuneTabletActions, type RuneTabletRuneState, type RuneTabletStore } from './useRuneTabletStore'
 
 export type RuneActions = {

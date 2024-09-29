@@ -31,10 +31,10 @@
     "baseUrl": ".",
     "paths": {
       "~/RT/*": [
-        "./app/RuneTablet/*"
+        "./app/pages/RuneTablet/*"
       ],
       "~/TT/*": [
-        "./app/TalentTree/*"
+        "./app/pages/TalentTree/*"
       ],
       "~/components/*": [
         "./app/components/*"
@@ -42,9 +42,12 @@
       "~/data/*": [
         "./app/data/*"
       ],
+      "~/types/*": [
+        "./app/types/*"
+      ],
       "~/utils/*": [
         "./app/utils/*"
-      ]
+      ],
     },
     // Vite takes care of building everything, not tsc.
     "noEmit": true

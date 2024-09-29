@@ -3,7 +3,7 @@ import { type ForwardedRef, forwardRef } from 'react'
 import { TABLE_SCALE } from '~/RT/data/constants'
 import { useRuneTabletStore } from '~/RT/state/useRuneTabletStore'
 import testForwardRef from '~/RT/utils/typeGuardForwardRef'
-import { typedObject } from '~/utils/typedObject'
+import { typedObject } from '~/types/typedObject'
 import DraggableRune from './DraggableRune'
 import { type SquareRefMap } from './Tablet'
 
