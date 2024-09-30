@@ -1,10 +1,11 @@
-import { ColorSchemeScript } from '@mantine/core'
+import { Box, ColorSchemeScript, Group } from '@mantine/core'
 import { type LinksFunction } from '@remix-run/node'
 import { Links, Meta, Outlet, Scripts, ScrollRestoration } from '@remix-run/react'
 import { type ReactNode } from 'react'
-import Mantine from './components/Mantine'
+import Mantine, { defaultColorScheme } from '~/components/Mantine'
+import Navbar from '~/components/Navbar'
+import './styles/font.css'
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const links: LinksFunction = () => []
 
 export function Layout({ children }: { children: ReactNode }) {
@@ -15,7 +16,7 @@ export function Layout({ children }: { children: ReactNode }) {
 				<meta name='viewport' content='width=device-width, initial-scale=1' />
 				<Meta />
 				<Links />
-				<ColorSchemeScript defaultColorScheme='dark' />
+				<ColorSchemeScript defaultColorScheme={defaultColorScheme} />
 			</head>
 			<body>
 				<Mantine>
@@ -29,5 +30,12 @@ export function Layout({ children }: { children: ReactNode }) {
 }
 
 export default function App() {
-	return <Outlet />
+	return (
+		<Group>
+			<Navbar />
+			<Box component='main' flex='1'>
+				<Outlet />
+			</Box>
+		</Group>
+	)
 }
