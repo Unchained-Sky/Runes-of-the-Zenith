@@ -1,8 +1,9 @@
-import { Box, Collapse, type ElementProps, Group, type PolymorphicComponentProps, rem, ThemeIcon, UnstyledButton, type UnstyledButtonProps } from '@mantine/core'
+import { Box, Collapse, type ElementProps, Group, type PolymorphicComponentProps, ThemeIcon, UnstyledButton, type UnstyledButtonProps } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { Link } from '@remix-run/react'
 import { type RemixLinkProps } from '@remix-run/react/dist/components'
 import { IconChevronRight } from '@tabler/icons-react'
+import { iconSize } from '~/utils/iconSize'
 import classes from './LinkGroup.module.css'
 import { type NavLink, type NestedLink } from './navbarLinks'
 
@@ -33,7 +34,7 @@ export default function LinkGroup(navLink: NavLink) {
 				<Group justify='space-between' gap={0}>
 					<Group align='center' gap={0}>
 						<ThemeIcon>
-							<Icon width={rem(18)} height={rem(18)} />
+							<Icon {...iconSize(18)} />
 						</ThemeIcon>
 						<Box ml='md'>{label}</Box>
 					</Group>
@@ -41,8 +42,7 @@ export default function LinkGroup(navLink: NavLink) {
 						isNestedLink(navLink) && (
 							<IconChevronRight
 								stroke={1.5}
-								width={rem(16)}
-								height={rem(16)}
+								{...iconSize(16)}
 								style={{
 									transform: opened ? 'rotate(-90deg)' : 'none',
 									transition: 'transform 200ms ease'

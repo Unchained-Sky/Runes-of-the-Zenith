@@ -1,28 +1,13 @@
 import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'
 import { type Database } from './databaseTypes'
+import { getSupabaseEnv } from './supabaseEnv'
 
-type Options = {
-	supabaseUrl?: string
-	supabaseAnonKey?: string
-}
-
-export function getServerClient(request: Request, options?: Options) {
+export function getServerClient(request: Request) {
 	const headers = new Headers()
 
-	if (!process.env.SUPABASE_URL) {
-		throw new Error('SUPABASE_URL env is missing')
-	}
+	const { SUPABASE_URL, SUPABASE_ANON_KEY } = getSupabaseEnv()
 
-	if (!process.env.SUPABASE_ANON_KEY) {
-		throw new Error('SUPABASE_ANON_KEY env is missing')
-	}
-
-	const env = {
-		SUPABASE_URL: options?.supabaseUrl ?? process.env.SUPABASE_URL,
-		SUPABASE_ANON_KEY: options?.supabaseAnonKey ?? process.env.SUPABASE_ANON_KEY
-	} as const
-
-	const supabase = createServerClient<Database>(env.SUPABASE_URL, env.SUPABASE_ANON_KEY, {
+	const supabase = createServerClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY, {
 		cookies: {
 			getAll() {
 				return parseCookieHeader(request.headers.get('Cookie') ?? '')

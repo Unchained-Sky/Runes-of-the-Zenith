@@ -42,6 +42,9 @@
       "~/data/*": [
         "./app/data/*"
       ],
+      "~/supabase/*": [
+        "./app/supabase/*"
+      ],
       "~/types/*": [
         "./app/types/*"
       ],
