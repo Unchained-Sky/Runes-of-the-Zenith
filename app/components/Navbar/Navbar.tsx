@@ -13,18 +13,23 @@ type NavbarProps = {
 
 export default function Navbar({ userIdentity }: NavbarProps) {
 	return (
-		<Stack
-			component='nav'
-			h='100vh'
-			w={300}
-			p='md'
-			pb={0}
-			bg='dark.6'
-		>
-			<Header />
-			<Links />
-			<User userIdentity={userIdentity} />
-		</Stack>
+		<>
+			<Stack
+				component='nav'
+				h='100vh'
+				w={300}
+				p='md'
+				pb={0}
+				bg='dark.6'
+				pos='fixed'
+			>
+				<Header />
+				<Links />
+				<User userIdentity={userIdentity} />
+			</Stack>
+
+			<Box h='100vh' w={300} />
+		</>
 	)
 }
 

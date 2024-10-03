@@ -39,9 +39,9 @@ export default function App() {
 	const { userIdentity } = useLoaderData<typeof loader>()
 
 	return (
-		<Group>
+		<Group align='flex-start'>
 			<Navbar userIdentity={userIdentity} />
-			<Box component='main' flex='1'>
+			<Box component='main' flex='1' pt='md'>
 				<Outlet />
 			</Box>
 		</Group>
