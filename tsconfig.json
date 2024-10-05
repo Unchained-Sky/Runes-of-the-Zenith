@@ -43,7 +43,7 @@
         "./app/data/*"
       ],
       "~/supabase/*": [
-        "./app/supabase/*"
+        "./app/.server/supabase/*"
       ],
       "~/types/*": [
         "./app/types/*"

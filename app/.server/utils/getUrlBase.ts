@@ -1,4 +1,3 @@
-/** Must be used on the server */
 export default function getUrlBase() {
 	const isServer = typeof window === 'undefined'
 	if (!isServer) throw new Error('getUrlBase() must be used on the server')

@@ -2,7 +2,6 @@ import { ActionIcon, Group, rem, Stack, TextInput, Title } from '@mantine/core'
 import { type ActionFunctionArgs, type LoaderFunctionArgs } from '@remix-run/node'
 import { Form, json, redirect, useActionData, type MetaFunction } from '@remix-run/react'
 import { IconCirclePlusFilled } from '@tabler/icons-react'
-import { getServerClient } from '~/supabase/getServerClient'
 import { getUserId } from '~/supabase/getUserId'
 import { requireAccount } from '~/supabase/requireAccount'
 
@@ -27,10 +26,9 @@ export async function action({ request }: ActionFunctionArgs) {
 		}
 	}
 
-	const { supabase, headers } = getServerClient(request)
-	const { userId } = await getUserId({ supabase, headers })
+	const { supabase, headers, userId } = await getUserId(request)
 	const { data, error } = await supabase
-		.from('campaign_owner')
+		.from('campaign_info')
 		.insert({ campaign_name: campaignName, user_id: userId })
 		.select()
 	if (error) throw new Error(error.message, { cause: error })

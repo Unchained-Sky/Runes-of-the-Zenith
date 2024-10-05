@@ -26,7 +26,7 @@ export async function requireAccess<T extends TableName, K extends keyof Column<
 }: RequireAccessOptions<T, K>) {
 	const { supabase, headers } = await requireAccount(request)
 
-	const { userId } = await getUserId({ supabase, headers })
+	const { userId } = await getUserId(supabase)
 
 	const { data, error } = await supabase
 		.from(table)

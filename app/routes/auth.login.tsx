@@ -1,8 +1,8 @@
 import { type ActionFunctionArgs } from '@remix-run/node'
 import { redirect } from '@remix-run/react'
 import { type Provider } from '@supabase/supabase-js'
-import { getServerClient } from 'app/supabase/getServerClient'
-import getUrlBase from '~/utils/getUrlBase'
+import getUrlBase from 'app/.server/utils/getUrlBase'
+import { getServerClient } from '~/supabase/getServerClient'
 
 export async function action({ request }: ActionFunctionArgs) {
 	const formData = await request.formData()

@@ -27,7 +27,7 @@ export type Database = {
             foreignKeyName: "campaign_characters_campaign_id_fkey"
             columns: ["campaign_id"]
             isOneToOne: false
-            referencedRelation: "campaign_owner"
+            referencedRelation: "campaign_info"
             referencedColumns: ["campaign_id"]
           },
           {
@@ -39,20 +39,23 @@ export type Database = {
           },
         ]
       }
-      campaign_owner: {
+      campaign_info: {
         Row: {
           campaign_id: number
           campaign_name: string
+          invite_id: string
           user_id: string
         }
         Insert: {
           campaign_id?: number
           campaign_name: string
+          invite_id?: string
           user_id: string
         }
         Update: {
           campaign_id?: number
           campaign_name?: string
+          invite_id?: string
           user_id?: string
         }
         Relationships: [
@@ -86,7 +89,7 @@ export type Database = {
             foreignKeyName: "campaign_members_campaign_id_fkey"
             columns: ["campaign_id"]
             isOneToOne: false
-            referencedRelation: "campaign_owner"
+            referencedRelation: "campaign_info"
             referencedColumns: ["campaign_id"]
           },
           {
@@ -125,7 +128,7 @@ export type Database = {
             foreignKeyName: "characters_campaign_id_fkey"
             columns: ["campaign_id"]
             isOneToOne: false
-            referencedRelation: "campaign_owner"
+            referencedRelation: "campaign_info"
             referencedColumns: ["campaign_id"]
           },
           {

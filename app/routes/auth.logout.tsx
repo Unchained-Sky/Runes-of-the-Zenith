@@ -1,5 +1,5 @@
 import { type ActionFunctionArgs, redirect } from '@remix-run/node'
-import { getServerClient } from 'app/supabase/getServerClient'
+import { getServerClient } from '~/supabase/getServerClient'
 
 export async function action({ request }: ActionFunctionArgs) {
 	const formData = await request.formData()
