@@ -2,7 +2,6 @@ import { Button, Stack, Title } from '@mantine/core'
 import { type MetaFunction } from '@remix-run/node'
 import { Link } from '@remix-run/react'
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const meta: MetaFunction = () => {
 	return [
 		{ title: 'New Remix App' },

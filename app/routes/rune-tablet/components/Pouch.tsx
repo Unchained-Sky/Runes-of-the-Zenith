@@ -1,7 +1,7 @@
 import { Button, Stack } from '@mantine/core'
 import { RUNE_SQUARE_SIZE } from '~/RT/data/constants'
 import { useRuneTabletStore } from '~/RT/state/useRuneTabletStore'
-import { typedObject } from '~/utils/typedObject'
+import { typedObject } from '~/types/typedObject'
 import DraggableRune from './DraggableRune'
 
 export default function Pouch() {

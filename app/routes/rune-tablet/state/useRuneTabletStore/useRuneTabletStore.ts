@@ -1,8 +1,8 @@
 import { create } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
-import { type TabletCords } from '~/RT/components/Tablet'
 import { type RuneName } from '~/data/runes'
-import { persistStoreName } from '~/utils/storeTypes'
+import { type TabletCords } from '~/RT/components/Tablet'
+import { persistStoreName } from '~/types/storeTypes'
 import { createRuneActions, type RuneActions } from './runeActions'
 import { createTabletActions, type TabletActions } from './tabletActions'
 

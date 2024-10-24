@@ -4,7 +4,7 @@ import { TABLET_SQUARE_SIZE } from '~/RT/data/constants'
 import useDropRune from '~/RT/hooks/useDropRune'
 import usePickupRune from '~/RT/hooks/usePickupRune'
 import { useRuneTabletStore } from '~/RT/state/useRuneTabletStore'
-import { type MapKey, type MapValue } from '~/utils/mapTypes'
+import { type MapKey, type MapValue } from '~/types/mapTypes'
 import SlottedRunes from './SlottedRunes'
 import TabletSquare from './TabletSquare'
 

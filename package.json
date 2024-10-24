@@ -12,7 +12,9 @@
     "start": "remix-serve ./build/server/index.js",
     "typecheck": "tsc",
     "sst:deploy": "sst deploy",
-    "sst:dev": "sst dev"
+    "sst:dev": "sst dev",
+    "supabase:login": "supabase login",
+    "supabase:types": "supabase gen types typescript --project-id kttsshgvhhwzwjhwiesz > app/.server/supabase/databaseTypes.d.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.1.0",
@@ -22,6 +24,9 @@
     "@remix-run/node": "^2.12.1",
     "@remix-run/react": "^2.12.1",
     "@remix-run/serve": "^2.12.1",
+    "@supabase/ssr": "^0.5.1",
+    "@supabase/supabase-js": "^2.45.4",
+    "@tabler/icons-react": "^3.18.0",
     "@unchainedsky/react-drawline": "^1.2.1",
     "isbot": "^4.1.0",
     "react": "^18.2.0",
@@ -33,13 +38,15 @@
   "devDependencies": {
     "@nabla/vite-plugin-eslint": "^2.0.4",
     "@remix-run/dev": "^2.12.1",
+    "@types/node": "^22.7.4",
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.2.7",
-    "@unchainedsky/eslint-config": "^2.2.0",
+    "@unchainedsky/eslint-config": "^2.2.2",
     "eslint": "^9.11.1",
     "postcss": "^8.4.47",
     "postcss-preset-mantine": "^1.17.0",
     "postcss-simple-vars": "^7.0.1",
+    "supabase": "^1.200.3",
     "typescript": "^5.1.6",
     "vite": "^5.1.0",
     "vite-tsconfig-paths": "^4.2.1"
