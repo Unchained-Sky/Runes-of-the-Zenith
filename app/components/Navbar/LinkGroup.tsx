@@ -34,7 +34,7 @@ export default function LinkGroup(navLink: NavLink) {
 				<Group justify='space-between' gap={0}>
 					<Group align='center' gap={0}>
 						<ThemeIcon>
-							<Icon {...iconSize(18)} />
+							<Icon style={iconSize(18)} />
 						</ThemeIcon>
 						<Box ml='md'>{label}</Box>
 					</Group>
@@ -42,8 +42,8 @@ export default function LinkGroup(navLink: NavLink) {
 						isNestedLink(navLink) && (
 							<IconChevronRight
 								stroke={1.5}
-								{...iconSize(16)}
 								style={{
+									...iconSize(16),
 									transform: opened ? 'rotate(-90deg)' : 'none',
 									transition: 'transform 200ms ease'
 								}}

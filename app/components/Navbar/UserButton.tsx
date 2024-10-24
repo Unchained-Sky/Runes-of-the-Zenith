@@ -64,7 +64,7 @@ const User = forwardRef<HTMLButtonElement, UserProps>(function User({ toggle, us
 					</Text>
 				</Box>
 
-				<IconChevronRight stroke={1.5} {...iconSize(14)} />
+				<IconChevronRight stroke={1.5} style={iconSize(14)} />
 			</Group>
 		</UnstyledButton>
 	)
@@ -76,7 +76,7 @@ function MenuDropdown() {
 			<Menu.Label>Account</Menu.Label>
 			<Form method='POST' action='/auth/logout'>
 				<Menu.Item
-					leftSection={<IconUser {...iconSize(14)} />}
+					leftSection={<IconUser style={iconSize(14)} />}
 					type='submit'
 				>
 					Logout
