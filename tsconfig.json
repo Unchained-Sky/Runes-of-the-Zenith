@@ -31,10 +31,10 @@
     "baseUrl": ".",
     "paths": {
       "~/RT/*": [
-        "./app/pages/RuneTablet/*"
+        "./app/routes/rune-tablet/*"
       ],
       "~/TT/*": [
-        "./app/pages/TalentTree/*"
+        "./app/routes/talent-tree/*"
       ],
       "~/components/*": [
         "./app/components/*"
