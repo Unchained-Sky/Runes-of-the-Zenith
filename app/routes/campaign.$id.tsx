@@ -1,7 +1,7 @@
 import { Code, Group, Stack, Text, Title } from '@mantine/core'
 import { json, redirect, type LoaderFunctionArgs } from '@remix-run/node'
 import { useLoaderData, type MetaFunction } from '@remix-run/react'
-import { requireAccess } from '~/supabase/requireAccess'
+import { getServerClient } from '~/supabase/getServerClient'
 import { isNumberParam } from '~/utils/isNumberParam'
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
@@ -12,18 +12,14 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 
 export async function loader({ params, request }: LoaderFunctionArgs) {
 	const campaignId = isNumberParam(params.id, request.headers)
-	const { supabase, headers } = await requireAccess(request, {
-		table: 'campaign_info',
-		userColumn: 'user_id',
-		selectColumn: 'campaign_id',
-		selectValue: campaignId
-	})
+
+	const { supabase, headers } = getServerClient(request)
 
 	const { data, error } = await supabase
 		.from('campaign_info')
 		.select('campaign_name, invite_id')
 		.eq('campaign_id', campaignId)
-	if (error) throw redirect('/', { headers })
+	if (error || !data.length) throw redirect('/', { headers })
 
 	const { campaign_name, invite_id } = data[0]
 

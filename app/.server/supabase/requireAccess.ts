@@ -1,12 +1,12 @@
 import { redirect } from '@remix-run/react'
-import { type Database } from './databaseTypes'
+import { type Database, type Tables } from './databaseTypes'
 import { getUserId } from './getUserId'
 import { requireAccount } from './requireAccount'
 
 type TableName = keyof Database['public']['Tables']
 
 type Column<T extends TableName> = {
-	[K in T]: Database['public']['Tables'][T]['Row']
+	[K in T]: Tables<T>
 }[T]
 
 type RequireAccessOptions<T extends TableName, K extends keyof Column<T>> = {

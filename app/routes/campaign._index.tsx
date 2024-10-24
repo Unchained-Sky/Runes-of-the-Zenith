@@ -1,4 +1,4 @@
-import { Button, Card, Group, rem, Stack, Text, Title } from '@mantine/core'
+import { Button, Card, Group, rem, Stack, Title } from '@mantine/core'
 import { type LoaderFunctionArgs } from '@remix-run/node'
 import { json, Link, redirect, useLoaderData, type MetaFunction } from '@remix-run/react'
 import { getUserId } from '~/supabase/getUserId'
@@ -15,17 +15,27 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 	const { userId } = await getUserId(supabase)
 
-	const { data: gmCampaigns, error } = await supabase
+	const { data: gmCampaigns, error: gmError } = await supabase
 		.from('campaign_info')
 		.select('campaign_id, campaign_name')
 		.eq('user_id', userId)
-	if (error) throw redirect('/', { headers })
+	if (gmError) throw redirect('/', { headers })
 
-	return json({ gmCampaigns }, { headers })
+	const { data: playerCampaigns, error: playerError } = await supabase
+		.from('campaign_users')
+		.select(`
+			campaign_id,
+			campaign_info (
+				campaign_name
+			)
+			`)
+	if (playerError) throw redirect('/', { headers })
+
+	return json({ gmCampaigns, playerCampaigns }, { headers })
 }
 
 export default function Campaigns() {
-	const { gmCampaigns } = useLoaderData<typeof loader>()
+	const { gmCampaigns, playerCampaigns } = useLoaderData<typeof loader>()
 
 	return (
 		<Stack>
@@ -44,7 +54,17 @@ export default function Campaigns() {
 
 			<Title order={2}>Player</Title>
 			<Group>
-				<Text>None</Text>
+				{
+					playerCampaigns.map(({ campaign_id, campaign_info }) => {
+						return (
+							<CampaignCard
+								key={campaign_id}
+								campaign_id={campaign_id}
+								campaign_name={campaign_info?.campaign_name ?? ''}
+							/>
+						)
+					})
+				}
 			</Group>
 		</Stack>
 	)

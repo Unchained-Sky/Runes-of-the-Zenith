@@ -1,8 +1,9 @@
 import { Button, Stack, Text, Title } from '@mantine/core'
 import { json, redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from '@remix-run/node'
 import { Form, useLoaderData } from '@remix-run/react'
+import { type SupabaseClient } from '@supabase/supabase-js'
 import { createHash } from 'node:crypto'
-import { type Database } from '~/supabase/databaseTypes'
+import { type Tables } from '~/supabase/databaseTypes'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { getUserId } from '~/supabase/getUserId'
 import { requireAccount } from '~/supabase/requireAccount'
@@ -11,10 +12,12 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 	const inviteId = params.id
 	if (!inviteId) throw redirect('/campaign', { headers: request.headers })
 
-	const { headers } = await requireAccount(request)
+	const { supabase, headers } = await requireAccount(request)
+
+	await alreadyInCampaign(inviteId, supabase, headers)
 
 	const { data, error } = await getCampaignInfo(inviteId, 'campaign_name')
-	if (error || !data || !data.length) throw redirect('/', { headers })
+	if (error || !data || !data.length) throw redirect('/campaign', { headers })
 
 	return json({ campaignName: data[0].campaign_name }, { headers })
 }
@@ -24,6 +27,8 @@ export async function action({ params, request }: ActionFunctionArgs) {
 	if (!inviteId) throw redirect('/campaign', { headers: request.headers })
 
 	const { supabase, headers } = await requireAccount(request)
+
+	await alreadyInCampaign(inviteId, supabase, headers)
 
 	const { userId } = await getUserId(supabase)
 
@@ -58,7 +63,15 @@ export default function CampaignJoinPage() {
 	)
 }
 
-type CampaignInfoColumn = Database['public']['Tables']['campaign_info']['Row']
+async function alreadyInCampaign(inviteId: string, supabase: SupabaseClient, headers: Headers) {
+	const { data } = await supabase
+		.from('campaign_info')
+		.select('campaign_id')
+		.eq('invite_id', inviteId)
+	if (data?.length) throw redirect(`/campaign/${data[0].campaign_id}`, { headers })
+}
+
+type CampaignInfoColumn = Tables<'campaign_info'>
 type GetCampaignInfoReturn<T extends keyof CampaignInfoColumn> = {
 	data: {
 		[K in T]: CampaignInfoColumn[K]

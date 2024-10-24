@@ -13,4 +13,4 @@ __TEMP
 .sst
 
 # supabase types
-app/supabase/databaseTypes.d.ts
+app/.server/supabase/databaseTypes.d.ts
