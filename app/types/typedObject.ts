@@ -29,6 +29,17 @@ type Entry<T extends object> = T extends readonly [unknown, ...unknown[]]
 		? [`${number}`, U]
 		: ObjectEntry<T>
 
+type Merge<T1, T2> = Omit<T1, keyof T2> & T2
+
+type MergeArrayOfObjects<
+	TArr extends readonly object[],
+	T1 = object
+> = TArr extends [
+	infer T2 extends object,
+	...infer TRest extends object[]
+] ? MergeArrayOfObjects<TRest, Merge<T1, T2>>
+	: T1
+
 export const typedObject = {
 	keys: <T extends object>(object: T): ObjectKeys<T> => Object.keys(object) as ObjectKeys<T>,
 	entries: <T extends object>(object: T) => Object.entries(object) as unknown as ReadonlyArray<Entry<T>>,
@@ -36,5 +47,6 @@ export const typedObject = {
 		entries: T
 	): { [K in T[number] as K[0]]: K[1] } => {
 		return Object.fromEntries(entries) as { [K in T[number] as K[0]]: K[1] }
-	}
+	},
+	assign: <TArr extends readonly object[]>(...objects: TArr) => Object.assign({}, ...objects) as MergeArrayOfObjects<TArr>
 } as const
