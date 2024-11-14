@@ -1,8 +1,14 @@
 import { Stack, Title } from '@mantine/core'
-import { json, redirect, type LoaderFunctionArgs } from '@remix-run/node'
+import { json, redirect, type LoaderFunctionArgs, type MetaFunction } from '@remix-run/node'
 import { useLoaderData } from '@remix-run/react'
 import { getServerClient } from '~/supabase/getServerClient'
 import { isNumberParam } from '~/utils/isNumberParam'
+
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+	return [
+		{ title: data?.characterName ?? 'Character' }
+	]
+}
 
 export async function loader({ params, request }: LoaderFunctionArgs) {
 	const characterId = isNumberParam(params.id, request.headers)

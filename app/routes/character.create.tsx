@@ -1,8 +1,14 @@
 import { ActionIcon, Group, rem, Stack, TextInput, Title } from '@mantine/core'
-import { type ActionFunctionArgs, json, type LoaderFunctionArgs } from '@remix-run/node'
+import { type ActionFunctionArgs, json, type LoaderFunctionArgs, type MetaFunction } from '@remix-run/node'
 import { Form, redirect, useActionData } from '@remix-run/react'
 import { IconCirclePlusFilled } from '@tabler/icons-react'
 import { requireAccount } from '~/supabase/requireAccount'
+
+export const meta: MetaFunction = () => {
+	return [
+		{ title: 'Create Character' }
+	]
+}
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const { headers } = await requireAccount(request)

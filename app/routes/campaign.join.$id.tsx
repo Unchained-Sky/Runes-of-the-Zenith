@@ -1,5 +1,5 @@
 import { Button, Stack, Text, Title } from '@mantine/core'
-import { json, redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from '@remix-run/node'
+import { json, redirect, type ActionFunctionArgs, type LoaderFunctionArgs, type MetaFunction } from '@remix-run/node'
 import { Form, useLoaderData } from '@remix-run/react'
 import { type SupabaseClient } from '@supabase/supabase-js'
 import { createHash } from 'node:crypto'
@@ -7,6 +7,12 @@ import { type Tables } from '~/supabase/databaseTypes'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { getUserId } from '~/supabase/getUserId'
 import { requireAccount } from '~/supabase/requireAccount'
+
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+	return [
+		{ title: data?.campaignName ?? 'Campaign' }
+	]
+}
 
 export async function loader({ params, request }: LoaderFunctionArgs) {
 	const inviteId = params.id

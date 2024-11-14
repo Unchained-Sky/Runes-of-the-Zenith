@@ -1,5 +1,12 @@
 import { Button, Stack, Title } from '@mantine/core'
+import { type MetaFunction } from '@remix-run/node'
 import { Form } from '@remix-run/react'
+
+export const meta: MetaFunction = () => {
+	return [
+		{ title: 'Login' }
+	]
+}
 
 export default function LoginPage() {
 	return (

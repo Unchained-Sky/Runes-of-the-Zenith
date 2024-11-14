@@ -1,8 +1,14 @@
 import { Button, Card, Group, rem, Stack, Title } from '@mantine/core'
-import { type LoaderFunctionArgs } from '@remix-run/node'
+import { type LoaderFunctionArgs, type MetaFunction } from '@remix-run/node'
 import { json, Link, redirect, useLoaderData } from '@remix-run/react'
 import { getUserId } from '~/supabase/getUserId'
 import { requireAccount } from '~/supabase/requireAccount'
+
+export const meta: MetaFunction = () => {
+	return [
+		{ title: 'My Characters' }
+	]
+}
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const { supabase, headers } = await requireAccount(request)
