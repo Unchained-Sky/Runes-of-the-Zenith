@@ -28,7 +28,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	}
 
 	const { data, error } = await supabase
-		.from('characters')
+		.from('character_info')
 		.insert({ character_name: characterName })
 		.select()
 	if (error) throw new Error(error.message, { cause: error })

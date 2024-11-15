@@ -16,7 +16,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	const { userId } = await getUserId(supabase)
 
 	const { data, error } = await supabase
-		.from('characters')
+		.from('character_info')
 		.select('character_id, character_name')
 		.eq('user_id', userId)
 	if (error) throw redirect('/', { headers })
