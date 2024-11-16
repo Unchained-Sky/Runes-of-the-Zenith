@@ -1,5 +1,4 @@
 import { Box, Code, Group, rem, ScrollArea, Stack, Text } from '@mantine/core'
-import { type UserIdentityData } from '~/supabase/getUserIdentity'
 import LinkGroup from './LinkGroup'
 import { navbarLinks } from './navbarLinks'
 import UserButton from './UserButton'
@@ -7,11 +6,7 @@ import UserButton from './UserButton'
 const mx = 'calc(var(--mantine-spacing-md) * -1)'
 const border = `${rem('1px')} solid var(--mantine-color-dark-4)`
 
-type NavbarProps = {
-	userIdentity: UserIdentityData
-}
-
-export default function Navbar({ userIdentity }: NavbarProps) {
+export default function Navbar() {
 	return (
 		<>
 			<Stack
@@ -25,7 +20,7 @@ export default function Navbar({ userIdentity }: NavbarProps) {
 			>
 				<Header />
 				<Links />
-				<User userIdentity={userIdentity} />
+				<User />
 			</Stack>
 
 			<Box h='100vh' w={300} />
@@ -63,11 +58,7 @@ function Links() {
 	)
 }
 
-type UserProps = {
-	userIdentity: UserIdentityData
-}
-
-function User({ userIdentity }: UserProps) {
+function User() {
 	return (
 		<Box
 			mx={mx}
@@ -75,7 +66,7 @@ function User({ userIdentity }: UserProps) {
 				borderTop: border
 			}}
 		>
-			<UserButton userIdentity={userIdentity} />
+			<UserButton />
 		</Box>
 	)
 }

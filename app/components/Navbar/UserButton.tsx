@@ -2,23 +2,21 @@ import { Avatar, Box, Group, Menu, Text, UnstyledButton } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { Form } from '@remix-run/react'
 import { IconChevronRight, IconUser } from '@tabler/icons-react'
-import { forwardRef } from 'react'
-import { type UserIdentityData } from '~/supabase/getUserIdentity'
+import { forwardRef, useContext } from 'react'
 import { iconSize } from '~/utils/iconSize'
+import { NavbarContext } from './NavbarContext'
 import classes from './UserButton.module.css'
 
-type UserButtonProps = {
-	userIdentity: UserIdentityData
-}
-
-export default function UserButton({ userIdentity }: UserButtonProps) {
+export default function UserButton() {
 	const [menuOpened, { toggle }] = useDisclosure(false)
+
+	const { userIdentity } = useContext(NavbarContext)
 
 	return userIdentity
 		? (
 			<Menu position='right-end' opened={menuOpened}>
 				<Menu.Target>
-					<User toggle={toggle} userIdentity={userIdentity} />
+					<User toggle={toggle} />
 				</Menu.Target>
 
 				<MenuDropdown />
@@ -38,10 +36,12 @@ function Login() {
 
 type UserProps = {
 	toggle: () => void
-	userIdentity: NonNullable<UserIdentityData>
 }
 
-const User = forwardRef<HTMLButtonElement, UserProps>(function User({ toggle, userIdentity }, ref) {
+const User = forwardRef<HTMLButtonElement, UserProps>(function User({ toggle }, ref) {
+	const { userIdentity, campaignCount, characterCount } = useContext(NavbarContext)
+	if (!userIdentity) return null
+
 	return (
 		<UnstyledButton className={classes.user} ref={ref} onClick={toggle}>
 			<Group>
@@ -56,11 +56,11 @@ const User = forwardRef<HTMLButtonElement, UserProps>(function User({ toggle, us
 					</Text>
 
 					<Text c='dimmed' size='xs'>
-						0 Campaigns
+						{campaignCount} Campaigns
 					</Text>
 
 					<Text c='dimmed' size='xs'>
-						0 Character
+						{characterCount} Character
 					</Text>
 				</Box>
 
