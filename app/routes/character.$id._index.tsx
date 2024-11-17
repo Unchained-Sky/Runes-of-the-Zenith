@@ -18,7 +18,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 	const serverClient = getServerClient(request)
 
 	const { character_name, campaign_id } = await getCharacterData('character_name, campaign_id', characterId, serverClient)
-	const { campaign_name } = await getCampaignData('campaign_name', campaign_id, serverClient)
+	const { campaign_name } = campaign_id ? await getCampaignData('campaign_name', campaign_id, serverClient) : { campaign_name: null }
 
 	return json({
 		characterName: character_name,
