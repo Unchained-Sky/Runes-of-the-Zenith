@@ -4,14 +4,32 @@ import { json, Links, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } 
 import { type ReactNode } from 'react'
 import Mantine, { defaultColorScheme } from '~/components/Mantine'
 import Navbar from '~/components/Navbar'
+import { getUserId } from '~/supabase/getUserId'
 import { getUserIdentity } from '~/supabase/getUserIdentity'
+import { NavbarContext } from './components/Navbar/NavbarContext'
 import './styles/font.css'
 
 export const links: LinksFunction = () => []
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-	const { userIdentity, headers } = await getUserIdentity(request)
-	return json({ userIdentity }, { headers })
+	const { userIdentity, supabase, headers } = await getUserIdentity(request)
+
+	const { count: campaignCount } = await supabase
+		.from('campaign_info')
+		.select('', { count: 'exact' })
+
+	const { userId } = await getUserId(supabase)
+
+	const { count: characterCount } = await supabase
+		.from('character_info')
+		.select('', { count: 'exact' })
+		.eq('user_id', userId)
+
+	return json({
+		userIdentity,
+		campaignCount: campaignCount ?? 0,
+		characterCount: characterCount ?? 0
+	}, { headers })
 }
 
 export function Layout({ children }: { children: ReactNode }) {
@@ -36,11 +54,14 @@ export function Layout({ children }: { children: ReactNode }) {
 }
 
 export default function App() {
-	const { userIdentity } = useLoaderData<typeof loader>()
+	const { userIdentity, campaignCount, characterCount } = useLoaderData<typeof loader>()
 
 	return (
 		<Group align='flex-start'>
-			<Navbar userIdentity={userIdentity} />
+			<NavbarContext.Provider value={{ userIdentity, campaignCount, characterCount }}>
+				<Navbar />
+			</NavbarContext.Provider>
+
 			<Box component='main' flex='1' pt='md'>
 				<Outlet />
 			</Box>

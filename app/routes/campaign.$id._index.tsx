@@ -1,6 +1,6 @@
-import { Code, Group, Stack, Text, Title } from '@mantine/core'
-import { json, redirect, type LoaderFunctionArgs } from '@remix-run/node'
-import { useLoaderData, type MetaFunction } from '@remix-run/react'
+import { Button, Code, Group, Stack, Text, Title } from '@mantine/core'
+import { json, type LoaderFunctionArgs } from '@remix-run/node'
+import { Link, redirect, useLoaderData, type MetaFunction } from '@remix-run/react'
 import { getServerClient } from '~/supabase/getServerClient'
 import { isNumberParam } from '~/utils/isNumberParam'
 
@@ -17,17 +17,22 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 
 	const { data, error } = await supabase
 		.from('campaign_info')
-		.select('campaign_name, invite_id')
+		.select(`
+			campaignName:campaign_name,
+			inviteId:invite_id,
+			characterInfo:character_info(
+				name:character_name,
+				id:character_id
+			)
+		`)
 		.eq('campaign_id', campaignId)
 	if (error || !data.length) throw redirect('/', { headers })
 
-	const { campaign_name, invite_id } = data[0]
-
-	return json({ campaignName: campaign_name, inviteId: invite_id }, { headers })
+	return json(data[0], { headers })
 }
 
 export default function CampaignPage() {
-	const { campaignName, inviteId } = useLoaderData<typeof loader>()
+	const { campaignName, characterInfo, inviteId } = useLoaderData<typeof loader>()
 
 	return (
 		<Stack>
@@ -35,6 +40,16 @@ export default function CampaignPage() {
 			<Group>
 				<Text>Invite URL</Text>
 				<Code>{`http://localhost:5173/campaign/join/${inviteId}`}</Code>
+			</Group>
+			<Title order={2}>Characters:</Title>
+			<Group>
+				{
+					characterInfo.length
+						? characterInfo.map(({ name, id }) => {
+							return <Button key={id} component={Link} to={`/character/${id}`}>{name}</Button>
+						})
+						: <Text fs='italic'>None</Text>
+				}
 			</Group>
 		</Stack>
 	)

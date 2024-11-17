@@ -23,6 +23,7 @@ export async function getUserIdentity(request: Request) {
 	const identityData = data?.identities[0].identity_data ?? null
 	return {
 		userIdentity: identityData as UserIdentityData,
+		supabase,
 		headers
 	}
 }

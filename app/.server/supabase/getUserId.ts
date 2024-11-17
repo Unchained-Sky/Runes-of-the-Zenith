@@ -37,6 +37,9 @@ export async function getUserId(options: GetUserIdOptions) {
 
 async function id(supabase: SupabaseClient<Database>) {
 	const { data, error } = await supabase.auth.getUser()
-	if (error) throw new Error(error.message, { cause: error })
+	if (error) {
+		await supabase.auth.signOut()
+		throw new Error(error.message, { cause: error })
+	}
 	return data.user.id
 }
