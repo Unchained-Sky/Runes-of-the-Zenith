@@ -28,7 +28,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 		.eq('campaign_id', campaignId)
 	if (error || !data.length) throw redirect('/', { headers })
 
-	return json({ ...data[0] }, { headers })
+	return json(data[0], { headers })
 }
 
 export default function CampaignPage() {

@@ -1,9 +1,8 @@
 import { Button, rem, Stack, Text, Title } from '@mantine/core'
 import { json, type LoaderFunctionArgs, type MetaFunction } from '@remix-run/node'
-import { Link, useLoaderData } from '@remix-run/react'
-import { getCampaignData } from 'app/.server/data/getCampaignData'
-import { getCharacterData } from 'app/.server/data/getCharacterData'
+import { Link, redirect, useLoaderData } from '@remix-run/react'
 import { getServerClient } from '~/supabase/getServerClient'
+import { getUserId } from '~/supabase/getUserId'
 import { isNumberParam } from '~/utils/isNumberParam'
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
@@ -15,20 +14,33 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 export async function loader({ params, request }: LoaderFunctionArgs) {
 	const characterId = isNumberParam(params.id, request.headers)
 
-	const serverClient = getServerClient(request)
+	const { supabase, headers } = getServerClient(request)
 
-	const { character_name, campaign_id } = await getCharacterData('character_name, campaign_id', characterId, serverClient)
-	const { campaign_name } = campaign_id ? await getCampaignData('campaign_name', campaign_id, serverClient) : { campaign_name: null }
+	const { data, error } = await supabase
+		.from('character_info')
+		.select(`
+			characterName:character_name,
+			userId:user_id,
+			campaignInfo:campaign_info(
+				campaignName:campaign_name
+			)
+		`)
+		.eq('character_id', characterId)
+	if (error || !data.length) throw redirect('/character', { headers })
+
+	const characterUserId = data[0].userId
+	const accountUserId = (await getUserId(supabase)).userId
 
 	return json({
-		characterName: character_name,
-		campaignName: campaign_name,
-		characterId
-	}, { headers: serverClient.headers })
+		characterName: data[0].characterName,
+		campaignName: data[0].campaignInfo?.campaignName ?? null,
+		characterId,
+		isOwner: characterUserId === accountUserId
+	}, { headers })
 }
 
 export default function Character() {
-	const { characterName, campaignName, characterId } = useLoaderData<typeof loader>()
+	const { characterName, campaignName, characterId, isOwner } = useLoaderData<typeof loader>()
 
 	return (
 		<Stack>
@@ -36,7 +48,7 @@ export default function Character() {
 
 			<Text>Linked campaign: {campaignName ?? 'None'}</Text>
 
-			<Button component={Link} to={`/character/${characterId}/settings`} maw={rem(240)}>Edit Settings</Button>
+			{isOwner && <Button component={Link} to={`/character/${characterId}/settings`} maw={rem(240)}>Edit Settings</Button>}
 		</Stack>
 	)
 }

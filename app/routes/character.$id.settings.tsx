@@ -1,4 +1,4 @@
-import { Button, rem, Select, Stack, Title } from '@mantine/core'
+import { Button, rem, Select, Stack, Switch, Title } from '@mantine/core'
 import { type ActionFunctionArgs, json, type LoaderFunctionArgs, type MetaFunction } from '@remix-run/node'
 import { Form, redirect, useLoaderData } from '@remix-run/react'
 import { getCharacterData } from 'app/.server/data/getCharacterData'
@@ -20,7 +20,15 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 	const serverClient = getServerClient(request)
 	const { supabase, headers } = serverClient
 
-	const { character_name, campaign_id } = await getCharacterData('character_name, campaign_id', characterId, serverClient)
+	const {
+		character_name,
+		campaign_id,
+		user_id,
+		visibility
+	} = await getCharacterData('character_name, campaign_id, user_id, visibility', characterId, serverClient)
+
+	const accountUserId = (await getUserId(supabase)).userId
+	if (user_id !== accountUserId) throw redirect(`/character/${characterId}`, { headers })
 
 	const { data, error } = await supabase
 		.from('campaign_info')
@@ -30,7 +38,8 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 	return json({
 		characterName: character_name,
 		campaignId: campaign_id,
-		campaigns: data
+		campaigns: data,
+		visibility
 	}, { headers })
 }
 
@@ -38,8 +47,11 @@ export async function action({ params, request }: ActionFunctionArgs) {
 	const { supabase, headers } = await requireAccount(request)
 
 	const formData = await request.formData()
+
 	const linkedCampaign = formData.get('linked_campaign')?.toString() ?? ''
 	const campaignId = safeParseInt(linkedCampaign)
+
+	const visibility = formData.get('private') === 'on' ? 'PRIVATE' : 'PUBLIC'
 
 	const serviceClient = getServiceClient()
 	const characterId = isNumberParam(params.id, request.headers)
@@ -47,7 +59,7 @@ export async function action({ params, request }: ActionFunctionArgs) {
 
 	const { error } = await serviceClient
 		.from('character_info')
-		.update({ campaign_id: campaignId })
+		.update({ campaign_id: campaignId, visibility })
 		.eq('character_id', characterId)
 		.eq('user_id', userId)
 	if (error) throw new Error(error.message, { cause: error })
@@ -56,7 +68,7 @@ export async function action({ params, request }: ActionFunctionArgs) {
 }
 
 export default function Character() {
-	const { characterName, campaignId, campaigns } = useLoaderData<typeof loader>()
+	const { characterName, campaignId, campaigns, visibility } = useLoaderData<typeof loader>()
 
 	return (
 		<Stack>
@@ -69,6 +81,13 @@ export default function Character() {
 						name='linked_campaign'
 						data={campaigns.map(({ campaign_id, campaign_name }) => ({ value: campaign_id.toString(), label: campaign_name }))}
 						defaultValue={campaignId?.toString()}
+					/>
+
+					<Switch
+						defaultChecked={visibility === 'PRIVATE'}
+						label='Private'
+						name='private'
+						description='Private characters can still be viewed to members of the same campaign'
 					/>
 
 					<Button type='submit'>Save</Button>
