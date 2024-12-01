@@ -1,8 +1,9 @@
-import { Button, rem, Stack, Title } from '@mantine/core'
+import { Box, Title } from '@mantine/core'
 import { type LoaderFunctionArgs } from '@remix-run/node'
-import { json, Link, redirect, useLoaderData, type MetaFunction } from '@remix-run/react'
+import { json, type MetaFunction, redirect, useLoaderData } from '@remix-run/react'
 import { getServerClient } from '~/supabase/getServerClient'
 import { isNumberParam } from '~/utils/isNumberParam'
+import Honeycomb from './components/Honeycomb'
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
 	return [
@@ -25,13 +26,13 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 }
 
 export default function Map() {
-	const { mapName, mapId } = useLoaderData<typeof loader>()
+	const { mapName } = useLoaderData<typeof loader>()
 
 	return (
-		<Stack>
+		<Box>
 			<Title>{mapName}</Title>
 
-			<Button maw={rem(240)} component={Link} to={`/homebrew/map/${mapId}/edit`}>Edit</Button>
-		</Stack>
+			<Honeycomb />
+		</Box>
 	)
 }
