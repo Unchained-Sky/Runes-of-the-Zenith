@@ -2,11 +2,11 @@
 /* eslint react-hooks/exhaustive-deps: 0 */
 import { Box, useMantineTheme } from '@mantine/core'
 import { useMemo, type ReactNode } from 'react'
+import { type CombatTileCord } from '~/data/mapTemplates/combat'
 import { HEX_SIZE, HEX_WIDTH_SCALER } from './constants'
-import { type HexCord } from './Honeycomb'
 
 type HexProps = {
-	cord: HexCord
+	cord: CombatTileCord
 	offset: [x: number, y: number]
 	children?: ReactNode
 }

@@ -1,36 +1,27 @@
 import { Box } from '@mantine/core'
+import { type CombatTile } from '~/data/mapTemplates/combat'
 import Hex from './Hex'
 import { HEX_GAP, HEX_SIZE, HEX_WIDTH_SCALER } from './constants'
 
-export type HexCord = [q: number, r: number, s: number]
+type HoneycombProps = {
+	tiles: CombatTile[]
+}
 
-export default function Honeycomb() {
-	const cords: HexCord[] = [
-		[0, -1, 1],
-		[1, -1, 0],
-
-		[-1, 0, 1],
-		[0, 0, 0],
-		[1, 0, -1],
-
-		[-1, 1, 0],
-		[0, 1, -1],
-
-		[-2, 0, 2],
-		[-3, 1, 2],
-		[-3, 0, 3],
-		[-1, 2, -1]
-	]
+export default function HoneycombGrid({ tiles }: HoneycombProps) {
+	const cords = tiles.map(({ cord }) => cord)
 
 	const xCords = cords.map(([q, r, _s]) => (2 * q) + r)
-	const xHexAmount = ((Math.min(...xCords) * -1) / 2) + Math.max(...xCords)
+	const xHexAmount = ((Math.max(...xCords) - Math.min(...xCords)) / 2) + 1
 	const minWidth = (xHexAmount * HEX_SIZE) - HEX_GAP
 
 	const yCords = cords.map(([_q, r, _s]) => r)
 	const yHexAmount = (Math.min(...yCords) * -1) + Math.max(...yCords) + 1
 	const minHeight = (yHexAmount * HEX_SIZE * HEX_WIDTH_SCALER) + HEX_GAP
 
-	const offset: [number, number] = [Math.min(...xCords), Math.min(...yCords)]
+	const offset: [number, number] = [
+		Math.min(...xCords),
+		(Math.min(...yCords) * 2) + 1
+	]
 
 	return (
 		<Box pos='relative' w={minWidth} h={minHeight}>
