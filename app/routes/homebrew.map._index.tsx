@@ -21,7 +21,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		.eq('user_id', userId)
 	if (error) throw redirect('/', { headers })
 
-	return json({ maps: data }, { headers })
+	return json({ maps: data.reverse() }, { headers })
 }
 
 export default function Maps() {
