@@ -6,7 +6,9 @@ export async function action({ request }: ActionFunctionArgs) {
 
 	const { data, error } = await supabase
 		.from('map_info')
-		.insert({})
+		.insert({
+			map_type: 'COMBAT'
+		})
 		.select('mapId:map_id')
 	if (error) throw new Error(error.message, { cause: error })
 

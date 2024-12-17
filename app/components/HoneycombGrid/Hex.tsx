@@ -3,7 +3,7 @@
 import { Box, useMantineTheme } from '@mantine/core'
 import { useMemo, type ReactNode } from 'react'
 import { type CombatTileCord } from '~/data/mapTemplates/combat'
-import { HEX_SIZE, HEX_WIDTH_SCALER } from './constants'
+import { HEX_MULTIPLIER, HEX_SIZE, HEX_WIDTH_SCALER } from './constants'
 
 type HexProps = {
 	cord: CombatTileCord
@@ -15,13 +15,15 @@ export default function Hex({ cord: [q, r, _s], offset: [x, y], children }: HexP
 	const left = useMemo(() => {
 		let multiplier = (2 * q) + r
 		multiplier -= x
+		multiplier *= HEX_MULTIPLIER
 		return multiplier * (HEX_SIZE / 2)
 	}, [q, r, x])
 
 	const top = useMemo(() => {
-		let multiplier = (r * 2)
+		let multiplier = r * 2
 		multiplier -= y - 1
 		multiplier *= HEX_WIDTH_SCALER
+		multiplier *= HEX_MULTIPLIER
 		return multiplier * (HEX_SIZE / 2)
 	}, [r, y])
 
