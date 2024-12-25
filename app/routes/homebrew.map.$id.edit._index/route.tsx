@@ -3,7 +3,7 @@ import { useSetState } from '@mantine/hooks'
 import { type ActionFunctionArgs, type LoaderFunctionArgs } from '@remix-run/node'
 import { json, type MetaFunction, redirect, useLoaderData, useSubmit } from '@remix-run/react'
 import { useMemo } from 'react'
-import HoneycombGrid from '~/components/HoneycombGrid'
+import { CombatGridEdit } from '~/components/HoneycombGrid'
 import { getServerClient } from '~/supabase/getServerClient'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { getUserId } from '~/supabase/getUserId'
@@ -94,7 +94,7 @@ export default function Map() {
 				onChange={event => setMapChanges({ mapName: event.currentTarget.value || null })}
 			/>
 
-			<HoneycombGrid
+			<CombatGridEdit
 				tiles={mapTiles.map(({ q, r, s, image, terrain_type }) => ({
 					cord: [q, r, s],
 					image,

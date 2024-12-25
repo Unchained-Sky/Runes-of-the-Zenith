@@ -1,7 +1,7 @@
 import { Box, Button, Group, Stack, Title } from '@mantine/core'
 import { type ActionFunctionArgs, type LoaderFunctionArgs } from '@remix-run/node'
 import { Form, json, type MetaFunction, redirect, useLoaderData } from '@remix-run/react'
-import HoneycombGrid from '~/components/HoneycombGrid'
+import { CombatGridPreview } from '~/components/HoneycombGrid'
 import { type CombatMap, type CombatMapTemplateName, getAllCombatMapTemplates, getCombatMapTemplate } from '~/data/mapTemplates/combat'
 import { type Tables } from '~/supabase/databaseTypes'
 import { getServerClient } from '~/supabase/getServerClient'
@@ -84,7 +84,7 @@ function Template({ name, tiles }: TemplateProps) {
 		<Stack>
 			<Title order={2}>{name}</Title>
 
-			<HoneycombGrid tiles={tiles} />
+			<CombatGridPreview tiles={tiles} />
 
 			<Form method='POST'>
 				<input type='text' name='_template' value={name} hidden readOnly />
