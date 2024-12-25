@@ -4,6 +4,7 @@ import { type ActionFunctionArgs, type LoaderFunctionArgs } from '@remix-run/nod
 import { json, type MetaFunction, redirect, useLoaderData, useSubmit } from '@remix-run/react'
 import { useMemo } from 'react'
 import { CombatGridEdit } from '~/components/HoneycombGrid'
+import { type CombatTile } from '~/data/mapTemplates/combat'
 import { getServerClient } from '~/supabase/getServerClient'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { getUserId } from '~/supabase/getUserId'
@@ -72,7 +73,9 @@ type MapChanges = {
 	mapName: string | null
 }
 
-export default function Map() {
+export type TileString = `${number},${number},${number}`
+
+export default function MapEditor() {
 	const { mapName, mapTiles } = useLoaderData<typeof loader>()
 
 	const [mapChanges, setMapChanges] = useSetState<MapChanges>({
@@ -82,6 +85,19 @@ export default function Map() {
 	const hasChanged = useMemo(() => Object.values(mapChanges).some(v => v), [mapChanges])
 
 	const submit = useSubmit()
+
+	const tiles = useMemo(() => {
+		return new Map<TileString, CombatTile>([
+			...mapTiles.map<[TileString, CombatTile]>(({ q, r, s, image, terrain_type }) => [
+				`${q},${r},${s}` as const,
+				{
+					cord: [q, r, s],
+					image,
+					terrainType: terrain_type
+				}
+			])
+		])
+	}, [mapTiles])
 
 	return (
 		<>
@@ -94,13 +110,7 @@ export default function Map() {
 				onChange={event => setMapChanges({ mapName: event.currentTarget.value || null })}
 			/>
 
-			<CombatGridEdit
-				tiles={mapTiles.map(({ q, r, s, image, terrain_type }) => ({
-					cord: [q, r, s],
-					image,
-					terrainType: terrain_type
-				}))}
-			/>
+			<CombatGridEdit tiles={tiles} />
 
 			{hasChanged && (
 				<Button

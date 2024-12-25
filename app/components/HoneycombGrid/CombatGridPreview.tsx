@@ -1,6 +1,6 @@
-import { Box, useMantineTheme } from '@mantine/core'
-import { type CombatTile, type CombatTileCord } from '~/data/mapTemplates/combat'
-import useHexSize from './useHexSize'
+import { Box } from '@mantine/core'
+import { type CombatTile } from '~/data/mapTemplates/combat'
+import Hex from './Hex'
 import useHoneycombGridSize from './useHoneycombGridSize'
 
 type CombatGridPreview = {
@@ -16,30 +16,5 @@ export default function CombatGridPreview({ tiles }: CombatGridPreview) {
 				return <Hex key={cord.toString()} cord={cord} offset={offset} />
 			})}
 		</Box>
-	)
-}
-
-type HexProps = {
-	cord: CombatTileCord
-	offset: [x: number, y: number]
-}
-
-function Hex({ cord, offset }: HexProps) {
-	const { left, top, width, height, clipPath } = useHexSize(cord, offset)
-
-	const theme = useMantineTheme()
-
-	return (
-		<Box
-			pos='absolute'
-			bg={theme.primaryColor}
-			w={width}
-			h={height}
-			left={left}
-			top={top}
-			style={{
-				clipPath
-			}}
-		/>
 	)
 }
