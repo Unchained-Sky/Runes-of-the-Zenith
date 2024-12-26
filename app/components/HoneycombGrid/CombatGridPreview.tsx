@@ -8,12 +8,13 @@ type CombatGridPreview = {
 }
 
 export default function CombatGridPreview({ tiles }: CombatGridPreview) {
-	const { cords, offset, minHeight, minWidth } = useHoneycombGridSize(tiles)
+	const { offset, minHeight, minWidth } = useHoneycombGridSize(tiles)
 
 	return (
 		<Box pos='relative' w={minWidth} h={minHeight}>
-			{cords.map(cord => {
-				return <Hex key={cord.toString()} cord={cord} offset={offset} />
+			{tiles.map(tile => {
+				const { cord } = tile
+				return <Hex key={cord.toString()} tile={tile} offset={offset} />
 			})}
 		</Box>
 	)

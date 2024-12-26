@@ -1,18 +1,16 @@
-import { Box, useMantineTheme } from '@mantine/core'
+import { Box, Image } from '@mantine/core'
 import { type ReactNode } from 'react'
-import { type CombatTileCord } from '~/data/mapTemplates/combat'
+import { type CombatTile } from '~/data/mapTemplates/combat'
 import useHexSize from './useHexSize'
 
 type HexProps = {
-	cord: CombatTileCord
+	tile: CombatTile
 	offset: [x: number, y: number]
 	children?: ReactNode
 }
 
-export default function Hex({ cord, offset, children }: HexProps) {
+export default function Hex({ tile: { cord, image }, offset, children }: HexProps) {
 	const { left, top, width, height, clipPath } = useHexSize(cord, offset)
-
-	const theme = useMantineTheme()
 
 	return (
 		<Box
@@ -24,12 +22,13 @@ export default function Hex({ cord, offset, children }: HexProps) {
 		>
 			<Box
 				pos='absolute'
-				bg={theme.primaryColor}
 				style={{
 					inset: 0,
 					clipPath
 				}}
-			/>
+			>
+				<Image src={`/combatTiles/${image ?? 'grass'}.png`} />
+			</Box>
 			{children}
 		</Box>
 	)

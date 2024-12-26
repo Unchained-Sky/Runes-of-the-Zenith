@@ -1,6 +1,6 @@
 import { Box } from '@mantine/core'
 import { type TileString } from 'app/routes/homebrew.map.$id.edit._index/route'
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import { type CombatTile, type CombatTileCord } from '~/data/mapTemplates/combat'
 import { COPY_TILE_WIDTH, HEX_GAP, HEX_SIZE, HEX_WIDTH_SCALER } from './constants'
 import Hex from './Hex'
@@ -10,25 +10,27 @@ type CombatGridEdit = {
 	tiles: Map<TileString, CombatTile>
 }
 
-export default function CombatGridEdit({ tiles }: CombatGridEdit) {
-	const { cords, offset, minHeight, minWidth } = useHoneycombGridSize([...tiles.values()], { padding: 40 })
+export default function CombatGridEdit({ tiles: tilesMap }: CombatGridEdit) {
+	const tiles = useMemo(() => [...tilesMap.values()], [tilesMap])
+
+	const { offset, minHeight, minWidth } = useHoneycombGridSize(tiles, { padding: COPY_TILE_WIDTH + HEX_GAP })
 
 	const isBlocked = useCallback((cord: CombatTileCord, q: number, r: number, s: number) => {
-		return !tiles.has(`${cord[0] + q},${cord[1] + r},${cord[2] + s}`)
-	}, [tiles])
+		return !tilesMap.has(`${cord[0] + q},${cord[1] + r},${cord[2] + s}`)
+	}, [tilesMap])
 
 	return (
 		<Box pos='relative' w={minWidth} h={minHeight}>
-			{cords.map(cord => {
-				const left = isBlocked(cord, -1, 0, 1)
-				const topLeft = isBlocked(cord, 0, -1, 1)
-				const topRight = isBlocked(cord, 1, -1, 0)
-				const right = isBlocked(cord, 1, 0, -1)
-				const bottomRight = isBlocked(cord, 0, 1, -1)
-				const bottomLeft = isBlocked(cord, -1, 1, 0)
+			{tiles.map(tile => {
+				const left = isBlocked(tile.cord, -1, 0, 1)
+				const topLeft = isBlocked(tile.cord, 0, -1, 1)
+				const topRight = isBlocked(tile.cord, 1, -1, 0)
+				const right = isBlocked(tile.cord, 1, 0, -1)
+				const bottomRight = isBlocked(tile.cord, 0, 1, -1)
+				const bottomLeft = isBlocked(tile.cord, -1, 1, 0)
 
 				return (
-					<Hex key={cord.toString()} cord={cord} offset={offset}>
+					<Hex key={tile.cord.toString()} tile={tile} offset={offset}>
 						{left && <CopyTile left={(COPY_TILE_WIDTH * -1) - HEX_GAP} top={HEX_SIZE / 4} rotation={0} />}
 						{topLeft && <CopyTile left={17} top={-34} rotation={60} />}
 						{topRight && <CopyTile left={102} top={-34} rotation={120} />}

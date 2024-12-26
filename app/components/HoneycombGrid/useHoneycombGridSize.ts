@@ -39,7 +39,6 @@ export default function useHoneycombGridSize(tiles: CombatTile[], options: UseHo
 	}, [yCords])
 
 	return {
-		cords,
 		offset,
 		minWidth,
 		minHeight
