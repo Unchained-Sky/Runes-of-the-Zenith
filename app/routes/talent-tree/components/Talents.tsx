@@ -1,7 +1,7 @@
 import { Box } from '@mantine/core'
 import { useRef } from 'react'
 import { TransformComponent, TransformWrapper, type ReactZoomPanPinchRef } from 'react-zoom-pan-pinch'
-import { talentData } from '~/data/talents/talentData'
+import { talentData } from '~/scripts/data/skills/skillData'
 import TalentNode from './TalentNode'
 
 export default function Talents() {
