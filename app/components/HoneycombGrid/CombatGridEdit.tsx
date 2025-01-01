@@ -1,27 +1,25 @@
 import { Box } from '@mantine/core'
-import { type TileString } from 'app/routes/homebrew.map.$id.edit._index/route'
-import { useCallback, useMemo } from 'react'
-import { type CombatTile, type CombatTileCord } from '~/data/mapTemplates/combat'
+import { useMapEditStore } from 'app/routes/homebrew.map.$id.edit._index/useMapEditStore'
+import { useCallback } from 'react'
+import { type CombatTileCord } from '~/data/mapTemplates/combat'
 import { COPY_TILE_WIDTH, HEX_GAP, HEX_SIZE, HEX_WIDTH_SCALER } from './constants'
 import Hex from './Hex'
+import classes from './Hex.module.css'
 import useHoneycombGridSize from './useHoneycombGridSize'
 
-type CombatGridEdit = {
-	tiles: Map<TileString, CombatTile>
-}
+export default function CombatGridEdit() {
+	const tiles = useMapEditStore(state => state.tiles)
+	const tileValues = Object.values(tiles)
 
-export default function CombatGridEdit({ tiles: tilesMap }: CombatGridEdit) {
-	const tiles = useMemo(() => [...tilesMap.values()], [tilesMap])
-
-	const { offset, minHeight, minWidth } = useHoneycombGridSize(tiles, { padding: COPY_TILE_WIDTH + HEX_GAP })
+	const { offset, minHeight, minWidth } = useHoneycombGridSize(tileValues, { padding: COPY_TILE_WIDTH + HEX_GAP })
 
 	const isBlocked = useCallback((cord: CombatTileCord, q: number, r: number, s: number) => {
-		return !tilesMap.has(`${cord[0] + q},${cord[1] + r},${cord[2] + s}`)
-	}, [tilesMap])
+		return !Object.hasOwn(tiles, `${cord[0] + q},${cord[1] + r},${cord[2] + s}`)
+	}, [tiles])
 
 	return (
 		<Box pos='relative' w={minWidth} h={minHeight}>
-			{tiles.map(tile => {
+			{tileValues.map(tile => {
 				const left = isBlocked(tile.cord, -1, 0, 1)
 				const topLeft = isBlocked(tile.cord, 0, -1, 1)
 				const topRight = isBlocked(tile.cord, 1, -1, 0)
@@ -30,7 +28,15 @@ export default function CombatGridEdit({ tiles: tilesMap }: CombatGridEdit) {
 				const bottomLeft = isBlocked(tile.cord, -1, 1, 0)
 
 				return (
-					<Hex key={tile.cord.toString()} tile={tile} offset={offset}>
+					<Hex
+						key={tile.cord.toString()}
+						tile={tile}
+						offset={offset}
+						hexProps={{
+							className: classes.editHex,
+							component: 'button'
+						}}
+					>
 						{left && <CopyTile left={(COPY_TILE_WIDTH * -1) - HEX_GAP} top={HEX_SIZE / 4} rotation={0} />}
 						{topLeft && <CopyTile left={17} top={-34} rotation={60} />}
 						{topRight && <CopyTile left={102} top={-34} rotation={120} />}

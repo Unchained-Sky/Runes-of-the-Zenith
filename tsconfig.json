@@ -42,6 +42,9 @@
       "~/data/*": [
         "./app/data/*"
       ],
+      "~/hooks/*": [
+        "./app/hooks/*"
+      ],
       "~/supabase/*": [
         "./app/.server/supabase/*"
       ],

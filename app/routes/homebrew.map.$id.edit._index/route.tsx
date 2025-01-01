@@ -1,21 +1,23 @@
-import { Button, rem, TextInput } from '@mantine/core'
-import { useSetState } from '@mantine/hooks'
 import { type ActionFunctionArgs, type LoaderFunctionArgs } from '@remix-run/node'
-import { json, type MetaFunction, redirect, useLoaderData, useSubmit } from '@remix-run/react'
-import { useMemo } from 'react'
+import { json, redirect, useLoaderData, type MetaFunction } from '@remix-run/react'
 import { CombatGridEdit } from '~/components/HoneycombGrid'
-import { type CombatTile } from '~/data/mapTemplates/combat'
+import useMountEffect from '~/hooks/useMountEffect'
 import { getServerClient } from '~/supabase/getServerClient'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { getUserId } from '~/supabase/getUserId'
 import { requireAccount } from '~/supabase/requireAccount'
 import { isNumberParam } from '~/utils/isNumberParam'
+import MapTitle from './components/MapTitle'
+import Submit from './components/Submit'
+import { useMapEditStore } from './useMapEditStore'
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
 	return [
 		{ title: data?.mapName ?? 'Map' }
 	]
 }
+
+export type MapEditLoader = ReturnType<typeof useLoaderData<typeof loader>>
 
 export async function loader({ params, request }: LoaderFunctionArgs) {
 	const mapId = isNumberParam(params.id, request.headers)
@@ -35,7 +37,10 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 
 	if (!data[0].tileCount[0].count) throw redirect(`/homebrew/map/${mapId}/template`, { headers })
 
-	return json(data[0], { headers })
+	return json({
+		syncValue: +new Date(),
+		...data[0]
+	}, { headers })
 }
 
 export async function action({ params, request }: ActionFunctionArgs) {
@@ -56,11 +61,11 @@ export async function action({ params, request }: ActionFunctionArgs) {
 	const formData = await request.formData()
 
 	const mapName = formData.get('mapName')
-	if (mapName) {
+	if (typeof mapName === 'string') {
 		const { error } = await serviceClient
 			.from('map_info')
 			.update({
-				name: mapName as string
+				name: mapName
 			})
 			.eq('map_id', mapId)
 		if (error) throw new Error(error.message, { cause: error })
@@ -69,67 +74,24 @@ export async function action({ params, request }: ActionFunctionArgs) {
 	return redirect(`/homebrew/map/${mapId}/edit`, { headers })
 }
 
-type MapChanges = {
-	mapName: string | null
-}
-
-export type TileString = `${number},${number},${number}`
-
 export default function MapEditor() {
-	const { mapName, mapTiles } = useLoaderData<typeof loader>()
+	const loaderData = useLoaderData<typeof loader>()
 
-	const [mapChanges, setMapChanges] = useSetState<MapChanges>({
-		mapName: null
+	const syncLoader = useMapEditStore(state => state.syncLoader)
+	useMountEffect(() => {
+		syncLoader(loaderData)
 	})
 
-	const hasChanged = useMemo(() => Object.values(mapChanges).some(v => v), [mapChanges])
+	const syncValue = useMapEditStore(state => state.syncValue)
 
-	const submit = useSubmit()
-
-	const tiles = useMemo(() => {
-		return new Map<TileString, CombatTile>([
-			...mapTiles.map<[TileString, CombatTile]>(({ q, r, s, image, terrain_type }) => [
-				`${q},${r},${s}` as const,
-				{
-					cord: [q, r, s],
-					image,
-					terrainType: terrain_type
-				}
-			])
-		])
-	}, [mapTiles])
-
+	if (loaderData.syncValue !== syncValue) return null
 	return (
 		<>
-			<TextInput
-				pb='sm'
-				maw={rem(300)}
-				maxLength={32}
-				placeholder={mapName}
-				value={mapChanges.mapName ?? ''}
-				onChange={event => setMapChanges({ mapName: event.currentTarget.value || null })}
-			/>
+			<MapTitle loaderMapName={loaderData.mapName} />
 
-			<CombatGridEdit tiles={tiles} />
+			<CombatGridEdit />
 
-			{hasChanged && (
-				<Button
-					type='submit'
-					pos='absolute'
-					size='xl'
-					color='green'
-					right={rem(32)}
-					bottom={rem(32)}
-					onClick={() => {
-						submit(mapChanges, { method: 'POST', encType: 'multipart/form-data' })
-						setMapChanges({
-							mapName: null
-						})
-					}}
-				>
-					Save
-				</Button>
-			)}
+			<Submit />
 		</>
 	)
 }

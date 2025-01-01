@@ -1,4 +1,4 @@
-import { Box, Image } from '@mantine/core'
+import { Box, type BoxComponentProps, Image, type PolymorphicComponentProps } from '@mantine/core'
 import { type ReactNode } from 'react'
 import { type CombatTile } from '~/data/mapTemplates/combat'
 import useHexSize from './useHexSize'
@@ -6,11 +6,14 @@ import useHexSize from './useHexSize'
 type HexProps = {
 	tile: CombatTile
 	offset: [x: number, y: number]
+	hexProps?: PolymorphicComponentProps<'div' | 'button', BoxComponentProps>
 	children?: ReactNode
 }
 
-export default function Hex({ tile: { cord, image }, offset, children }: HexProps) {
+export default function Hex({ tile: { cord, image }, offset, hexProps, children }: HexProps) {
 	const { left, top, width, height, clipPath } = useHexSize(cord, offset)
+
+	const { style, ...props } = hexProps ?? {}
 
 	return (
 		<Box
@@ -22,10 +25,14 @@ export default function Hex({ tile: { cord, image }, offset, children }: HexProp
 		>
 			<Box
 				pos='absolute'
-				style={{
-					inset: 0,
-					clipPath
-				}}
+				style={[
+					{
+						inset: 0,
+						clipPath
+					},
+					style
+				]}
+				{...props}
 			>
 				<Image src={`/combatTiles/${image ?? 'grass'}.png`} />
 			</Box>
