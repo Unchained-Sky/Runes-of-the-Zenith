@@ -1,6 +1,6 @@
 import { type SkillNodeData } from '~/scripts/data/skills/skillData'
 import skillFormatter from '~/scripts/data/skills/skillFormatter'
 
-const waterNodes: SkillNodeData[] = []
+const dodgeNodes: SkillNodeData[] = []
 
-export default skillFormatter(waterNodes, 'elemental', 'water')
+export default skillFormatter(dodgeNodes, 'agility', 'dodge')

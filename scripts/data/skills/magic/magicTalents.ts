@@ -1,17 +1,51 @@
-import arcaneTalentNodes from './arcane/arcaneTalents'
-import celestialTalentNodes from './celestial/celestialTalents'
-import elementalTalentNodes from './elemental/elementalTalents'
-import natureTalentNodes from './nature/natureTalents'
-import psychicTalents from './psychic/psychicTalents'
-import shadowTalentNodes from './shadow/shadowTalents'
-import supportTalentNodes from './support/supportTalents'
+import astral from './arcane/astral'
+import construct from './arcane/construct'
+import sorcery from './arcane/sorcery'
+import holy from './celestial/holy'
+import unholy from './celestial/unholy'
+import earth from './elemental/earth'
+import fire from './elemental/fire'
+import water from './elemental/water'
+import wind from './elemental/wind'
+import beastMaster from './nature/beastMaster'
+import plant from './nature/plant'
+import shapeshift from './nature/shapeshift'
+import totem from './nature/totem'
+import inspire from './psychic/inspire'
+import trickery from './psychic/trickery'
+import chaos from './shadow/chaos'
+import demonology from './shadow/demonology'
+import hellfire from './shadow/hellfire'
 
 export default [
-	arcaneTalentNodes,
-	celestialTalentNodes,
-	elementalTalentNodes,
-	natureTalentNodes,
-	psychicTalents,
-	shadowTalentNodes,
-	supportTalentNodes
-].flat()
+	[
+		astral,
+		construct,
+		sorcery
+	],
+	[
+		holy,
+		unholy
+	],
+	[
+		earth,
+		fire,
+		water,
+		wind
+	],
+	[
+		beastMaster,
+		plant,
+		shapeshift,
+		totem
+	],
+	[
+		inspire,
+		trickery
+	],
+	[
+		chaos,
+		demonology,
+		hellfire
+	]
+]

@@ -1,8 +1,6 @@
-import { type TalentNodeData } from '~/scripts/data/skills/skillData'
-import skillTuple from '~/scripts/data/skills/skillTuple'
+import { type SkillNodeData } from '~/scripts/data/skills/skillData'
+import skillFormatter from '~/scripts/data/skills/skillFormatter'
 
-const bloodthirstTalentNodes: TalentNodeData[] = [
+const bloodthirstNodes: SkillNodeData[] = []
 
-]
-
-export default skillTuple(bloodthirstTalentNodes, 'bloodthirst', 'bloodthirst')
+export default skillFormatter(bloodthirstNodes, 'bloodthirst', 'bloodthirst')

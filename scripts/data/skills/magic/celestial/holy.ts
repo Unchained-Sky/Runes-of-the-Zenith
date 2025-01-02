@@ -1,7 +1,7 @@
-import { type TalentNodeData } from '~/scripts/data/skills/skillData'
-import skillTuple from '~/scripts/data/skills/skillTuple'
+import { type SkillNodeData } from '~/scripts/data/skills/skillData'
+import skillFormatter from '~/scripts/data/skills/skillFormatter'
 
-const holyTalentNodes: TalentNodeData[] = [
+const holyNodes: SkillNodeData[] = [
 	{
 		nodeId: 0,
 		nodeType: 'Stat',
@@ -31,4 +31,4 @@ const holyTalentNodes: TalentNodeData[] = [
 	}
 ]
 
-export const holySkills = skillTuple(holyTalentNodes, 'celestial', 'holy')
+export default skillFormatter(holyNodes, 'celestial', 'holy')

@@ -20,11 +20,11 @@ const supabase = getServiceClient()
 	// map ts skill data to sql format
 
 	const [userId, campaignId] = ['', '']
-	const idHash = createHash('md5').update(`${userId}_${campaignId}`).digest('hex')
+	const skillIdHash = createHash('md5').update(`${userId}_${campaignId}`).digest('hex')
 
-	const { data, error } = await supabase
-		.from('skill_info')
-		.insert([
-			{ skill_id: 0, version: skillVersion, skill_data: {} }
-		])
+	// const { data, error } = await supabase
+	// 	.from('skill_info')
+	// 	.insert([
+	// 		{ skill_id: 0, version: skillVersion, skill_data: {} }
+	// 	])
 }

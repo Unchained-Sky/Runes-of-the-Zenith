@@ -1,6 +1,6 @@
-import skillTuple from '~/scripts/data/talents/skillTuple'
-import { type TalentNodeData } from '~/scripts/data/talents/talentData'
+import { type SkillNodeData } from '~/scripts/data/skills/skillData'
+import skillFormatter from '~/scripts/data/skills/skillFormatter'
 
-const earthTalentNodes: TalentNodeData[] = []
+const earthNodes: SkillNodeData[] = []
 
-export default skillTuple(earthTalentNodes, 'elemental', 'earth')
+export default skillFormatter(earthNodes, 'elemental', 'earth')

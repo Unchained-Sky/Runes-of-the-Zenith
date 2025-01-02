@@ -1,8 +1,6 @@
-import { type TalentNodeData } from '~/scripts/data/skills/skillData'
-import skillTuple from '~/scripts/data/skills/skillTuple'
+import { type SkillNodeData } from '~/scripts/data/skills/skillData'
+import skillFormatter from '~/scripts/data/skills/skillFormatter'
 
-const totemTalentNodes: TalentNodeData[] = [
+const totemNodes: SkillNodeData[] = []
 
-]
-
-export default skillTuple(totemTalentNodes, 'nature', 'totem')
+export default skillFormatter(totemNodes, 'nature', 'totem')
