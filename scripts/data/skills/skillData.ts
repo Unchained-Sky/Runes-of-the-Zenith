@@ -1,4 +1,4 @@
-import magicTalents from './magic/magicTalents'
+import magicTalents from './magic/magicSkills'
 import physicalTalents from './physical/physicalSkills'
 
 /*
@@ -24,4 +24,4 @@ export type SkillNodeData = {
 	pos: Coordinate
 }
 
-export const skillData = [physicalTalents, magicTalents].flat(Infinity)
+export const skillData = [physicalTalents, magicTalents].flat(10)
