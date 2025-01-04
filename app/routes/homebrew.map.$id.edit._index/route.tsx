@@ -1,5 +1,6 @@
 import { type ActionFunctionArgs, type LoaderFunctionArgs } from '@remix-run/node'
 import { json, redirect, useLoaderData, type MetaFunction } from '@remix-run/react'
+import { type } from 'arktype'
 import { CombatGridEdit } from '~/components/HoneycombGrid'
 import useMountEffect from '~/hooks/useMountEffect'
 import { getServerClient } from '~/supabase/getServerClient'
@@ -9,6 +10,7 @@ import { requireAccount } from '~/supabase/requireAccount'
 import { isNumberParam } from '~/utils/isNumberParam'
 import MapTitle from './components/MapTitle'
 import Submit from './components/Submit'
+import TileEditPanel from './components/TileEditPanel'
 import { useMapEditStore } from './useMapEditStore'
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
@@ -50,24 +52,60 @@ export async function action({ params, request }: ActionFunctionArgs) {
 
 	const { userId } = await getUserId(supabase)
 
-	const { data, error } = await supabase
-		.from('map_info')
-		.select('user_id')
-		.eq('map_id', mapId)
-	if (error || data[0].user_id !== userId) throw new Error('Invalid user')
+	{
+		const { data, error } = await supabase
+			.from('map_info')
+			.select('user_id')
+			.eq('map_id', mapId)
+		if (error || data[0].user_id !== userId) throw new Error('Invalid user')
+	}
 
 	const serviceClient = getServiceClient()
 
+	const dataValidator = type({
+		mapName: 'string | null',
+		tiles: {
+			'[string]': {
+				cord: ['number', 'number', 'number'],
+				image: 'string',
+				// eslint-disable-next-line @stylistic/quotes
+				terrainType: "'BLOCKED' | 'NORMAL' | 'ROUGH' | 'HARSH' | 'GAP'"
+			}
+		}
+	})
 	const formData = await request.formData()
+	const data = dataValidator(JSON.parse(String(formData.get('data'))))
+	if (data instanceof type.errors) throw new Error(data.summary)
 
-	const mapName = formData.get('mapName')
-	if (typeof mapName === 'string') {
+	if (data.mapName && data.mapName.length > 0) {
 		const { error } = await serviceClient
 			.from('map_info')
 			.update({
-				name: mapName
+				name: data.mapName
 			})
 			.eq('map_id', mapId)
+		if (error) throw new Error(error.message, { cause: error })
+	}
+
+	{
+		const { error } = await serviceClient
+			.from('map_combat_tile')
+			.delete()
+			.eq('map_id', mapId)
+		if (error) throw new Error(error.message, { cause: error })
+	}
+
+	{
+		const { error } = await serviceClient
+			.from('map_combat_tile')
+			.insert(Object.values(data.tiles).map(tile => ({
+				map_id: mapId,
+				q: tile.cord[0],
+				r: tile.cord[1],
+				s: tile.cord[2],
+				image: tile.image,
+				terrain_type: tile.terrainType
+			})))
 		if (error) throw new Error(error.message, { cause: error })
 	}
 
@@ -90,6 +128,8 @@ export default function MapEditor() {
 			<MapTitle loaderMapName={loaderData.mapName} />
 
 			<CombatGridEdit />
+
+			<TileEditPanel />
 
 			<Submit />
 		</>

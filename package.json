@@ -28,6 +28,7 @@
     "@supabase/supabase-js": "^2.45.4",
     "@tabler/icons-react": "^3.18.0",
     "@unchainedsky/react-drawline": "^1.2.1",
+    "arktype": "^2.0.0-rc.32",
     "isbot": "^4.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

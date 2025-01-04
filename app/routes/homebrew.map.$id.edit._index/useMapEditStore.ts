@@ -10,6 +10,7 @@ type MapEditState = MapEditStateUtil & MapEditStateValues
 type MapEditStateUtil = {
 	syncValue: number
 	hasChanged: Partial<Record<keyof MapEditStateValues, boolean>>
+	selectedTiles: CombatTileString[]
 }
 
 type MapEditStateValues = {
@@ -20,6 +21,7 @@ type MapEditStateValues = {
 const mapEditState: MapEditState = {
 	syncValue: 0,
 	hasChanged: {},
+	selectedTiles: [],
 
 	mapName: null,
 	tiles: {}
@@ -27,13 +29,16 @@ const mapEditState: MapEditState = {
 
 type MapEditActions = {
 	syncLoader: (loader: MapEditLoader) => void
+	selectTile: (tile: CombatTileString) => void
+	clearSelectedTiles: () => void
 
 	updateMapName: (mapName: MapEditState['mapName']) => void
+	updateTiles: (tileData: Partial<CombatTile>) => void
 }
 
 const actionName = createActionName<MapEditActions>('mapEdit')
 
-export const createMapEditActions: Slice<MapEditStore, MapEditActions, [DevTools]> = (set, _get) => ({
+export const createMapEditActions: Slice<MapEditStore, MapEditActions, [DevTools]> = (set, get) => ({
 	syncLoader: loader => {
 		const tiles = typedObject.fromEntries(
 			loader.mapTiles.map<[CombatTileString, CombatTile]>(({ q, r, s, image, terrain_type }) => [
@@ -49,9 +54,22 @@ export const createMapEditActions: Slice<MapEditStore, MapEditActions, [DevTools
 		set({
 			syncValue: loader.syncValue,
 			hasChanged: {},
+			selectedTiles: [],
 			mapName: null,
 			tiles
 		} satisfies MapEditState, ...actionName('syncLoader'))
+	},
+
+	selectTile: tile => {
+		set(({ selectedTiles }) => ({
+			selectedTiles: selectedTiles.includes(tile)
+				? selectedTiles.filter(t => t !== tile)
+				: [...selectedTiles, tile]
+		}), ...actionName('selectTile'))
+	},
+
+	clearSelectedTiles: () => {
+		set({ selectedTiles: [] }, ...actionName('clearSelectedTiles'))
 	},
 
 	updateMapName: mapName => {
@@ -59,6 +77,26 @@ export const createMapEditActions: Slice<MapEditStore, MapEditActions, [DevTools
 			mapName,
 			hasChanged: { mapName: !!mapName }
 		}, ...actionName('updateMapName'))
+	},
+
+	updateTiles: tileDate => {
+		const tiles = get().selectedTiles
+
+		set({
+			hasChanged: { tiles: true }
+		}, ...actionName('updateTiles/hasChanged'))
+
+		tiles.forEach(tile => {
+			set(state => ({
+				tiles: {
+					...state.tiles,
+					[tile]: {
+						...state.tiles[tile],
+						...tileDate
+					}
+				}
+			}), ...actionName(`updateTiles/updateTile/${tile}`))
+		})
 	}
 })
 

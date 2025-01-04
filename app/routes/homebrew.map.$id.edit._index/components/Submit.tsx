@@ -16,8 +16,9 @@ export default function Submit() {
 			right={rem(32)}
 			bottom={rem(32)}
 			onClick={() => {
+				// TODO - only send changed data
 				const { mapName, tiles } = useMapEditStore.getState()
-				submit({ mapName, tiles }, { method: 'POST', encType: 'multipart/form-data' })
+				submit({ data: JSON.stringify({ mapName, tiles }) }, { method: 'POST', encType: 'multipart/form-data' })
 			}}
 		>
 			Save

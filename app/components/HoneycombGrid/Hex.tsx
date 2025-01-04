@@ -34,7 +34,7 @@ export default function Hex({ tile: { cord, image }, offset, hexProps, children 
 				]}
 				{...props}
 			>
-				<Image src={`/combatTiles/${image ?? 'grass'}.png`} />
+				<Image src={`/combatTiles/${image}.png`} />
 			</Box>
 			{children}
 		</Box>

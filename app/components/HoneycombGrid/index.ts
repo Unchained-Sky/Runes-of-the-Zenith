@@ -1,4 +1,4 @@
-import CombatGridEdit from './CombatGridEdit'
+import CombatGridEdit from './CombatGridEdit/CombatGridEdit'
 import CombatGridPreview from './CombatGridPreview'
 
 export { CombatGridEdit, CombatGridPreview }
