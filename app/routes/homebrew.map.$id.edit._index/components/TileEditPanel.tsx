@@ -1,4 +1,4 @@
-import { Drawer, Image, SimpleGrid, UnstyledButton } from '@mantine/core'
+import { Button, Drawer, Image, SimpleGrid, Stack, UnstyledButton } from '@mantine/core'
 import { useMapEditStore } from '../useMapEditStore'
 
 export default function TileEditPanel() {
@@ -21,13 +21,16 @@ export default function TileEditPanel() {
 			}}
 			title={`Editing ${selectedTiles.length} tiles`}
 		>
-			<TileImage />
+			<Drawer.Body component={Stack}>
+				<TileImage />
+				<DeleteTiles />
+			</Drawer.Body>
 		</Drawer>
 	)
 }
 
 function TileImage() {
-	const updateTiles = useMapEditStore(state => state.updateTiles)
+	const updateTiles = useMapEditStore(state => state.updateSelectedTiles)
 
 	return (
 		<SimpleGrid cols={3} spacing='md'>
@@ -40,4 +43,10 @@ function TileImage() {
 			})}
 		</SimpleGrid>
 	)
+}
+
+function DeleteTiles() {
+	const deleteSelectedTiles = useMapEditStore(state => state.deleteSelectedTiles)
+
+	return <Button color='red' onClick={deleteSelectedTiles}>Delete Tiles</Button>
 }

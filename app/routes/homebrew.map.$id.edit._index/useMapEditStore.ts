@@ -33,7 +33,9 @@ type MapEditActions = {
 	clearSelectedTiles: () => void
 
 	updateMapName: (mapName: MapEditState['mapName']) => void
-	updateTiles: (tileData: Partial<CombatTile>) => void
+	updateSelectedTiles: (tileData: Partial<CombatTile>) => void
+	addTiles: (tiles: CombatTile[]) => void
+	deleteSelectedTiles: () => void
 }
 
 const actionName = createActionName<MapEditActions>('mapEdit')
@@ -79,12 +81,12 @@ export const createMapEditActions: Slice<MapEditStore, MapEditActions, [DevTools
 		}, ...actionName('updateMapName'))
 	},
 
-	updateTiles: tileDate => {
+	updateSelectedTiles: tileDate => {
 		const tiles = get().selectedTiles
 
 		set({
 			hasChanged: { tiles: true }
-		}, ...actionName('updateTiles/hasChanged'))
+		}, ...actionName('updateSelectedTiles/hasChanged'))
 
 		tiles.forEach(tile => {
 			set(state => ({
@@ -95,8 +97,35 @@ export const createMapEditActions: Slice<MapEditStore, MapEditActions, [DevTools
 						...tileDate
 					}
 				}
-			}), ...actionName(`updateTiles/updateTile/${tile}`))
+			}), ...actionName(`updateSelectedTiles/updateTile/${tile}`))
 		})
+	},
+
+	addTiles: tiles => {
+		const newTiles = typedObject.fromEntries(
+			tiles.map<[CombatTileString, CombatTile]>(({ cord, image, terrainType }) => [
+				`${cord[0]},${cord[1]},${cord[2]}` as const,
+				{ cord, image, terrainType }
+			])
+		)
+
+		set(state => {
+			return {
+				hasChanged: { tiles: true },
+				tiles: {
+					...state.tiles,
+					...newTiles
+				}
+			}
+		}, ...actionName('addTiles'))
+	},
+
+	deleteSelectedTiles: () => {
+		set({
+			hasChanged: { tiles: true },
+			tiles: typedObject.omit(get().tiles, get().selectedTiles),
+			selectedTiles: []
+		}, ...actionName('deleteSelectedTiles'))
 	}
 })
 
