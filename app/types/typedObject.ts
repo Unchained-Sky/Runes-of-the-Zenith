@@ -54,5 +54,12 @@ export const typedObject = {
 		return Object.fromEntries(
 			Object.entries(obj).filter(([key]) => !omitKeys.has(key))
 		) as Omit<T, K>
+	},
+	pick: <T extends Record<string, unknown>, K extends keyof T>(obj: T, keys: K[]) => {
+		return Object.fromEntries(
+			keys
+				.filter(key => key in obj)
+				.map(key => [key, obj[key]])
+		) as Pick<T, K>
 	}
 } as const

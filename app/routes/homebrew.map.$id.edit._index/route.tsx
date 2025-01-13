@@ -63,8 +63,8 @@ export async function action({ params, request }: ActionFunctionArgs) {
 	const serviceClient = getServiceClient()
 
 	const dataValidator = type({
-		mapName: 'string | null',
-		tiles: {
+		'mapName?': 'string | null',
+		'tiles?': {
 			'[string]': {
 				cord: ['number', 'number', 'number'],
 				image: 'string',
@@ -87,16 +87,14 @@ export async function action({ params, request }: ActionFunctionArgs) {
 		if (error) throw new Error(error.message, { cause: error })
 	}
 
-	{
-		const { error } = await serviceClient
+	if (data.tiles) {
+		const { error: deleteError } = await serviceClient
 			.from('map_combat_tile')
 			.delete()
 			.eq('map_id', mapId)
-		if (error) throw new Error(error.message, { cause: error })
-	}
+		if (deleteError) throw new Error(deleteError.message, { cause: deleteError })
 
-	{
-		const { error } = await serviceClient
+		const { error: insertError } = await serviceClient
 			.from('map_combat_tile')
 			.insert(Object.values(data.tiles).map(tile => ({
 				map_id: mapId,
@@ -106,7 +104,7 @@ export async function action({ params, request }: ActionFunctionArgs) {
 				image: tile.image,
 				terrain_type: tile.terrainType
 			})))
-		if (error) throw new Error(error.message, { cause: error })
+		if (insertError) throw new Error(insertError.message, { cause: insertError })
 	}
 
 	return redirect(`/homebrew/map/${mapId}/edit`, { headers })

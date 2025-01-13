@@ -42,6 +42,8 @@ const actionName = createActionName<MapEditActions>('mapEdit')
 
 export const createMapEditActions: Slice<MapEditStore, MapEditActions, [DevTools]> = (set, get) => ({
 	syncLoader: loader => {
+		if (loader.syncValue === get().syncValue) return
+
 		const tiles = typedObject.fromEntries(
 			loader.mapTiles.map<[CombatTileString, CombatTile]>(({ q, r, s, image, terrain_type }) => [
 				`${q},${r},${s}` as const,
@@ -75,18 +77,24 @@ export const createMapEditActions: Slice<MapEditStore, MapEditActions, [DevTools
 	},
 
 	updateMapName: mapName => {
-		set({
+		set(state => ({
 			mapName,
-			hasChanged: { mapName: !!mapName }
-		}, ...actionName('updateMapName'))
+			hasChanged: {
+				...state.hasChanged,
+				mapName: !!mapName
+			}
+		}), ...actionName('updateMapName'))
 	},
 
 	updateSelectedTiles: tileDate => {
 		const tiles = get().selectedTiles
 
-		set({
-			hasChanged: { tiles: true }
-		}, ...actionName('updateSelectedTiles/hasChanged'))
+		set(state => ({
+			hasChanged: {
+				...state.hasChanged,
+				tiles: true
+			}
+		}), ...actionName('updateSelectedTiles/hasChanged'))
 
 		tiles.forEach(tile => {
 			set(state => ({
@@ -109,15 +117,17 @@ export const createMapEditActions: Slice<MapEditStore, MapEditActions, [DevTools
 			])
 		)
 
-		set(state => {
-			return {
-				hasChanged: { tiles: true },
-				tiles: {
-					...state.tiles,
-					...newTiles
-				}
+		set(state => ({
+			hasChanged: {
+				...state.hasChanged,
+				tiles: true
+			},
+			tiles: {
+				...state.tiles,
+				...newTiles
 			}
-		}, ...actionName('addTiles'))
+
+		}), ...actionName('addTiles'))
 	},
 
 	deleteSelectedTiles: () => {

@@ -1,5 +1,6 @@
 import { Button, rem } from '@mantine/core'
 import { useSubmit } from '@remix-run/react'
+import { typedObject } from '~/types/typedObject'
 import { useMapEditStore } from '../useMapEditStore'
 
 export default function Submit() {
@@ -16,9 +17,11 @@ export default function Submit() {
 			right={rem(32)}
 			bottom={rem(32)}
 			onClick={() => {
-				// TODO - only send changed data
-				const { mapName, tiles } = useMapEditStore.getState()
-				submit({ data: JSON.stringify({ mapName, tiles }) }, { method: 'POST', encType: 'multipart/form-data' })
+				const changedKeys = typedObject.entries(hasChanged)
+					.filter(([_key, value]) => value)
+					.map(([key, _value]) => key)
+				const data = typedObject.pick(useMapEditStore.getState(), changedKeys)
+				submit({ data: JSON.stringify(data) }, { method: 'POST', encType: 'multipart/form-data' })
 			}}
 		>
 			Save
