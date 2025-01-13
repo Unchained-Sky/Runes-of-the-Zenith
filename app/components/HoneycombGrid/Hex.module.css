@@ -1,0 +1,10 @@
+.editHex {
+  border: none;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+
+  @mixin hover {
+    filter: invert(0.3);
+  }
+}

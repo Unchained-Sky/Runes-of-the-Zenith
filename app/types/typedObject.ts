@@ -45,8 +45,21 @@ export const typedObject = {
 	entries: <T extends object>(object: T) => Object.entries(object) as unknown as ReadonlyArray<Entry<T>>,
 	fromEntries: <const T extends ReadonlyArray<readonly [PropertyKey, unknown]>>(
 		entries: T
-	): { [K in T[number] as K[0]]: K[1] } => {
-		return Object.fromEntries(entries) as { [K in T[number] as K[0]]: K[1] }
+	): { [K in T[number]as K[0]]: K[1] } => {
+		return Object.fromEntries(entries) as { [K in T[number]as K[0]]: K[1] }
 	},
-	assign: <TArr extends readonly object[]>(...objects: TArr) => Object.assign({}, ...objects) as MergeArrayOfObjects<TArr>
+	assign: <TArr extends readonly object[]>(...objects: TArr) => Object.assign({}, ...objects) as MergeArrayOfObjects<TArr>,
+	omit: <T extends Record<string, unknown>, K extends keyof T>(obj: T, keys: K[]): Omit<T, K> => {
+		const omitKeys = new Set(keys as string[])
+		return Object.fromEntries(
+			Object.entries(obj).filter(([key]) => !omitKeys.has(key))
+		) as Omit<T, K>
+	},
+	pick: <T extends Record<string, unknown>, K extends keyof T>(obj: T, keys: K[]) => {
+		return Object.fromEntries(
+			keys
+				.filter(key => key in obj)
+				.map(key => [key, obj[key]])
+		) as Pick<T, K>
+	}
 } as const
