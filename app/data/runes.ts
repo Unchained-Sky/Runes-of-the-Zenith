@@ -1,4 +1,8 @@
-import { type CategoryKey } from './categories'
+import { type NodeCategories, type NodeCategory } from '~/scripts/data/skills/skillFormatter'
+
+type CategoryKey<T extends NodeCategory = NodeCategory> = {
+	[K in T]: `${K}-${NodeCategories[K]}`
+}[T]
 
 export type RuneData = RuneInternal<RuneName>
 

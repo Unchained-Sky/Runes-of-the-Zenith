@@ -1,27 +1,27 @@
 import { Stack, Text } from '@mantine/core'
-import { type TalentNodeData } from '~/data/talents/talentData'
+import { type SkillNodeData } from '~/scripts/data/skills/skillData'
 
 const size = '100px'
-const nodeTypeTextColour: Record<TalentNodeData['nodeType'], string> = {
+const nodeTypeTextColour: Record<SkillNodeData['type'], string> = {
 	Start: '#09ded7',
 	Rune: '#4509de',
 	Stat: '#deb009'
 }
 
 type TalentNodeProps = {
-	nodeData: TalentNodeData
+	nodeData: SkillNodeData
 }
 
-export default function TalentNode({ nodeData: { nodeType, nodeText, pos } }: TalentNodeProps) {
+export default function TalentNode({ nodeData: { type, description, cord: [x, y] } }: TalentNodeProps) {
 	// const [selected, setSelected] = useState(false)
 
-	console.log({ nodeType, nodeText, pos })
+	console.log({ nodeType: type, nodeText: description, cord: [x, y] })
 
 	return (
 		<Stack
 			pos='absolute'
-			left={pos.xPos}
-			top={pos.yPos}
+			left={x}
+			top={y}
 			w={size}
 			h={size}
 			bd='3px solid black'
@@ -33,16 +33,16 @@ export default function TalentNode({ nodeData: { nodeType, nodeText, pos } }: Ta
 		>
 			<Text
 				size='lg'
-				c={nodeTypeTextColour[nodeType]}
+				c={nodeTypeTextColour[type]}
 				ta='center'
 			>
-				{nodeType}
+				{type}
 			</Text>
 			<Text
 				size='sm'
 				ta='center'
 			>
-				{nodeText}
+				{description}
 			</Text>
 		</Stack>
 	)

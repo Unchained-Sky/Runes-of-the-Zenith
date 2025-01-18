@@ -14,7 +14,8 @@
     "sst:deploy": "sst deploy",
     "sst:dev": "sst dev",
     "supabase:login": "supabase login",
-    "supabase:types": "supabase gen types typescript --project-id kttsshgvhhwzwjhwiesz > app/.server/supabase/databaseTypes.d.ts"
+    "supabase:types": "supabase gen types typescript --project-id kttsshgvhhwzwjhwiesz > app/.server/supabase/databaseTypes.d.ts",
+    "update:skills": "bun run ./scripts/skillDeletion.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.1.0",

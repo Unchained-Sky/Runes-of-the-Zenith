@@ -1,7 +1,7 @@
 import { Box } from '@mantine/core'
 import { useRef } from 'react'
 import { TransformComponent, TransformWrapper, type ReactZoomPanPinchRef } from 'react-zoom-pan-pinch'
-import { talentData } from '~/data/talents/talentData'
+import { skillData, type SkillNodeData } from '~/scripts/data/skills/skillData'
 import TalentNode from './TalentNode'
 
 export default function Talents() {
@@ -29,11 +29,11 @@ export default function Talents() {
 				>
 					{/** Giant Talents Div **/}
 					{
-						[...talentData.values()].map((data, i) => {
+						[...skillData.values()].map((data, i) => {
 							return (
 								<TalentNode
 									key={i}
-									nodeData={data}
+									nodeData={data as unknown as SkillNodeData}
 								/>
 							)
 						})

@@ -54,6 +54,9 @@
       "~/utils/*": [
         "./app/utils/*"
       ],
+      "~/scripts/*": [
+        "./scripts/*"
+      ]
     },
     // Vite takes care of building everything, not tsc.
     "noEmit": true
