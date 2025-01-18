@@ -1,38 +1,70 @@
 import { createHash } from 'node:crypto'
 import { skillData, skillVersion } from '~/scripts/data/skills/skillData'
+import { type TablesInsert } from '~/supabase/databaseTypes'
 import { getServiceClient } from '~/supabase/getServiceClient'
 
 const supabase = getServiceClient()
+const version = skillVersion
+
+{
+	const { error } = await supabase
+		.from('skill_links')
+		.delete()
+		.eq('version', version)
+	if (error) throw new Error(error.message, { cause: error })
+	console.log('Successfully deleted skill_links table data')
+}
 
 {
 	const { error } = await supabase
 		.from('skill_info')
 		.delete()
-		.eq('version', skillVersion)
+		.eq('version', version)
 	if (error) throw new Error(error.message, { cause: error })
 	console.log('Successfully deleted skill_info table data')
 }
 
 {
-	// map ts skill data to sql format
-
 	const { error } = await supabase
 		.from('skill_info')
 		.insert(
 			skillData.map(data => {
-				const skillIdHash = createHash('md5')
-					.update(`${data.skillId}-${data.nodeId}`)
+				const hash = createHash('md5')
+					.update(`${data.skillId}-${version}`)
 					.digest('hex')
 
 				return {
-					hash: skillIdHash,
-					skill_data: {},
+					hash,
 					skill_id: data.skillId,
-					version: skillVersion
-				}
+					skill_data: {},
+					version
+				} satisfies TablesInsert<'skill_info'>
 			})
 		)
 
 	if (error) throw new Error(error.message, { cause: error })
 	console.log('Successfully inserted updated skill_info table data')
+}
+
+{
+	const { error } = await supabase
+		.from('skill_links')
+		.insert(
+			skillData.map(data => {
+				return data.childNodes.map(childNodeId => {
+					const hash = createHash('md5')
+						.update(`${data.skillId}-${childNodeId}-${version}`)
+						.digest('hex')
+
+					return {
+						hash,
+						skill_id: data.skillId,
+						next_skill_id: childNodeId,
+						version
+					} satisfies TablesInsert<'skill_links'>
+				})
+			}).flat(1)
+		)
+	if (error) throw new Error(error.message, { cause: error })
+	console.log('Successfully inserted updated skill_links table data')
 }

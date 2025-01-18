@@ -3,31 +3,25 @@ import skillFormatter from '~/scripts/data/skills/skillFormatter'
 
 const unholyNodes: SkillNodeData[] = [
 	{
-		nodeId: 0,
-		nodeType: 'Stat',
-		nodeText: 'Int +1',
-		pos: {
-			xPos: 1000,
-			yPos: 0
-		}
+		id: 0,
+		type: 'Stat',
+		description: 'Int +1',
+		cord: [1000, 0],
+		childNodes: [1]
 	},
 	{
-		nodeId: 1,
-		nodeType: 'Stat',
-		nodeText: 'Int +1',
-		pos: {
-			xPos: 2000,
-			yPos: 100
-		}
+		id: 1,
+		type: 'Stat',
+		description: 'Int +1',
+		cord: [2000, 100],
+		childNodes: [2]
 	},
 	{
-		nodeId: 2,
-		nodeType: 'Rune',
-		nodeText: 'Radiant Blast',
-		pos: {
-			xPos: 0,
-			yPos: 100
-		}
+		id: 2,
+		type: 'Rune',
+		description: 'Radiant Blast',
+		cord: [0, 100],
+		childNodes: []
 	}
 ]
 

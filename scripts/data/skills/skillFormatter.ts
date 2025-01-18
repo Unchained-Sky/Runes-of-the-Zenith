@@ -26,13 +26,17 @@ type PhysicalNodeCategories = {
 	war_cry: 'war_cry'
 }
 
-type NodeCategories = MagicNodeCategories & PhysicalNodeCategories
-type NodeCategory = keyof NodeCategories
+export type NodeCategories = MagicNodeCategories & PhysicalNodeCategories
+export type NodeCategory = keyof NodeCategories
 
 type NodeSubcategory<T extends NodeCategory> = {
 	[K in T]: NodeCategories[K]
 }[T]
 
 export default function skillFormatter<T extends NodeCategory>(skillData: SkillNodeData[], category: T, subcategory: NodeSubcategory<T>) {
-	return skillData.map(node => typedObject.assign(node, { skillId: `${category}-${subcategory}-${node.nodeId}` as const }))
+	const idFormat = (id: number) => `${category}-${subcategory}-${id}` as const
+	return skillData.map(node => {
+		const nodeWithChild = typedObject.assign(node, { childNodes: node.childNodes.map(idFormat) })
+		return typedObject.assign(nodeWithChild, { skillId: idFormat(node.id) })
+	})
 }

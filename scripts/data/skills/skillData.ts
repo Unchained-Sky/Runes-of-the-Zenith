@@ -12,16 +12,12 @@ type NodeType =
 	| 'Rune'
 	| 'Stat'
 
-type Coordinate = {
-	xPos: number
-	yPos: number
-}
-
 export type SkillNodeData = {
-	nodeId: number
-	nodeType: NodeType
-	nodeText: string
-	pos: Coordinate
+	id: number
+	type: NodeType
+	description: string
+	cord: [x: number, y: number]
+	childNodes: number[]
 }
 
 export const skillData = [physicalTalents, magicTalents].flat(10)
