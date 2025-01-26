@@ -1,7 +1,8 @@
-import { Button, Code, Group, Stack, Text, Title } from '@mantine/core'
+import { Button, Code, Group, rem, Stack, Text, Title } from '@mantine/core'
 import { json, type LoaderFunctionArgs } from '@remix-run/node'
 import { Link, redirect, useLoaderData, type MetaFunction } from '@remix-run/react'
 import { getServerClient } from '~/supabase/getServerClient'
+import { getUserId } from '~/supabase/getUserId'
 import { isNumberParam } from '~/utils/isNumberParam'
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
@@ -18,21 +19,30 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 	const { data, error } = await supabase
 		.from('campaign_info')
 		.select(`
-			campaignName:campaign_name,
-			inviteId:invite_id,
-			characterInfo:character_info(
-				name:character_name,
-				id:character_id
+			campaignName: campaign_name,
+			inviteId: invite_id,
+			campaignOwnerId: user_id,
+			characterInfo: character_info(
+				name: character_name,
+				id: character_id
 			)
 		`)
 		.eq('campaign_id', campaignId)
-	if (error || !data.length) throw redirect('/', { headers })
+	if (error || !data.length) throw redirect('/campaign', { headers })
 
-	return json(data[0], { headers })
+	const isOwner = data[0].campaignOwnerId === (await getUserId(supabase)).userId
+
+	return json({
+		campaignName: data[0].campaignName,
+		characterInfo: data[0].characterInfo,
+		inviteId: data[0].inviteId,
+		campaignId,
+		isOwner
+	}, { headers })
 }
 
 export default function CampaignPage() {
-	const { campaignName, characterInfo, inviteId } = useLoaderData<typeof loader>()
+	const { campaignName, characterInfo, inviteId, campaignId, isOwner } = useLoaderData<typeof loader>()
 
 	return (
 		<Stack>
@@ -41,6 +51,7 @@ export default function CampaignPage() {
 				<Text>Invite URL</Text>
 				<Code>{`http://localhost:5173/campaign/join/${inviteId}`}</Code>
 			</Group>
+
 			<Title order={2}>Characters:</Title>
 			<Group>
 				{
@@ -51,6 +62,9 @@ export default function CampaignPage() {
 						: <Text fs='italic'>None</Text>
 				}
 			</Group>
+
+			<Title order={2}>Tabletop</Title>
+			<Button component={Link} to={`/tabletop/${campaignId}${isOwner ? '/gm' : ''}`} maw={rem(240)}>Play</Button>
 		</Stack>
 	)
 }
