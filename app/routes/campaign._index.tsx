@@ -60,7 +60,7 @@ export default function Campaigns() {
 							<CampaignCard
 								key={campaign_id}
 								campaign_id={campaign_id}
-								campaign_name={campaign_info?.campaign_name ?? ''}
+								campaign_name={campaign_info.campaign_name}
 							/>
 						)
 					})

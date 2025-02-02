@@ -1,8 +1,11 @@
-import { Title } from '@mantine/core'
 import { json, redirect, type LoaderFunctionArgs, type MetaFunction } from '@remix-run/node'
+import { useLoaderData } from '@remix-run/react'
+import { CombatGridTabletopGM } from '~/components/HoneycombGrid'
 import { getUserId } from '~/supabase/getUserId'
 import { requireAccount } from '~/supabase/requireAccount'
 import { safeParseInt } from '~/utils/isNumberParam'
+import SettingsPanel from './components/SettingsPanel'
+import { getCampaignName, getMaps, getTiles, type LoaderOptions } from './loader'
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
 	return [
@@ -17,18 +20,40 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 
 	const { supabase, headers } = await requireAccount(request)
 	const { userId } = (await getUserId(supabase))
-	const { data, error } = await supabase
-		.from('campaign_info')
-		.select('campaignName: campaign_name')
-		.eq('campaign_id', campaignId)
-		.eq('user_id', userId)
-	if (error || !data.length) throw redirect(`/tabletop/${campaignIdParam}`, { headers })
+
+	const loaderOptions: LoaderOptions = {
+		supabase,
+		headers,
+		campaignId,
+		userId
+	}
+
+	const [
+		campaignName,
+		tiles,
+		maps
+	] = await Promise.all([
+		getCampaignName(loaderOptions),
+		getTiles(loaderOptions),
+		getMaps(loaderOptions)
+	])
 
 	return json({
-		campaignName: data[0].campaignName
+		campaignId,
+		campaignName,
+		tiles,
+		maps
 	}, { headers })
 }
 
 export default function Route() {
-	return <Title>GM</Title>
+	const { tiles } = useLoaderData<typeof loader>()
+
+	return (
+		<>
+			<CombatGridTabletopGM tiles={tiles} />
+
+			<SettingsPanel />
+		</>
+	)
 }

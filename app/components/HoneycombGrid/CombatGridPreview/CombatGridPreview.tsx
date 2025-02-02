@@ -1,7 +1,7 @@
 import { Box } from '@mantine/core'
 import { type CombatTile } from '~/data/mapTemplates/combat'
-import Hex from './Hex'
-import useHoneycombGridSize from './useHoneycombGridSize'
+import Hex from '../Hex'
+import useHoneycombGridSize from '../useHoneycombGridSize'
 
 type CombatGridPreview = {
 	tiles: CombatTile[]
