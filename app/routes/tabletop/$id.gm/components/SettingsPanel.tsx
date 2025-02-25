@@ -3,7 +3,7 @@ import { useDisclosure } from '@mantine/hooks'
 import { Form, useLoaderData } from '@remix-run/react'
 import { IconMenu2, IconX } from '@tabler/icons-react'
 import { useState } from 'react'
-import { type loader } from '../route'
+import { type loader } from '..'
 
 export default function SettingsPanel() {
 	const [opened, handlers] = useDisclosure(false)

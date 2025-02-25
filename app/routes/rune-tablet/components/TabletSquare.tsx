@@ -1,10 +1,10 @@
 import { useDroppable } from '@dnd-kit/core'
 import { Box } from '@mantine/core'
+import { TABLET_SQUARE_SIZE, TABLE_SCALE } from 'app/routes/rune-tablet/data/constants'
+import testForwardRef from 'app/routes/rune-tablet/utils/typeGuardForwardRef'
+import { testDataIsRune } from 'app/routes/rune-tablet/utils/typeGuardRuneTablet'
 import { type ForwardedRef, forwardRef, useMemo } from 'react'
 import { getRune } from '~/data/runes'
-import { TABLET_SQUARE_SIZE, TABLE_SCALE } from '~/RT/data/constants'
-import testForwardRef from '~/RT/utils/typeGuardForwardRef'
-import { testDataIsRune } from '~/RT/utils/typeGuardRuneTablet'
 import Rune from './Rune'
 import { type SquareRefMap, type TabletCords } from './Tablet'
 

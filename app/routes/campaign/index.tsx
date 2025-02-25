@@ -1,6 +1,6 @@
 import { Button, Card, Group, rem, Stack, Title } from '@mantine/core'
 import { type LoaderFunctionArgs } from '@remix-run/node'
-import { json, Link, redirect, useLoaderData, type MetaFunction } from '@remix-run/react'
+import { Link, redirect, useLoaderData, type MetaFunction } from '@remix-run/react'
 import { getUserId } from '~/supabase/getUserId'
 import { requireAccount } from '~/supabase/requireAccount'
 
@@ -31,10 +31,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
 			`)
 	if (playerError) throw redirect('/', { headers })
 
-	return json({ gmCampaigns, playerCampaigns }, { headers })
+	return { gmCampaigns, playerCampaigns }
 }
 
-export default function Campaigns() {
+export default function Route() {
 	const { gmCampaigns, playerCampaigns } = useLoaderData<typeof loader>()
 
 	return (

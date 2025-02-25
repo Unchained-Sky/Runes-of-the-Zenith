@@ -16,12 +16,14 @@ export async function action({ params, request }: ActionFunctionArgs) {
 			.select('user_id')
 			.eq('campaign_id', campaignId)
 		if (error) throw new Error(error.message, { cause: error })
-		if (data[0].user_id !== userId) return redirect(`/tabletop/${campaignId}/gm`, { headers })
+		if (data[0].user_id !== userId) throw new Error('Invalid user')
 	}
 
 	const formData = await request.formData()
-	const mapId = safeParseInt(formData.get('mapId')?.toString() ?? '')
-	if (!mapId) return redirect(`/tabletop/${campaignId}/gm`, { headers })
+	const unsafeMapId = formData.get('mapId')
+	if (typeof unsafeMapId !== 'string') throw new Error('Invalid mapId')
+	const mapId = safeParseInt(unsafeMapId)
+	if (!mapId) throw new Error('Invalid mapId')
 
 	{
 		const { data, error } = await supabase
@@ -29,7 +31,7 @@ export async function action({ params, request }: ActionFunctionArgs) {
 			.select('mapType: map_type')
 			.eq('map_id', mapId)
 		if (error) throw new Error(error.message, { cause: error })
-		if (!data.length) redirect(`/tabletop/${campaignId}/gm`, { headers })
+		if (!data.length) throw new Error('Missing map data')
 	}
 
 	const serviceClient = getServiceClient()

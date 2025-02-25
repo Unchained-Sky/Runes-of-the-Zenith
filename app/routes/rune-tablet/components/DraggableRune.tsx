@@ -1,8 +1,8 @@
 import { useDraggable } from '@dnd-kit/core'
+import Rune, { type RuneProps } from 'app/routes/rune-tablet/components/Rune'
+import { TABLE_SCALE } from 'app/routes/rune-tablet/data/constants'
 import { type CSSProperties } from 'react'
 import { type RuneName } from '~/data/runes'
-import Rune, { type RuneProps } from '~/RT/components/Rune'
-import { TABLE_SCALE } from '~/RT/data/constants'
 
 export type DraggableRuneData = {
 	runeName: RuneName

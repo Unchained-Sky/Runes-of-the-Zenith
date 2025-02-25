@@ -1,7 +1,7 @@
 import { Box, type BoxProps } from '@mantine/core'
+import { RUNE_SQUARE_SIZE } from 'app/routes/rune-tablet/data/constants'
 import { type ForwardedRef, forwardRef } from 'react'
 import { getRune, type RuneName } from '~/data/runes'
-import { RUNE_SQUARE_SIZE } from '~/RT/data/constants'
 
 export type RuneProps = {
 	runeName: RuneName

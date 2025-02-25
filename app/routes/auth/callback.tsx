@@ -15,5 +15,5 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		}
 	}
 
-	return redirect('/auth/auth-error', { headers })
+	return redirect('/auth/error', { headers })
 }

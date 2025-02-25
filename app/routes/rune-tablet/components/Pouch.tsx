@@ -1,6 +1,6 @@
 import { Button, Stack } from '@mantine/core'
-import { RUNE_SQUARE_SIZE } from '~/RT/data/constants'
-import { useRuneTabletStore } from '~/RT/state/useRuneTabletStore'
+import { RUNE_SQUARE_SIZE } from 'app/routes/rune-tablet/data/constants'
+import { useRuneTabletStore } from 'app/routes/rune-tablet/state/useRuneTabletStore'
 import { typedObject } from '~/types/typedObject'
 import DraggableRune from './DraggableRune'
 

@@ -1,7 +1,7 @@
+import { type TabletCords } from 'app/routes/rune-tablet/components/Tablet'
 import { create } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
 import { type RuneName } from '~/data/runes'
-import { type TabletCords } from '~/RT/components/Tablet'
 import { persistStoreName } from '~/types/storeTypes'
 import { createRuneActions, type RuneActions } from './runeActions'
 import { createTabletActions, type TabletActions } from './tabletActions'

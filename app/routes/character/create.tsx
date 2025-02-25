@@ -1,57 +1,57 @@
 import { ActionIcon, Group, rem, Stack, TextInput, Title } from '@mantine/core'
-import { type ActionFunctionArgs, type LoaderFunctionArgs } from '@remix-run/node'
-import { Form, json, redirect, useActionData, type MetaFunction } from '@remix-run/react'
+import { type ActionFunctionArgs, type LoaderFunctionArgs, type MetaFunction } from '@remix-run/node'
+import { Form, redirect, useActionData } from '@remix-run/react'
 import { IconCirclePlusFilled } from '@tabler/icons-react'
 import { requireAccount } from '~/supabase/requireAccount'
 
 export const meta: MetaFunction = () => {
 	return [
-		{ title: 'Create Campaigns' }
+		{ title: 'Create Character' }
 	]
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
-	const { headers } = await requireAccount(request)
-	return json({}, { headers })
+	await requireAccount(request)
+	return {}
 }
 
 export async function action({ request }: ActionFunctionArgs) {
 	const { supabase, headers } = await requireAccount(request)
 
 	const formData = await request.formData()
-	const campaignName = formData.get('campaign_name')
-	if (typeof campaignName !== 'string' || campaignName.length <= 0 || campaignName.length > 32) {
+	const characterName = formData.get('character_name')
+	if (typeof characterName !== 'string' || characterName.length <= 0 || characterName.length > 32) {
 		return {
-			errorMessage: 'Invalid Campaign Name',
-			component: 'campaign_name'
+			errorMessage: 'Invalid Character Name',
+			component: 'character_name'
 		}
 	}
 
 	const { data, error } = await supabase
-		.from('campaign_info')
-		.insert({ campaign_name: campaignName })
+		.from('character_info')
+		.insert({ character_name: characterName })
 		.select()
 	if (error) throw new Error(error.message, { cause: error })
 
-	const { campaign_id } = data[0]
+	const { character_id } = data[0]
 
-	return redirect(`/campaign/${campaign_id}`, { headers })
+	return redirect(`/character/${character_id}`, { headers })
 }
 
-export default function CampaignsCreate() {
+export default function Route() {
 	const { errorMessage, component } = useActionData<typeof action>() ?? {}
 
 	return (
 		<Stack>
-			<Title>Create Campaign</Title>
+			<Title>Create Character</Title>
 
 			<Form method='POST'>
 				<Group align='center'>
 					<TextInput
-						label='Campaign Name'
+						label='Character Name'
 						w={rem(240)}
-						name='campaign_name'
-						error={component === 'campaign_name' && errorMessage}
+						name='character_name'
+						error={component === 'character_name' && errorMessage}
 						rightSection={(
 							<ActionIcon type='submit'>
 								<IconCirclePlusFilled />
@@ -60,6 +60,7 @@ export default function CampaignsCreate() {
 					/>
 				</Group>
 			</Form>
+
 		</Stack>
 	)
 }

@@ -1,5 +1,5 @@
 import { Box } from '@mantine/core'
-import { useMapEditStore } from 'app/routes/homebrew.map.$id.edit._index/useMapEditStore'
+import { useMapEditStore } from 'app/routes/homebrew/map/$id.edit/useMapEditStore'
 import { useMemo } from 'react'
 import { COPY_TILE_WIDTH, HEX_GAP } from '../constants'
 import Hex from '../Hex'

@@ -1,5 +1,5 @@
 import { type ActionFunctionArgs, type LoaderFunctionArgs } from '@remix-run/node'
-import { json, redirect, useLoaderData, type MetaFunction } from '@remix-run/react'
+import { redirect, useLoaderData, type MetaFunction } from '@remix-run/react'
 import { type } from 'arktype'
 import { CombatGridEdit } from '~/components/HoneycombGrid'
 import useMountEffect from '~/hooks/useMountEffect'
@@ -39,10 +39,10 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 
 	if (!data[0].tileCount[0].count) throw redirect(`/homebrew/map/${mapId}/template`, { headers })
 
-	return json({
+	return {
 		syncValue: +new Date(),
 		...data[0]
-	}, { headers })
+	}
 }
 
 export async function action({ params, request }: ActionFunctionArgs) {
@@ -74,7 +74,11 @@ export async function action({ params, request }: ActionFunctionArgs) {
 		}
 	})
 	const formData = await request.formData()
-	const data = dataValidator(JSON.parse(String(formData.get('data'))))
+
+	const unsafeData = formData.get('data')
+	if (typeof unsafeData !== 'string') throw new Error('Invalid data')
+
+	const data = dataValidator(JSON.parse(unsafeData))
 	if (data instanceof type.errors) throw new Error(data.summary)
 
 	if (data.mapName && data.mapName.length > 0) {
@@ -110,7 +114,7 @@ export async function action({ params, request }: ActionFunctionArgs) {
 	return redirect(`/homebrew/map/${mapId}/edit`, { headers })
 }
 
-export default function MapEditor() {
+export default function Route() {
 	const loaderData = useLoaderData<typeof loader>()
 
 	const syncLoader = useMapEditStore(state => state.syncLoader)

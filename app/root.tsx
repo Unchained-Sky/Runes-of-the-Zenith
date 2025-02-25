@@ -1,6 +1,6 @@
 import { Box, ColorSchemeScript, Group } from '@mantine/core'
 import { type LinksFunction, type LoaderFunctionArgs } from '@remix-run/node'
-import { json, Links, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } from '@remix-run/react'
+import { Links, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } from '@remix-run/react'
 import { type ReactNode } from 'react'
 import Mantine, { defaultColorScheme } from '~/components/Mantine'
 import Navbar from '~/components/Navbar'
@@ -12,7 +12,7 @@ import './styles/font.css'
 export const links: LinksFunction = () => []
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-	const { userIdentity, supabase, headers } = await getUserIdentity(request)
+	const { userIdentity, supabase } = await getUserIdentity(request)
 
 	const { count: campaignCount } = await supabase
 		.from('campaign_info')
@@ -25,11 +25,11 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 		.select('', { count: 'exact' })
 		.eq('user_id', userId)
 
-	return json({
+	return {
 		userIdentity,
 		campaignCount: campaignCount ?? 0,
 		characterCount: characterCount ?? 0
-	}, { headers })
+	}
 }
 
 export function Layout({ children }: { children: ReactNode }) {

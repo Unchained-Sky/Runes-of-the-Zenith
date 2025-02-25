@@ -1,6 +1,6 @@
 import { Button, rem, Stack, Title } from '@mantine/core'
 import { type LoaderFunctionArgs } from '@remix-run/node'
-import { json, Link, redirect, useLoaderData, type MetaFunction } from '@remix-run/react'
+import { Link, redirect, useLoaderData, type MetaFunction } from '@remix-run/react'
 import { getServerClient } from '~/supabase/getServerClient'
 import { isNumberParam } from '~/utils/isNumberParam'
 
@@ -21,10 +21,10 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 		.eq('map_id', mapId)
 	if (error || !data.length) throw redirect('/homebrew/map', { headers })
 
-	return json(data[0], { headers })
+	return data[0]
 }
 
-export default function Map() {
+export default function Route() {
 	const { mapName, mapId } = useLoaderData<typeof loader>()
 
 	return (

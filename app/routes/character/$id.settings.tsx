@@ -1,5 +1,5 @@
 import { Button, rem, Select, Stack, Switch, Title } from '@mantine/core'
-import { type ActionFunctionArgs, json, type LoaderFunctionArgs, type MetaFunction } from '@remix-run/node'
+import { type ActionFunctionArgs, type LoaderFunctionArgs, type MetaFunction } from '@remix-run/node'
 import { Form, redirect, useLoaderData } from '@remix-run/react'
 import { getServerClient } from '~/supabase/getServerClient'
 import { getServiceClient } from '~/supabase/getServiceClient'
@@ -38,26 +38,27 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 		.select('campaign_id, campaign_name')
 	if (campaignError) throw redirect('/', { headers })
 
-	return json({
+	return {
 		characterName,
 		campaignId,
 		campaigns: campaignData,
 		visibility
-	}, { headers })
+	}
 }
 
 export async function action({ params, request }: ActionFunctionArgs) {
 	const { supabase, headers } = await requireAccount(request)
 
 	const formData = await request.formData()
+	const characterId = isNumberParam(params.id, request.headers)
 
-	const linkedCampaign = formData.get('linked_campaign')?.toString() ?? ''
+	const linkedCampaign = formData.get('linked_campaign')
+	if (typeof linkedCampaign !== 'string') return redirect(`/character/${characterId}`, { headers })
 	const campaignId = safeParseInt(linkedCampaign)
 
 	const visibility = formData.get('private') === 'on' ? 'PRIVATE' : 'PUBLIC'
 
 	const serviceClient = getServiceClient()
-	const characterId = isNumberParam(params.id, request.headers)
 	const { userId } = await getUserId(supabase)
 
 	const { error } = await serviceClient
@@ -70,7 +71,7 @@ export async function action({ params, request }: ActionFunctionArgs) {
 	return redirect(`/character/${characterId}`, { headers })
 }
 
-export default function Character() {
+export default function Route() {
 	const { characterName, campaignId, campaigns, visibility } = useLoaderData<typeof loader>()
 
 	return (

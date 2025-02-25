@@ -1,6 +1,6 @@
 import { useDndMonitor } from '@dnd-kit/core'
-import { useRuneTabletStore } from '~/RT/state/useRuneTabletStore'
-import { testDataIsRune, testDataIsTableSquare } from '~/RT/utils/typeGuardRuneTablet'
+import { useRuneTabletStore } from 'app/routes/rune-tablet/state/useRuneTabletStore'
+import { testDataIsRune, testDataIsTableSquare } from 'app/routes/rune-tablet/utils/typeGuardRuneTablet'
 
 export default function useDropRune() {
 	const placeRune = useRuneTabletStore(state => state.placeRune)

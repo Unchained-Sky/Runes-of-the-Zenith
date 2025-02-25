@@ -1,5 +1,5 @@
 import { Button, Stack, Text, Title } from '@mantine/core'
-import { json, redirect, type ActionFunctionArgs, type LoaderFunctionArgs, type MetaFunction } from '@remix-run/node'
+import { redirect, type ActionFunctionArgs, type LoaderFunctionArgs, type MetaFunction } from '@remix-run/node'
 import { Form, useLoaderData } from '@remix-run/react'
 import { type SupabaseClient } from '@supabase/supabase-js'
 import { createHash } from 'node:crypto'
@@ -25,7 +25,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 	const { data, error } = await getCampaignInfo(inviteId, 'campaign_name')
 	if (error || !data || !data.length) throw redirect('/campaign', { headers })
 
-	return json({ campaignName: data[0].campaign_name }, { headers })
+	return { campaignName: data[0].campaign_name }
 }
 
 export async function action({ params, request }: ActionFunctionArgs) {
@@ -55,7 +55,7 @@ export async function action({ params, request }: ActionFunctionArgs) {
 	return redirect(`/campaign/${campaignId}`, { headers })
 }
 
-export default function CampaignJoinPage() {
+export default function Route() {
 	const { campaignName } = useLoaderData<typeof loader>()
 
 	return (

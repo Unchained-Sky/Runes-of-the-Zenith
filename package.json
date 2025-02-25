@@ -42,10 +42,11 @@
   "devDependencies": {
     "@nabla/vite-plugin-eslint": "^2.0.5",
     "@remix-run/dev": "^2.15.3",
+    "@remix-run/route-config": "^2.15.3",
     "@types/node": "^22.13.5",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
-    "@unchainedsky/eslint-config": "^2.2.5",
+    "@unchainedsky/eslint-config": "^2.2.6",
     "eslint": "^9.21.0",
     "postcss": "^8.5.3",
     "postcss-preset-mantine": "^1.17.0",

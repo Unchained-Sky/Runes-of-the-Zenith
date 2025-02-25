@@ -1,5 +1,5 @@
 import { Button, Code, Group, rem, Stack, Text, Title } from '@mantine/core'
-import { json, type LoaderFunctionArgs } from '@remix-run/node'
+import { type LoaderFunctionArgs } from '@remix-run/node'
 import { Link, redirect, useLoaderData, type MetaFunction } from '@remix-run/react'
 import { getServerClient } from '~/supabase/getServerClient'
 import { getUserId } from '~/supabase/getUserId'
@@ -32,16 +32,16 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 
 	const isOwner = data[0].campaignOwnerId === (await getUserId(supabase)).userId
 
-	return json({
+	return {
 		campaignName: data[0].campaignName,
 		characterInfo: data[0].characterInfo,
 		inviteId: data[0].inviteId,
 		campaignId,
 		isOwner
-	}, { headers })
+	}
 }
 
-export default function CampaignPage() {
+export default function Route() {
 	const { campaignName, characterInfo, inviteId, campaignId, isOwner } = useLoaderData<typeof loader>()
 
 	return (

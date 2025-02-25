@@ -1,6 +1,6 @@
 import { Box, Button, Group, Stack, Title } from '@mantine/core'
 import { type ActionFunctionArgs, type LoaderFunctionArgs } from '@remix-run/node'
-import { Form, json, type MetaFunction, redirect, useLoaderData } from '@remix-run/react'
+import { Form, type MetaFunction, redirect, useLoaderData } from '@remix-run/react'
 import { CombatGridPreview } from '~/components/HoneycombGrid'
 import { type CombatMap, type CombatMapTemplateName, getAllCombatMapTemplates, getCombatMapTemplate } from '~/data/mapTemplates/combat'
 import { type Tables } from '~/supabase/databaseTypes'
@@ -31,7 +31,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 
 	if (data[0].tileCount[0].count) throw redirect(`/homebrew/map/${mapId}/edit`, { headers })
 
-	return json(data[0], { headers })
+	return data[0]
 }
 
 export async function action({ params, request }: ActionFunctionArgs) {
@@ -57,7 +57,7 @@ export async function action({ params, request }: ActionFunctionArgs) {
 	return redirect(`/homebrew/map/${mapId}/edit`, { headers })
 }
 
-export default function MapTemplates() {
+export default function Route() {
 	const { mapName } = useLoaderData<typeof loader>()
 
 	const templates = getAllCombatMapTemplates()

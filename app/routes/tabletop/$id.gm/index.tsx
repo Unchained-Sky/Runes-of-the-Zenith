@@ -1,4 +1,4 @@
-import { json, redirect, type LoaderFunctionArgs, type MetaFunction } from '@remix-run/node'
+import { redirect, type LoaderFunctionArgs, type MetaFunction } from '@remix-run/node'
 import { useLoaderData } from '@remix-run/react'
 import { CombatGridTabletopGM } from '~/components/HoneycombGrid'
 import { getUserId } from '~/supabase/getUserId'
@@ -38,15 +38,15 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 		getMaps(loaderOptions)
 	])
 
-	return json({
+	return {
 		campaignId,
 		campaignName,
 		tiles,
 		maps
-	}, { headers })
+	}
 }
 
-export default function Route() {
+export default function Page() {
 	const { tiles } = useLoaderData<typeof loader>()
 
 	return (

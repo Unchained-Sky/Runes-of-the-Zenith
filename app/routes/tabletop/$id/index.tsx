@@ -1,5 +1,5 @@
 import { Title } from '@mantine/core'
-import { json, redirect, type LoaderFunctionArgs, type MetaFunction } from '@remix-run/node'
+import { redirect, type LoaderFunctionArgs, type MetaFunction } from '@remix-run/node'
 import { requireAccount } from '~/supabase/requireAccount'
 import { safeParseInt } from '~/utils/isNumberParam'
 
@@ -21,9 +21,9 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 		.eq('campaign_id', campaignId)
 	if (error || !data.length) throw redirect(`/tabletop/${campaignIdParam}`, { headers })
 
-	return json({
+	return {
 		campaignName: data[0].campaignName
-	}, { headers })
+	}
 }
 
 export default function Route() {

@@ -1,5 +1,5 @@
-import { type TabletCords } from '~/RT/components/Tablet'
-import { getTabletShape } from '~/RT/utils/getTableSize'
+import { type TabletCords } from 'app/routes/rune-tablet/components/Tablet'
+import { getTabletShape } from 'app/routes/rune-tablet/utils/getTableSize'
 import { getRune, type RuneName } from '~/data/runes'
 import { createActionName, type Slice } from '~/types/storeTypes'
 import { typedObject } from '~/types/typedObject'

@@ -8,7 +8,7 @@ export const meta: MetaFunction = () => {
 	]
 }
 
-export default function LoginPage() {
+export default function Route() {
 	return (
 		<Stack>
 			<Title>Login</Title>

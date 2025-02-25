@@ -3,7 +3,7 @@ import { devtools } from 'zustand/middleware'
 import { type CombatTile, type CombatTileString } from '~/data/mapTemplates/combat'
 import { createActionName, type DevTools, type Slice } from '~/types/storeTypes'
 import { typedObject } from '~/types/typedObject'
-import { type MapEditLoader } from './route'
+import { type MapEditLoader } from '.'
 
 type MapEditState = MapEditStateUtil & MapEditStateValues
 
