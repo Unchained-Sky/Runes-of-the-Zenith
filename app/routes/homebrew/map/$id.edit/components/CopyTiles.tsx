@@ -1,8 +1,8 @@
 import { UnstyledButton } from '@mantine/core'
 import { useMapEditStore } from 'app/routes/homebrew/map/$id.edit/useMapEditStore'
 import { useMemo } from 'react'
+import { COPY_TILE_WIDTH, HEX_GAP, HEX_SIZE, HEX_WIDTH_SCALER } from '~/components/HoneycombGrid/constants'
 import { type CombatTile } from '~/data/mapTemplates/combat'
-import { COPY_TILE_WIDTH, HEX_GAP, HEX_SIZE, HEX_WIDTH_SCALER } from '../constants'
 
 type CopyTilesProps = {
 	tile: CombatTile

@@ -1,9 +1,9 @@
 import { redirect, type LoaderFunctionArgs, type MetaFunction } from '@remix-run/node'
 import { useLoaderData } from '@remix-run/react'
-import { CombatGridTabletopGM } from '~/components/HoneycombGrid'
 import { getUserId } from '~/supabase/getUserId'
 import { requireAccount } from '~/supabase/requireAccount'
 import { safeParseInt } from '~/utils/isNumberParam'
+import CombatGridTabletopGM from './components/CombatGridTabletopGM'
 import SettingsPanel from './components/SettingsPanel'
 import { getCampaignName, getMaps, getTiles, type LoaderOptions } from './loader'
 

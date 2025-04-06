@@ -38,6 +38,8 @@ export async function getTiles({ supabase, headers, campaignId }: LoaderOptions)
 		.eq('campaign_id', campaignId)
 	if (error) throw redirect(`/campaign/${campaignId}`, { headers })
 
+	if (!data.length) return []
+
 	return data[0].mapInfo.mapCombatTile.map<CombatTile>(tile => ({
 		cord: [tile.q, tile.r, tile.s],
 		image: tile.image,

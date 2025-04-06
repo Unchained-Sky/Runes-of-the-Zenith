@@ -1,7 +1,7 @@
 import { Box, Button, Group, Stack, Title } from '@mantine/core'
 import { type ActionFunctionArgs, type LoaderFunctionArgs } from '@remix-run/node'
 import { Form, type MetaFunction, redirect, useLoaderData } from '@remix-run/react'
-import { CombatGridPreview } from '~/components/HoneycombGrid'
+import CombatGridPreview from '~/components/HoneycombGrid/CombatGridPreview'
 import { type CombatMap, type CombatMapTemplateName, getAllCombatMapTemplates, getCombatMapTemplate } from '~/data/mapTemplates/combat'
 import { type Tables } from '~/supabase/databaseTypes'
 import { getServerClient } from '~/supabase/getServerClient'

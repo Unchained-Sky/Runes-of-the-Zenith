@@ -1,10 +1,10 @@
 import { Box } from '@mantine/core'
 import { useMapEditStore } from 'app/routes/homebrew/map/$id.edit/useMapEditStore'
 import { useMemo } from 'react'
-import { COPY_TILE_WIDTH, HEX_GAP } from '../constants'
-import Hex from '../Hex'
-import classes from '../Hex.module.css'
-import useHoneycombGridSize from '../useHoneycombGridSize'
+import { COPY_TILE_WIDTH, HEX_GAP } from '~/components/HoneycombGrid/constants'
+import Hex from '~/components/HoneycombGrid/Hex'
+import classes from '~/components/HoneycombGrid/Hex.module.css'
+import useHoneycombGridSize from '~/components/HoneycombGrid/useHoneycombGridSize'
 import CopyTiles from './CopyTiles'
 
 export default function CombatGridEdit() {

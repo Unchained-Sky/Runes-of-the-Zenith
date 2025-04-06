@@ -1,5 +1,5 @@
 import { Box, type BoxComponentProps, Image, type PolymorphicComponentProps } from '@mantine/core'
-import { type ReactNode } from 'react'
+import { forwardRef, type ReactNode } from 'react'
 import { type CombatTile } from '~/data/mapTemplates/combat'
 import useHexSize from './useHexSize'
 
@@ -10,13 +10,14 @@ type HexProps = {
 	children?: ReactNode
 }
 
-export default function Hex({ tile: { cord, image }, offset, hexProps, children }: HexProps) {
+const Hex = forwardRef<HTMLDivElement, HexProps>(function Hex({ tile: { cord, image }, offset, hexProps, children }, ref) {
 	const { left, top, width, height, clipPath } = useHexSize(cord, offset)
 
 	const { style, ...props } = hexProps ?? {}
 
 	return (
 		<Box
+			ref={ref}
 			pos='absolute'
 			w={width}
 			h={height}
@@ -39,4 +40,6 @@ export default function Hex({ tile: { cord, image }, offset, hexProps, children 
 			{children}
 		</Box>
 	)
-}
+})
+
+export default Hex
