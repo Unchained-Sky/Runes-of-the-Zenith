@@ -62,3 +62,23 @@ export async function getMaps({ supabase, headers, campaignId, userId }: LoaderO
 
 	return out.map(map => ({ mapId: map.mapId, name: map.name }))
 }
+
+export async function getCharacters({ supabase, headers, campaignId }: LoaderOptions) {
+	const { data, error } = await supabase
+		.from('character_info')
+		.select(`
+			character_id,
+			character_name,
+			tabletop_characters(
+				shield_durability,
+				shield_current,
+				shield_max,
+				health_current,
+				health_max
+			)
+		`)
+		.eq('campaign_id', campaignId)
+	if (error) throw redirect(`/campaign/${campaignId}`, { headers })
+
+	return data
+}

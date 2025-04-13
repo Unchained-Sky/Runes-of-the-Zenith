@@ -1,14 +1,14 @@
 import { Box, Menu } from '@mantine/core'
+import { useLoaderData } from '@remix-run/react'
+import { type DragEventHandler } from 'react'
 import ContextMenu from '~/components/ContextMenu'
 import Hex from '~/components/HoneycombGrid/Hex'
 import useHoneycombGridSize from '~/components/HoneycombGrid/useHoneycombGridSize'
-import { type CombatTile } from '~/data/mapTemplates/combat'
+import { type TabletopGMLoader } from '..'
 
-type CombatGridPreview = {
-	tiles: CombatTile[]
-}
+export default function CombatGridTabletopGM() {
+	const { tiles } = useLoaderData<TabletopGMLoader>()
 
-export default function CombatGridTabletopGM({ tiles }: CombatGridPreview) {
 	const { offset, minHeight, minWidth } = useHoneycombGridSize(tiles)
 
 	return (
@@ -21,7 +21,7 @@ export default function CombatGridTabletopGM({ tiles }: CombatGridPreview) {
 						menuItems={(
 							<>
 								<Menu.Label>Characters</Menu.Label>
-								<Menu.Item>Add Player</Menu.Item>
+								<Menu.Item>Add Character</Menu.Item>
 								<Menu.Item>Add Enemy</Menu.Item>
 							</>
 						)}
@@ -29,6 +29,9 @@ export default function CombatGridTabletopGM({ tiles }: CombatGridPreview) {
 						<Hex
 							tile={tile}
 							offset={offset}
+							hexProps={{
+								onDragStart: (e: Parameters<DragEventHandler<HTMLButtonElement>>[0]) => e.preventDefault()
+							}}
 						/>
 					</ContextMenu>
 				)

@@ -1,17 +1,22 @@
 import { redirect, type LoaderFunctionArgs, type MetaFunction } from '@remix-run/node'
 import { useLoaderData } from '@remix-run/react'
+import useMountEffect from '~/hooks/useMountEffect'
 import { getUserId } from '~/supabase/getUserId'
 import { requireAccount } from '~/supabase/requireAccount'
 import { safeParseInt } from '~/utils/isNumberParam'
 import CombatGridTabletopGM from './components/CombatGridTabletopGM'
 import SettingsPanel from './components/SettingsPanel'
-import { getCampaignName, getMaps, getTiles, type LoaderOptions } from './loader'
+import { getCampaignName, getCharacters, getMaps, getTiles, type LoaderOptions } from './loader'
+import { useTabletopGMStore } from './useTabletopGMStore'
+import useTabletopGMSubscription from './useTabletopGMSubscription'
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
 	return [
 		{ title: data?.campaignName ?? 'Campaign' }
 	]
 }
+
+export type TabletopGMLoader = ReturnType<typeof useLoaderData<typeof loader>>
 
 export async function loader({ params, request }: LoaderFunctionArgs) {
 	const campaignIdParam = params.id
@@ -31,29 +36,41 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 	const [
 		campaignName,
 		tiles,
-		maps
+		maps,
+		characters
 	] = await Promise.all([
 		getCampaignName(loaderOptions),
 		getTiles(loaderOptions),
-		getMaps(loaderOptions)
+		getMaps(loaderOptions),
+		getCharacters(loaderOptions)
 	])
 
 	return {
+		syncValue: +new Date(),
 		campaignId,
 		campaignName,
 		tiles,
-		maps
+		maps,
+		characters
 	}
 }
 
 export default function Page() {
-	const { tiles } = useLoaderData<typeof loader>()
+	useStoreSync()
+	useTabletopGMSubscription()
 
 	return (
 		<>
-			<CombatGridTabletopGM tiles={tiles} />
+			<CombatGridTabletopGM />
 
 			<SettingsPanel />
 		</>
 	)
+}
+
+function useStoreSync() {
+	const loaderData = useLoaderData<typeof loader>()
+	useMountEffect(() => {
+		useTabletopGMStore.getState().syncLoader(loaderData)
+	})
 }

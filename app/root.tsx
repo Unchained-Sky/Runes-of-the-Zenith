@@ -1,11 +1,15 @@
 import { Box, ColorSchemeScript, Group } from '@mantine/core'
 import { type LinksFunction, type LoaderFunctionArgs } from '@remix-run/node'
 import { Links, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } from '@remix-run/react'
-import { type ReactNode } from 'react'
+import { createBrowserClient } from '@supabase/ssr'
+import { type SupabaseClient } from '@supabase/supabase-js'
+import { useState, type ReactNode } from 'react'
 import Mantine, { defaultColorScheme } from '~/components/Mantine'
 import Navbar from '~/components/Navbar'
+import { type Database } from '~/supabase/databaseTypes'
 import { getUserId } from '~/supabase/getUserId'
 import { getUserIdentity } from '~/supabase/getUserIdentity'
+import { getSupabaseEnv } from '~/supabase/supabaseEnv'
 import { NavbarContext } from './components/Navbar/NavbarContext'
 import './styles/font.css'
 
@@ -25,10 +29,13 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 		.select('', { count: 'exact' })
 		.eq('user_id', userId)
 
+	const { SUPABASE_URL, SUPABASE_ANON_KEY } = getSupabaseEnv()
+
 	return {
 		userIdentity,
 		campaignCount: campaignCount ?? 0,
-		characterCount: characterCount ?? 0
+		characterCount: characterCount ?? 0,
+		supabaseEnv: { SUPABASE_URL, SUPABASE_ANON_KEY }
 	}
 }
 
@@ -53,8 +60,12 @@ export function Layout({ children }: { children: ReactNode }) {
 	)
 }
 
+export type OutletContext = { supabase: SupabaseClient<Database> }
+
 export default function App() {
-	const { userIdentity, campaignCount, characterCount } = useLoaderData<typeof loader>()
+	const { userIdentity, campaignCount, characterCount, supabaseEnv } = useLoaderData<typeof loader>()
+
+	const [supabase] = useState(() => createBrowserClient<Database>(supabaseEnv.SUPABASE_URL, supabaseEnv.SUPABASE_ANON_KEY))
 
 	return (
 		<Group align='flex-start'>
@@ -63,7 +74,7 @@ export default function App() {
 			</NavbarContext.Provider>
 
 			<Box component='main' flex='1' pt='md'>
-				<Outlet />
+				<Outlet context={{ supabase } satisfies OutletContext} />
 			</Box>
 		</Group>
 	)
