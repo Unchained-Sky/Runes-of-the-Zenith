@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
+import { type Tables } from '~/supabase/databaseTypes'
 import { createActionName, type DevTools, type Slice } from '~/types/storeTypes'
 import { type TabletopGMLoader } from '.'
 
@@ -14,7 +15,7 @@ const tabletopGMStore: TabletopGMState = {
 	characters: {}
 }
 
-type TabletopCharacterData = NonNullable<TabletopGMLoader['characters'][number]['tabletop_characters']>
+type TabletopCharacterData = Omit<Tables<'tabletop_characters'>, 'character_id'>
 
 type TabletopGMActions = {
 	syncLoader: (loader: TabletopGMLoader) => void
