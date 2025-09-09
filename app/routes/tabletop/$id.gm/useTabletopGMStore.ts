@@ -7,7 +7,11 @@ import { type TabletopGMLoader } from '.'
 type TabletopGMState = {
 	syncValue: number
 	/** Record<characterId, characterData> */
-	characters: Record<number, TabletopGMLoader['characters'][number]>
+	characters: Record<number, {
+		character_id: number
+		character_name: string
+		tabletop_characters: TabletopCharacterData | null
+	}>
 }
 
 const tabletopGMStore: TabletopGMState = {
@@ -31,7 +35,10 @@ export const createTabletopGMActions: Slice<TabletopGMStore, TabletopGMActions, 
 	syncLoader: loader => {
 		if (loader.syncValue === get().syncValue) return
 
-		const characters = Object.fromEntries(loader.characters.map(character => [character.character_id, character]))
+		const characters = Object.fromEntries(loader.characters.map(character => [
+			character.character_id,
+			character
+		]))
 
 		set({
 			syncValue: loader.syncValue,

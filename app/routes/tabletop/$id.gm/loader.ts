@@ -74,7 +74,10 @@ export async function getCharacters({ supabase, headers, campaignId }: LoaderOpt
 				shield_current,
 				shield_max,
 				health_current,
-				health_max
+				health_max,
+				position_q,
+				position_r,
+				position_s
 			)
 		`)
 		.eq('campaign_id', campaignId)

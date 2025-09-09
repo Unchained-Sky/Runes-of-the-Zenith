@@ -1,22 +1,15 @@
-import { ActionIcon, Avatar, Button, Card, Group, Menu, Modal, NumberInput, type NumberInputProps, Stack, Table, Text, Title } from '@mantine/core'
+import { useDraggable } from '@dnd-kit/core'
+import { ActionIcon, Avatar, Box, Button, Group, Menu, Modal, NumberInput, Stack, Table, Text, Title, type CSSProperties, type NumberInputProps } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { useDisclosure } from '@mantine/hooks'
 import { useOutletContext } from '@remix-run/react'
 import { IconPencil, IconTrash, IconX } from '@tabler/icons-react'
 import { type OutletContext } from 'app/root'
+import { useEffect } from 'react'
 import { type Tables } from '~/supabase/databaseTypes'
-import { useTabletopGMStore } from '../../useTabletopGMStore'
+import { useTabletopGMStore } from '../../../useTabletopGMStore'
 
-export default function UnitsTab() {
-	return (
-		<Stack>
-			<Characters />
-			<InactiveCharacters />
-		</Stack>
-	)
-}
-
-function Characters() {
+export default function Characters() {
 	const characters = useTabletopGMStore(state => state.characters)
 
 	return (
@@ -66,8 +59,19 @@ function Character({ character_id }: CharacterProps) {
 		if (error) throw new Error(error.message, { cause: error })
 	}
 
-	const getTabletopValue = (value: Exclude<keyof Tables<'tabletop_characters'>, 'character_id'>) => {
+	const getTabletopLifeValue = (value: keyof Tables<'tabletop_characters'> & (`health_${string}` | `shield_${string}`)) => {
 		return tabletop_characters?.[value] ?? 0
+	}
+
+	const getTabletopPosition = () => {
+		if (!tabletop_characters) return null
+		if (!tabletop_characters.position_q || !tabletop_characters.position_r || !tabletop_characters.position_s) return null
+		const position = {
+			q: tabletop_characters.position_q,
+			r: tabletop_characters.position_r,
+			s: tabletop_characters.position_s
+		}
+		return `${position.q},${position.r},${position.s}`
 	}
 
 	return (
@@ -81,18 +85,18 @@ function Character({ character_id }: CharacterProps) {
 			<Table.Tr>
 				<Table.Td>
 					<Group gap='xs'>
-						<Avatar />
+						<CharacterAvatar character_id={character_id} />
 						<Text size='lg'>{character_name}</Text>
 					</Group>
 				</Table.Td>
 				<Table.Td>
 					<Stack gap={0}>
-						<Text size='sm'>{getTabletopValue('shield_durability')}</Text>
-						<Text size='sm'>{getTabletopValue('shield_current')} / {getTabletopValue('shield_max')}</Text>
+						<Text size='sm'>{getTabletopLifeValue('shield_durability')}</Text>
+						<Text size='sm'>{getTabletopLifeValue('shield_current')} / {getTabletopLifeValue('shield_max')}</Text>
 					</Stack>
 				</Table.Td>
-				<Table.Td>{getTabletopValue('health_current')} / {getTabletopValue('health_max')}</Table.Td>
-				<Table.Td>0,0,0</Table.Td>
+				<Table.Td>{getTabletopLifeValue('health_current')} / {getTabletopLifeValue('health_max')}</Table.Td>
+				<Table.Td>{getTabletopPosition() ?? 'Unplaced'}</Table.Td>
 				<Table.Td>
 					<Group>
 						<ActionIcon variant='subtle' color='gray' onClick={editModeHandlers.toggle}>
@@ -119,6 +123,43 @@ function Character({ character_id }: CharacterProps) {
 				</Table.Td>
 			</Table.Tr>
 		</>
+	)
+}
+
+type CharacterAvatarProps = {
+	character_id: number
+}
+
+function CharacterAvatar({ character_id }: CharacterAvatarProps) {
+	const { attributes, listeners, setNodeRef, transform, over, isDragging, node } = useDraggable({
+		id: `character-${character_id}`,
+		data: {
+			test: 'test'
+		}
+	})
+
+	useEffect(() => {
+		console.log(node)
+	}, [node])
+
+	useEffect(() => {
+		console.log(isDragging)
+	}, [isDragging])
+
+	const style = (transform
+		? {
+			translate: `${transform.x}px ${transform.y}px 0`
+			// visibility: over ? 'hidden' : undefined
+		}
+		: {
+			cursor: 'grab',
+			zIndex: '2'
+		}) satisfies CSSProperties
+
+	return (
+		<Box ref={setNodeRef} style={style} {...listeners} {...attributes}>
+			<Avatar />
+		</Box>
 	)
 }
 
@@ -220,45 +261,5 @@ function CharacterEditModal({ character_id, opened, close }: CharacterEditModalP
 				</Stack>
 			</form>
 		</Modal>
-	)
-}
-
-function InactiveCharacters() {
-	const characters = useTabletopGMStore(state => state.characters)
-	const { supabase } = useOutletContext<OutletContext>()
-
-	const inactiveCharacters = Object.values(characters).filter(({ tabletop_characters }) => tabletop_characters === null)
-
-	const addCharacter = async (characterId: number) => {
-		const { error } = await supabase
-			.from('tabletop_characters')
-			.upsert({
-				character_id: characterId
-			})
-		if (error) throw new Error(error.message, { cause: error })
-	}
-
-	return inactiveCharacters.length > 0 && (
-		<Stack gap={0}>
-			<Title order={3}>Inactive Characters</Title>
-			<Group>
-				{inactiveCharacters.map(character => {
-					return (
-						<Card key={character.character_id} component={Stack} gap={0} align='center' p='sm' bg='dark.5'>
-							<Avatar />
-							<Text>{character.character_name}</Text>
-							<Button
-								variant='subtle'
-								size='compact-md'
-								onClick={() => {
-									addCharacter(character.character_id).catch(console.error)
-								}}
-							>Add
-							</Button>
-						</Card>
-					)
-				})}
-			</Group>
-		</Stack>
 	)
 }
