@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto'
-import { skillData, skillVersion } from '~/scripts/data/skills/skillData'
 import { type TablesInsert } from '~/supabase/databaseTypes'
 import { getServiceClient } from '~/supabase/getServiceClient'
+import { skillData, skillVersion } from './data/skills/skillData'
 
 const supabase = getServiceClient()
 const version = skillVersion

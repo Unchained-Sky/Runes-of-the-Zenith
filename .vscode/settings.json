@@ -1,0 +1,18 @@
+{
+	"cSpell.words": [
+		"arktype",
+		"bloodthirst",
+		"Caeser",
+		"Pipeable",
+		"Revalidator",
+		"rotz",
+		"runetablet"
+	],
+	"cssVariables.lookupFiles": [
+		"**/*.css",
+		"**/*.scss",
+		"**/*.sass",
+		"**/*.less",
+		"node_modules/@mantine/core/styles.css"
+	]
+}
