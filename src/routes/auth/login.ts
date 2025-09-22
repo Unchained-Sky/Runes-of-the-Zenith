@@ -12,19 +12,21 @@ export const Route = createFileRoute('/auth/login')({
 	preload: false,
 	validateSearch: authLoginSearchSchema,
 	loaderDeps: ({ search }) => search,
-	loader: async ({ deps: search }) => await serverLoader({
-		data: { backlink: search.backlink }
-	})
+	loader: async ({ deps: search }) => {
+		return await serverLoader({
+			data: { backlink: search.backlink }
+		})
+	}
 })
 
 const serverLoader = createServerFn({ method: 'POST' })
-	.validator((data: { backlink?: string }) => data)
+	.validator(authLoginSearchSchema)
 	.handler(async ({ data: { backlink } }) => {
 		const supabase = getSupabaseServerClient()
 		const { data, error } = await supabase.auth.signInWithOAuth({
 			provider: 'discord',
 			options: {
-				redirectTo: `http://localhost:3000/auth/callback?next=${backlink ?? '/'}`
+				redirectTo: `${process.env.DOMAIN}/auth/callback?next=${backlink ?? '/'}`
 			}
 		})
 

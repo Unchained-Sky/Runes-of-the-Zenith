@@ -12,7 +12,11 @@
     "lint:types": "tsc --noEmit",
     "supabase:login": "supabase login",
     "supabase:types": "supabase gen types typescript --project-id kttsshgvhhwzwjhwiesz > src/supabase/databaseTypes.d.ts",
-    "db:skills": "bun run ./scripts/skillDeletion.ts"
+    "db:skills": "bun run ./scripts/skillDeletion.ts",
+    "cf:login": "wrangler login",
+    "cf:types": "wrangler types --env-interface Env",
+    "cf:dev": "wrangler dev",
+    "cf:deploy": "npm run vite:build && wrangler deploy"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -41,6 +45,7 @@
   },
   "devDependencies": {
     "@nabla/vite-plugin-eslint": "^2.0.6",
+    "@types/node": "^24.5.2",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
     "@unchainedsky/eslint-config": "^2.3.0",
@@ -50,6 +55,7 @@
     "postcss-simple-vars": "^7.0.1",
     "supabase": "^2.40.7",
     "typescript": "^5.7.2",
-    "vite": "^6.3.5"
+    "vite": "^6.3.5",
+    "wrangler": "^4.38.0"
   }
 }

@@ -1,10 +1,9 @@
 import { Box, Group } from '@mantine/core'
 import { createBrowserClient } from '@supabase/ssr'
-import { TanstackDevtools } from '@tanstack/react-devtools'
 import { type QueryClient } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { HeadContent, Outlet, Scripts, createRootRouteWithContext } from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
+import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 import { useState, type ReactNode } from 'react'
 import { DefaultCatchBoundary } from '~/components/DefaultCatchBoundary'
 import Mantine from '~/components/Mantine'
@@ -60,21 +59,9 @@ function RootDocument({ children }: { children: ReactNode }) {
 				<RootLayout>
 					{children}
 				</RootLayout>
-				<TanstackDevtools
-					config={{
-						position: 'bottom-left'
-					}}
-					plugins={[
-						{
-							name: 'Tanstack Router',
-							render: <TanStackRouterDevtoolsPanel />
-						},
-						{
-							name: 'React Query',
-							render: <ReactQueryDevtools />
-						}
-					]}
-				/>
+
+				<TanStackRouterDevtools position='bottom-right' />
+				<ReactQueryDevtools buttonPosition='bottom-right' />
 				<Scripts />
 			</body>
 		</html>

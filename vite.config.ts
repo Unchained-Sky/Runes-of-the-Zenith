@@ -10,7 +10,8 @@ const config = defineConfig({
 			projects: ['./tsconfig.json']
 		}),
 		tanstackStart({
-			customViteReactPlugin: true
+			customViteReactPlugin: true,
+			target: 'cloudflare-module'
 		}),
 		viteReact(),
 		eslintPlugin()

@@ -4,7 +4,11 @@ import { getSupabaseServerClient } from '~/supabase/getSupabaseServerClient'
 
 export const Route = createFileRoute('/auth/logout')({
 	preload: false,
-	loader: async () => await serverLoader()
+	loader: async ({ context }) => {
+		await serverLoader()
+		await context.queryClient.invalidateQueries({ queryKey: ['navbar'] })
+		throw redirect({ to: '/' })
+	}
 })
 
 const serverLoader = createServerFn({ method: 'POST' })
@@ -12,5 +16,4 @@ const serverLoader = createServerFn({ method: 'POST' })
 		const supabase = getSupabaseServerClient()
 		const { error } = await supabase.auth.signOut()
 		if (error) throw new Error(error.message, { cause: error })
-		throw redirect({ to: '/' })
 	})
