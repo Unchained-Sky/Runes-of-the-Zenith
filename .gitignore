@@ -1,16 +1,15 @@
 node_modules
-
-/.cache
-/build
+.DS_Store
+dist
+dist-ssr
+*.local
+count.txt
 .env
+.nitro
+.tanstack
+.output
+.vinxi
+todos.json
 
-.vscode/*
-!.vscode/extensions.json
-
-__TEMP
-
-# sst
-.sst
-
-# supabase types
-app/.server/supabase/databaseTypes.d.ts
+# Supabase Types
+src/supabase/databaseTypes.d.ts

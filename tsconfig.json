@@ -1,64 +1,41 @@
 {
   "include": [
     "**/*.ts",
-    "**/*.tsx",
-    "**/.server/**/*.ts",
-    "**/.server/**/*.tsx",
-    "**/.client/**/*.ts",
-    "**/.client/**/*.tsx"
+    "**/*.tsx"
   ],
   "compilerOptions": {
-    "lib": [
-      "DOM",
-      "DOM.Iterable",
-      "ES2022"
-    ],
-    "types": [
-      "@remix-run/node",
-      "vite/client"
-    ],
-    "isolatedModules": true,
-    "esModuleInterop": true,
+    "target": "ES2022",
     "jsx": "react-jsx",
     "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "resolveJsonModule": true,
-    "target": "ES2022",
-    "strict": true,
-    "allowJs": true,
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "types": [
+      "vite/client"
+    ],
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": false,
+    "noEmit": true,
+    /* Linting */
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true,
+    "noUncheckedIndexedAccess": true,
     "baseUrl": ".",
     "paths": {
-      "~/RT/*": [
-        "./app/routes/rune-tablet/*"
-      ],
-      "~/TT/*": [
-        "./app/routes/talent-tree/*"
-      ],
-      "~/components/*": [
-        "./app/components/*"
-      ],
-      "~/data/*": [
-        "./app/data/*"
-      ],
-      "~/hooks/*": [
-        "./app/hooks/*"
-      ],
-      "~/supabase/*": [
-        "./app/.server/supabase/*"
-      ],
-      "~/types/*": [
-        "./app/types/*"
-      ],
-      "~/utils/*": [
-        "./app/utils/*"
+      "~/*": [
+        "./src/*"
       ],
       "~/scripts/*": [
         "./scripts/*"
       ]
-    },
-    // Vite takes care of building everything, not tsc.
-    "noEmit": true
+    }
   }
 }

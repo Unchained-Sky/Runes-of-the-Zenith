@@ -1,21 +1,20 @@
 import eslintPlugin from '@nabla/vite-plugin-eslint'
-import { vitePlugin as remix } from '@remix-run/dev'
+import { tanstackStart } from '@tanstack/react-start/plugin/vite'
+import viteReact from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
-import tsconfigPaths from 'vite-tsconfig-paths'
+import viteTsConfigPaths from 'vite-tsconfig-paths'
 
-export default defineConfig({
-	server: {
-		port: parseInt(process.env.PORT ?? '5173')
-	},
+const config = defineConfig({
 	plugins: [
-		remix({
-			future: {
-				v3_fetcherPersist: true,
-				v3_relativeSplatPath: true,
-				v3_throwAbortReason: true
-			}
+		viteTsConfigPaths({
+			projects: ['./tsconfig.json']
 		}),
-		tsconfigPaths(),
+		tanstackStart({
+			customViteReactPlugin: true
+		}),
+		viteReact(),
 		eslintPlugin()
 	]
 })
+
+export default config
