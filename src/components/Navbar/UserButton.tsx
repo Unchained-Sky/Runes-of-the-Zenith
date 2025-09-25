@@ -53,9 +53,9 @@ const User = forwardRef<HTMLButtonElement, UserProps>(function User({ userIdenti
 		placeholderData: () => 0
 	})
 
-	const { data: characterCount } = useQuery({
-		queryKey: ['navbar', 'characterCount'],
-		queryFn: getCharacterCount,
+	const { data: heroCount } = useQuery({
+		queryKey: ['navbar', 'heroCount'],
+		queryFn: getHeroCount,
 		placeholderData: () => 0
 	})
 
@@ -79,7 +79,7 @@ const User = forwardRef<HTMLButtonElement, UserProps>(function User({ userIdenti
 					</Text>
 
 					<Text c='dimmed' size='xs'>
-						{characterCount} Character{characterCount === 1 ? '' : 's'}
+						{heroCount} Hero{heroCount === 1 ? '' : 'es'}
 					</Text>
 				</Box>
 
@@ -143,17 +143,17 @@ const getCampaignCount = createServerFn({ method: 'GET' })
 		return campaignCount ?? 0
 	})
 
-const getCharacterCount = createServerFn({ method: 'GET' })
+const getHeroCount = createServerFn({ method: 'GET' })
 	.handler(async () => {
 		const supabase = getSupabaseServerClient()
 
 		const { data: userData } = await supabase.auth.getUser()
 		if (!userData.user) return 0
 
-		const { count: characterCount } = await supabase
-			.from('character_info')
+		const { count: heroCount } = await supabase
+			.from('hero_info')
 			.select('', { count: 'exact' })
 			.eq('user_id', userData.user.id)
 
-		return characterCount ?? 0
+		return heroCount ?? 0
 	})

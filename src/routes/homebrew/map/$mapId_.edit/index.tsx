@@ -12,23 +12,21 @@ import Templates from './-components/Templates'
 import TileEditPanel from './-components/TileEditPanel'
 import { useMapEditStore } from './-hooks/useMapEditStore'
 
-export const Route = createFileRoute('/homebrew/map/$id_/edit/')({
+export const Route = createFileRoute('/homebrew/map/$mapId_/edit/')({
 	component: RouteComponent,
-	loader: async ({ params: { id } }) => await serverLoader({ data: { mapId: id } }),
+	loader: async ({ params: { mapId } }) => await serverLoader({ data: { mapId: +mapId } }),
 	head: ({ loaderData }) => ({
 		meta: loaderData ? [{ title: `Edit Map: ${loaderData.map_name}` }] : undefined
 	})
 })
 
 const serverLoaderSchema = type({
-	mapId: 'string.digits'
+	mapId: 'number'
 })
 
 const serverLoader = createServerFn({ method: 'GET' })
 	.validator(serverLoaderSchema)
-	.handler(async ({ data: { mapId: mapIdString } }) => {
-		const mapId = parseInt(mapIdString)
-
+	.handler(async ({ data: { mapId } }) => {
 		const { supabase } = await requireAccount({ backlink: '/homebrew/map' })
 
 		const { data, error } = await supabase

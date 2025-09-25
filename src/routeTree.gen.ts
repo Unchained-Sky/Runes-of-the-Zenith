@@ -10,31 +10,31 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as CharacterIndexRouteImport } from './routes/character/index'
+import { Route as HeroIndexRouteImport } from './routes/hero/index'
 import { Route as CampaignIndexRouteImport } from './routes/campaign/index'
-import { Route as CharacterCreateRouteImport } from './routes/character/create'
-import { Route as CharacterIdRouteImport } from './routes/character/$id'
+import { Route as HeroCreateRouteImport } from './routes/hero/create'
+import { Route as HeroHeroIdRouteImport } from './routes/hero/$heroId'
 import { Route as CampaignCreateRouteImport } from './routes/campaign/create'
-import { Route as CampaignIdRouteImport } from './routes/campaign/$id'
+import { Route as CampaignCampaignIdRouteImport } from './routes/campaign/$campaignId'
 import { Route as AuthLogoutRouteImport } from './routes/auth/logout'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
 import { Route as HomebrewMapIndexRouteImport } from './routes/homebrew/map/index'
-import { Route as HomebrewMapIdRouteImport } from './routes/homebrew/map/$id'
-import { Route as CharacterIdSettingsRouteImport } from './routes/character/$id_.settings'
-import { Route as CampaignJoinIdRouteImport } from './routes/campaign/join.$id'
-import { Route as TabletopIdPlayerIndexRouteImport } from './routes/tabletop/$id.player/index'
-import { Route as TabletopIdGmIndexRouteImport } from './routes/tabletop/$id.gm/index'
-import { Route as HomebrewMapIdEditIndexRouteImport } from './routes/homebrew/map/$id_.edit/index'
+import { Route as HomebrewMapMapIdRouteImport } from './routes/homebrew/map/$mapId'
+import { Route as HeroHeroIdSettingsRouteImport } from './routes/hero/$heroId_.settings'
+import { Route as CampaignJoinInviteIdRouteImport } from './routes/campaign/join.$inviteId'
+import { Route as TabletopCampaignIdPlayerIndexRouteImport } from './routes/tabletop/$campaignId.player/index'
+import { Route as TabletopCampaignIdGmIndexRouteImport } from './routes/tabletop/$campaignId.gm/index'
+import { Route as HomebrewMapMapIdEditIndexRouteImport } from './routes/homebrew/map/$mapId_.edit/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CharacterIndexRoute = CharacterIndexRouteImport.update({
-  id: '/character/',
-  path: '/character/',
+const HeroIndexRoute = HeroIndexRouteImport.update({
+  id: '/hero/',
+  path: '/hero/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CampaignIndexRoute = CampaignIndexRouteImport.update({
@@ -42,14 +42,14 @@ const CampaignIndexRoute = CampaignIndexRouteImport.update({
   path: '/campaign/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CharacterCreateRoute = CharacterCreateRouteImport.update({
-  id: '/character/create',
-  path: '/character/create',
+const HeroCreateRoute = HeroCreateRouteImport.update({
+  id: '/hero/create',
+  path: '/hero/create',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CharacterIdRoute = CharacterIdRouteImport.update({
-  id: '/character/$id',
-  path: '/character/$id',
+const HeroHeroIdRoute = HeroHeroIdRouteImport.update({
+  id: '/hero/$heroId',
+  path: '/hero/$heroId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CampaignCreateRoute = CampaignCreateRouteImport.update({
@@ -57,9 +57,9 @@ const CampaignCreateRoute = CampaignCreateRouteImport.update({
   path: '/campaign/create',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CampaignIdRoute = CampaignIdRouteImport.update({
-  id: '/campaign/$id',
-  path: '/campaign/$id',
+const CampaignCampaignIdRoute = CampaignCampaignIdRouteImport.update({
+  id: '/campaign/$campaignId',
+  path: '/campaign/$campaignId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthLogoutRoute = AuthLogoutRouteImport.update({
@@ -82,74 +82,77 @@ const HomebrewMapIndexRoute = HomebrewMapIndexRouteImport.update({
   path: '/homebrew/map/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const HomebrewMapIdRoute = HomebrewMapIdRouteImport.update({
-  id: '/homebrew/map/$id',
-  path: '/homebrew/map/$id',
+const HomebrewMapMapIdRoute = HomebrewMapMapIdRouteImport.update({
+  id: '/homebrew/map/$mapId',
+  path: '/homebrew/map/$mapId',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CharacterIdSettingsRoute = CharacterIdSettingsRouteImport.update({
-  id: '/character/$id_/settings',
-  path: '/character/$id/settings',
+const HeroHeroIdSettingsRoute = HeroHeroIdSettingsRouteImport.update({
+  id: '/hero/$heroId_/settings',
+  path: '/hero/$heroId/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CampaignJoinIdRoute = CampaignJoinIdRouteImport.update({
-  id: '/campaign/join/$id',
-  path: '/campaign/join/$id',
+const CampaignJoinInviteIdRoute = CampaignJoinInviteIdRouteImport.update({
+  id: '/campaign/join/$inviteId',
+  path: '/campaign/join/$inviteId',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TabletopIdPlayerIndexRoute = TabletopIdPlayerIndexRouteImport.update({
-  id: '/tabletop/$id/player/',
-  path: '/tabletop/$id/player/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TabletopIdGmIndexRoute = TabletopIdGmIndexRouteImport.update({
-  id: '/tabletop/$id/gm/',
-  path: '/tabletop/$id/gm/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HomebrewMapIdEditIndexRoute = HomebrewMapIdEditIndexRouteImport.update({
-  id: '/homebrew/map/$id_/edit/',
-  path: '/homebrew/map/$id/edit/',
-  getParentRoute: () => rootRouteImport,
-} as any)
+const TabletopCampaignIdPlayerIndexRoute =
+  TabletopCampaignIdPlayerIndexRouteImport.update({
+    id: '/tabletop/$campaignId/player/',
+    path: '/tabletop/$campaignId/player/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const TabletopCampaignIdGmIndexRoute =
+  TabletopCampaignIdGmIndexRouteImport.update({
+    id: '/tabletop/$campaignId/gm/',
+    path: '/tabletop/$campaignId/gm/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const HomebrewMapMapIdEditIndexRoute =
+  HomebrewMapMapIdEditIndexRouteImport.update({
+    id: '/homebrew/map/$mapId_/edit/',
+    path: '/homebrew/map/$mapId/edit/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/logout': typeof AuthLogoutRoute
-  '/campaign/$id': typeof CampaignIdRoute
+  '/campaign/$campaignId': typeof CampaignCampaignIdRoute
   '/campaign/create': typeof CampaignCreateRoute
-  '/character/$id': typeof CharacterIdRoute
-  '/character/create': typeof CharacterCreateRoute
+  '/hero/$heroId': typeof HeroHeroIdRoute
+  '/hero/create': typeof HeroCreateRoute
   '/campaign': typeof CampaignIndexRoute
-  '/character': typeof CharacterIndexRoute
-  '/campaign/join/$id': typeof CampaignJoinIdRoute
-  '/character/$id/settings': typeof CharacterIdSettingsRoute
-  '/homebrew/map/$id': typeof HomebrewMapIdRoute
+  '/hero': typeof HeroIndexRoute
+  '/campaign/join/$inviteId': typeof CampaignJoinInviteIdRoute
+  '/hero/$heroId/settings': typeof HeroHeroIdSettingsRoute
+  '/homebrew/map/$mapId': typeof HomebrewMapMapIdRoute
   '/homebrew/map': typeof HomebrewMapIndexRoute
-  '/tabletop/$id/gm': typeof TabletopIdGmIndexRoute
-  '/tabletop/$id/player': typeof TabletopIdPlayerIndexRoute
-  '/homebrew/map/$id/edit': typeof HomebrewMapIdEditIndexRoute
+  '/tabletop/$campaignId/gm': typeof TabletopCampaignIdGmIndexRoute
+  '/tabletop/$campaignId/player': typeof TabletopCampaignIdPlayerIndexRoute
+  '/homebrew/map/$mapId/edit': typeof HomebrewMapMapIdEditIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/logout': typeof AuthLogoutRoute
-  '/campaign/$id': typeof CampaignIdRoute
+  '/campaign/$campaignId': typeof CampaignCampaignIdRoute
   '/campaign/create': typeof CampaignCreateRoute
-  '/character/$id': typeof CharacterIdRoute
-  '/character/create': typeof CharacterCreateRoute
+  '/hero/$heroId': typeof HeroHeroIdRoute
+  '/hero/create': typeof HeroCreateRoute
   '/campaign': typeof CampaignIndexRoute
-  '/character': typeof CharacterIndexRoute
-  '/campaign/join/$id': typeof CampaignJoinIdRoute
-  '/character/$id/settings': typeof CharacterIdSettingsRoute
-  '/homebrew/map/$id': typeof HomebrewMapIdRoute
+  '/hero': typeof HeroIndexRoute
+  '/campaign/join/$inviteId': typeof CampaignJoinInviteIdRoute
+  '/hero/$heroId/settings': typeof HeroHeroIdSettingsRoute
+  '/homebrew/map/$mapId': typeof HomebrewMapMapIdRoute
   '/homebrew/map': typeof HomebrewMapIndexRoute
-  '/tabletop/$id/gm': typeof TabletopIdGmIndexRoute
-  '/tabletop/$id/player': typeof TabletopIdPlayerIndexRoute
-  '/homebrew/map/$id/edit': typeof HomebrewMapIdEditIndexRoute
+  '/tabletop/$campaignId/gm': typeof TabletopCampaignIdGmIndexRoute
+  '/tabletop/$campaignId/player': typeof TabletopCampaignIdPlayerIndexRoute
+  '/homebrew/map/$mapId/edit': typeof HomebrewMapMapIdEditIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -157,19 +160,19 @@ export interface FileRoutesById {
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/logout': typeof AuthLogoutRoute
-  '/campaign/$id': typeof CampaignIdRoute
+  '/campaign/$campaignId': typeof CampaignCampaignIdRoute
   '/campaign/create': typeof CampaignCreateRoute
-  '/character/$id': typeof CharacterIdRoute
-  '/character/create': typeof CharacterCreateRoute
+  '/hero/$heroId': typeof HeroHeroIdRoute
+  '/hero/create': typeof HeroCreateRoute
   '/campaign/': typeof CampaignIndexRoute
-  '/character/': typeof CharacterIndexRoute
-  '/campaign/join/$id': typeof CampaignJoinIdRoute
-  '/character/$id_/settings': typeof CharacterIdSettingsRoute
-  '/homebrew/map/$id': typeof HomebrewMapIdRoute
+  '/hero/': typeof HeroIndexRoute
+  '/campaign/join/$inviteId': typeof CampaignJoinInviteIdRoute
+  '/hero/$heroId_/settings': typeof HeroHeroIdSettingsRoute
+  '/homebrew/map/$mapId': typeof HomebrewMapMapIdRoute
   '/homebrew/map/': typeof HomebrewMapIndexRoute
-  '/tabletop/$id/gm/': typeof TabletopIdGmIndexRoute
-  '/tabletop/$id/player/': typeof TabletopIdPlayerIndexRoute
-  '/homebrew/map/$id_/edit/': typeof HomebrewMapIdEditIndexRoute
+  '/tabletop/$campaignId/gm/': typeof TabletopCampaignIdGmIndexRoute
+  '/tabletop/$campaignId/player/': typeof TabletopCampaignIdPlayerIndexRoute
+  '/homebrew/map/$mapId_/edit/': typeof HomebrewMapMapIdEditIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -178,57 +181,57 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/auth/login'
     | '/auth/logout'
-    | '/campaign/$id'
+    | '/campaign/$campaignId'
     | '/campaign/create'
-    | '/character/$id'
-    | '/character/create'
+    | '/hero/$heroId'
+    | '/hero/create'
     | '/campaign'
-    | '/character'
-    | '/campaign/join/$id'
-    | '/character/$id/settings'
-    | '/homebrew/map/$id'
+    | '/hero'
+    | '/campaign/join/$inviteId'
+    | '/hero/$heroId/settings'
+    | '/homebrew/map/$mapId'
     | '/homebrew/map'
-    | '/tabletop/$id/gm'
-    | '/tabletop/$id/player'
-    | '/homebrew/map/$id/edit'
+    | '/tabletop/$campaignId/gm'
+    | '/tabletop/$campaignId/player'
+    | '/homebrew/map/$mapId/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth/callback'
     | '/auth/login'
     | '/auth/logout'
-    | '/campaign/$id'
+    | '/campaign/$campaignId'
     | '/campaign/create'
-    | '/character/$id'
-    | '/character/create'
+    | '/hero/$heroId'
+    | '/hero/create'
     | '/campaign'
-    | '/character'
-    | '/campaign/join/$id'
-    | '/character/$id/settings'
-    | '/homebrew/map/$id'
+    | '/hero'
+    | '/campaign/join/$inviteId'
+    | '/hero/$heroId/settings'
+    | '/homebrew/map/$mapId'
     | '/homebrew/map'
-    | '/tabletop/$id/gm'
-    | '/tabletop/$id/player'
-    | '/homebrew/map/$id/edit'
+    | '/tabletop/$campaignId/gm'
+    | '/tabletop/$campaignId/player'
+    | '/homebrew/map/$mapId/edit'
   id:
     | '__root__'
     | '/'
     | '/auth/callback'
     | '/auth/login'
     | '/auth/logout'
-    | '/campaign/$id'
+    | '/campaign/$campaignId'
     | '/campaign/create'
-    | '/character/$id'
-    | '/character/create'
+    | '/hero/$heroId'
+    | '/hero/create'
     | '/campaign/'
-    | '/character/'
-    | '/campaign/join/$id'
-    | '/character/$id_/settings'
-    | '/homebrew/map/$id'
+    | '/hero/'
+    | '/campaign/join/$inviteId'
+    | '/hero/$heroId_/settings'
+    | '/homebrew/map/$mapId'
     | '/homebrew/map/'
-    | '/tabletop/$id/gm/'
-    | '/tabletop/$id/player/'
-    | '/homebrew/map/$id_/edit/'
+    | '/tabletop/$campaignId/gm/'
+    | '/tabletop/$campaignId/player/'
+    | '/homebrew/map/$mapId_/edit/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -236,19 +239,19 @@ export interface RootRouteChildren {
   AuthCallbackRoute: typeof AuthCallbackRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthLogoutRoute: typeof AuthLogoutRoute
-  CampaignIdRoute: typeof CampaignIdRoute
+  CampaignCampaignIdRoute: typeof CampaignCampaignIdRoute
   CampaignCreateRoute: typeof CampaignCreateRoute
-  CharacterIdRoute: typeof CharacterIdRoute
-  CharacterCreateRoute: typeof CharacterCreateRoute
+  HeroHeroIdRoute: typeof HeroHeroIdRoute
+  HeroCreateRoute: typeof HeroCreateRoute
   CampaignIndexRoute: typeof CampaignIndexRoute
-  CharacterIndexRoute: typeof CharacterIndexRoute
-  CampaignJoinIdRoute: typeof CampaignJoinIdRoute
-  CharacterIdSettingsRoute: typeof CharacterIdSettingsRoute
-  HomebrewMapIdRoute: typeof HomebrewMapIdRoute
+  HeroIndexRoute: typeof HeroIndexRoute
+  CampaignJoinInviteIdRoute: typeof CampaignJoinInviteIdRoute
+  HeroHeroIdSettingsRoute: typeof HeroHeroIdSettingsRoute
+  HomebrewMapMapIdRoute: typeof HomebrewMapMapIdRoute
   HomebrewMapIndexRoute: typeof HomebrewMapIndexRoute
-  TabletopIdGmIndexRoute: typeof TabletopIdGmIndexRoute
-  TabletopIdPlayerIndexRoute: typeof TabletopIdPlayerIndexRoute
-  HomebrewMapIdEditIndexRoute: typeof HomebrewMapIdEditIndexRoute
+  TabletopCampaignIdGmIndexRoute: typeof TabletopCampaignIdGmIndexRoute
+  TabletopCampaignIdPlayerIndexRoute: typeof TabletopCampaignIdPlayerIndexRoute
+  HomebrewMapMapIdEditIndexRoute: typeof HomebrewMapMapIdEditIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -260,11 +263,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/character/': {
-      id: '/character/'
-      path: '/character'
-      fullPath: '/character'
-      preLoaderRoute: typeof CharacterIndexRouteImport
+    '/hero/': {
+      id: '/hero/'
+      path: '/hero'
+      fullPath: '/hero'
+      preLoaderRoute: typeof HeroIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/campaign/': {
@@ -274,18 +277,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CampaignIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/character/create': {
-      id: '/character/create'
-      path: '/character/create'
-      fullPath: '/character/create'
-      preLoaderRoute: typeof CharacterCreateRouteImport
+    '/hero/create': {
+      id: '/hero/create'
+      path: '/hero/create'
+      fullPath: '/hero/create'
+      preLoaderRoute: typeof HeroCreateRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/character/$id': {
-      id: '/character/$id'
-      path: '/character/$id'
-      fullPath: '/character/$id'
-      preLoaderRoute: typeof CharacterIdRouteImport
+    '/hero/$heroId': {
+      id: '/hero/$heroId'
+      path: '/hero/$heroId'
+      fullPath: '/hero/$heroId'
+      preLoaderRoute: typeof HeroHeroIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/campaign/create': {
@@ -295,11 +298,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CampaignCreateRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/campaign/$id': {
-      id: '/campaign/$id'
-      path: '/campaign/$id'
-      fullPath: '/campaign/$id'
-      preLoaderRoute: typeof CampaignIdRouteImport
+    '/campaign/$campaignId': {
+      id: '/campaign/$campaignId'
+      path: '/campaign/$campaignId'
+      fullPath: '/campaign/$campaignId'
+      preLoaderRoute: typeof CampaignCampaignIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/logout': {
@@ -330,46 +333,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HomebrewMapIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/homebrew/map/$id': {
-      id: '/homebrew/map/$id'
-      path: '/homebrew/map/$id'
-      fullPath: '/homebrew/map/$id'
-      preLoaderRoute: typeof HomebrewMapIdRouteImport
+    '/homebrew/map/$mapId': {
+      id: '/homebrew/map/$mapId'
+      path: '/homebrew/map/$mapId'
+      fullPath: '/homebrew/map/$mapId'
+      preLoaderRoute: typeof HomebrewMapMapIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/character/$id_/settings': {
-      id: '/character/$id_/settings'
-      path: '/character/$id/settings'
-      fullPath: '/character/$id/settings'
-      preLoaderRoute: typeof CharacterIdSettingsRouteImport
+    '/hero/$heroId_/settings': {
+      id: '/hero/$heroId_/settings'
+      path: '/hero/$heroId/settings'
+      fullPath: '/hero/$heroId/settings'
+      preLoaderRoute: typeof HeroHeroIdSettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/campaign/join/$id': {
-      id: '/campaign/join/$id'
-      path: '/campaign/join/$id'
-      fullPath: '/campaign/join/$id'
-      preLoaderRoute: typeof CampaignJoinIdRouteImport
+    '/campaign/join/$inviteId': {
+      id: '/campaign/join/$inviteId'
+      path: '/campaign/join/$inviteId'
+      fullPath: '/campaign/join/$inviteId'
+      preLoaderRoute: typeof CampaignJoinInviteIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/tabletop/$id/player/': {
-      id: '/tabletop/$id/player/'
-      path: '/tabletop/$id/player'
-      fullPath: '/tabletop/$id/player'
-      preLoaderRoute: typeof TabletopIdPlayerIndexRouteImport
+    '/tabletop/$campaignId/player/': {
+      id: '/tabletop/$campaignId/player/'
+      path: '/tabletop/$campaignId/player'
+      fullPath: '/tabletop/$campaignId/player'
+      preLoaderRoute: typeof TabletopCampaignIdPlayerIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/tabletop/$id/gm/': {
-      id: '/tabletop/$id/gm/'
-      path: '/tabletop/$id/gm'
-      fullPath: '/tabletop/$id/gm'
-      preLoaderRoute: typeof TabletopIdGmIndexRouteImport
+    '/tabletop/$campaignId/gm/': {
+      id: '/tabletop/$campaignId/gm/'
+      path: '/tabletop/$campaignId/gm'
+      fullPath: '/tabletop/$campaignId/gm'
+      preLoaderRoute: typeof TabletopCampaignIdGmIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/homebrew/map/$id_/edit/': {
-      id: '/homebrew/map/$id_/edit/'
-      path: '/homebrew/map/$id/edit'
-      fullPath: '/homebrew/map/$id/edit'
-      preLoaderRoute: typeof HomebrewMapIdEditIndexRouteImport
+    '/homebrew/map/$mapId_/edit/': {
+      id: '/homebrew/map/$mapId_/edit/'
+      path: '/homebrew/map/$mapId/edit'
+      fullPath: '/homebrew/map/$mapId/edit'
+      preLoaderRoute: typeof HomebrewMapMapIdEditIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -380,19 +383,19 @@ const rootRouteChildren: RootRouteChildren = {
   AuthCallbackRoute: AuthCallbackRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthLogoutRoute: AuthLogoutRoute,
-  CampaignIdRoute: CampaignIdRoute,
+  CampaignCampaignIdRoute: CampaignCampaignIdRoute,
   CampaignCreateRoute: CampaignCreateRoute,
-  CharacterIdRoute: CharacterIdRoute,
-  CharacterCreateRoute: CharacterCreateRoute,
+  HeroHeroIdRoute: HeroHeroIdRoute,
+  HeroCreateRoute: HeroCreateRoute,
   CampaignIndexRoute: CampaignIndexRoute,
-  CharacterIndexRoute: CharacterIndexRoute,
-  CampaignJoinIdRoute: CampaignJoinIdRoute,
-  CharacterIdSettingsRoute: CharacterIdSettingsRoute,
-  HomebrewMapIdRoute: HomebrewMapIdRoute,
+  HeroIndexRoute: HeroIndexRoute,
+  CampaignJoinInviteIdRoute: CampaignJoinInviteIdRoute,
+  HeroHeroIdSettingsRoute: HeroHeroIdSettingsRoute,
+  HomebrewMapMapIdRoute: HomebrewMapMapIdRoute,
   HomebrewMapIndexRoute: HomebrewMapIndexRoute,
-  TabletopIdGmIndexRoute: TabletopIdGmIndexRoute,
-  TabletopIdPlayerIndexRoute: TabletopIdPlayerIndexRoute,
-  HomebrewMapIdEditIndexRoute: HomebrewMapIdEditIndexRoute,
+  TabletopCampaignIdGmIndexRoute: TabletopCampaignIdGmIndexRoute,
+  TabletopCampaignIdPlayerIndexRoute: TabletopCampaignIdPlayerIndexRoute,
+  HomebrewMapMapIdEditIndexRoute: HomebrewMapMapIdEditIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

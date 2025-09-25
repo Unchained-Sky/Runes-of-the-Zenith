@@ -36,10 +36,10 @@ function RouteComponent() {
 	const navigate = useNavigate({ from: '/campaign/create' })
 
 	const campaignCreate = useMutation({
-		mutationFn: campaignCreateAction,
+		mutationFn: createCampaignAction,
 		onSuccess: async data => {
 			void queryClient.invalidateQueries({ queryKey: ['navbar', 'campaignCount'] })
-			await navigate({ to: '/campaign/$id', params: { id: data } })
+			await navigate({ to: '/campaign/$campaignId', params: { campaignId: data } })
 		}
 	})
 
@@ -66,12 +66,12 @@ function RouteComponent() {
 	)
 }
 
-const createCharacterSchema = type({
+const createCampaignSchema = type({
 	campaignName: '3 <= string <= 32'
 })
 
-const campaignCreateAction = createServerFn({ method: 'POST' })
-	.validator(createCharacterSchema)
+const createCampaignAction = createServerFn({ method: 'POST' })
+	.validator(createCampaignSchema)
 	.handler(async ({ data: { campaignName } }) => {
 		const { supabase } = await requireAccount()
 

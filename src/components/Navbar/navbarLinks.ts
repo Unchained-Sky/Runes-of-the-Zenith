@@ -23,7 +23,7 @@ export type NavLink = MainLink | NestedLink
 export const navbarLinks = [
 	{ label: 'Home', icon: IconHome, link: '/' },
 	{ label: 'Campaigns', icon: IconCampfire, link: '/campaign' },
-	{ label: 'Characters', icon: IconUser, link: '/character' },
+	{ label: 'Heroes', icon: IconUser, link: '/hero' },
 	{ label: 'Homebrew', icon: IconCoffee, links: [
 		{ label: 'Encounters', link: '/' },
 		{ label: 'Maps', link: '/homebrew/map' },

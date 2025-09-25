@@ -4,23 +4,21 @@ import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { requireAccount } from '~/supabase/requireAccount'
 
-export const Route = createFileRoute('/tabletop/$id/player/')({
+export const Route = createFileRoute('/tabletop/$campaignId/player/')({
 	component: RouteComponent,
-	loader: async ({ params: { id } }) => await serverLoader({ data: { campaignId: id } }),
+	loader: async ({ params: { campaignId } }) => await serverLoader({ data: { campaignId: +campaignId } }),
 	head: ({ loaderData }) => ({
 		meta: loaderData ? [{ title: loaderData.campaignName }] : undefined
 	})
 })
 
 const serverLoaderSchema = type({
-	campaignId: 'string.digits'
+	campaignId: 'number'
 })
 
 const serverLoader = createServerFn({ method: 'GET' })
 	.validator(serverLoaderSchema)
-	.handler(async ({ data: { campaignId: campaignIdString } }) => {
-		const campaignId = parseInt(campaignIdString)
-
+	.handler(async ({ data: { campaignId } }) => {
 		const { supabase } = await requireAccount({ backlink: '/tabletop/$id/player' })
 
 		const { data, error } = await supabase

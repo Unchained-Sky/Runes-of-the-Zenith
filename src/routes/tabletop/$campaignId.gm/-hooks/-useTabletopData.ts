@@ -26,7 +26,7 @@ const nameLoader = createServerFn({ method: 'GET' })
 			.limit(1)
 			.maybeSingle()
 		if (error) throw new Error(error.message, { cause: error })
-		if (!data) throw redirect({ to: '/campaign/$id', params: { id: campaignId.toString() } })
+		if (!data) throw redirect({ to: '/campaign/$campaignId', params: { campaignId: campaignId.toString() } })
 
 		return data.campaign_name
 	})
@@ -38,7 +38,7 @@ export const tabletopNameQueryOptions = (campaignId: number) => queryOptions({
 })
 
 export function useTabletopName() {
-	const { campaignId } = getRouteApi('/tabletop/$id/gm/').useLoaderData()
+	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useLoaderData()
 	return useSuspenseQuery(tabletopNameQueryOptions(campaignId))
 }
 
@@ -83,7 +83,7 @@ export const tabletopTilesQueryOptions = (campaignId: number) => queryOptions({
 })
 
 export function useTabletopTiles() {
-	const { campaignId } = getRouteApi('/tabletop/$id/gm/').useLoaderData()
+	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useLoaderData()
 	return useSuspenseQuery(tabletopTilesQueryOptions(campaignId))
 }
 
@@ -120,20 +120,20 @@ export function useTabletopMaps() {
 }
 
 /*
-	Characters
+	Heroes
 */
 
-const charactersLoader = createServerFn({ method: 'GET' })
+const heroesLoader = createServerFn({ method: 'GET' })
 	.validator(tabletopLoaderSchema)
 	.handler(async ({ data: { campaignId } }) => {
 		const { supabase } = await requireAccount({ backlink: '/campaigns' })
 
 		const { data, error } = await supabase
-			.from('character_info')
+			.from('hero_info')
 			.select(`
-				character_id,
-				character_name,
-				tabletop_characters(
+				hero_id,
+				hero_name,
+				tabletop_heroes (
 					shield_durability,
 					shield_current,
 					shield_max,
@@ -145,20 +145,20 @@ const charactersLoader = createServerFn({ method: 'GET' })
 				)
 			`)
 			.eq('campaign_id', campaignId)
-		if (error) throw redirect({ to: '/campaign/$id', params: { id: campaignId.toString() } })
+		if (error) throw redirect({ to: '/campaign/$campaignId', params: { campaignId: campaignId.toString() } })
 
-		return Object.fromEntries(data.map(character => [
-			character.character_id,
-			character
+		return Object.fromEntries(data.map(hero => [
+			hero.hero_id,
+			hero
 		]))
 	})
 
-export const tabletopCharactersQueryOptions = (campaignId: number) => queryOptions({
-	queryKey: ['tabletop', 'characters', campaignId],
-	queryFn: () => charactersLoader({ data: { campaignId } })
+export const tabletopHeroesQueryOptions = (campaignId: number) => queryOptions({
+	queryKey: ['tabletop', 'heroes', campaignId],
+	queryFn: () => heroesLoader({ data: { campaignId } })
 })
 
-export function useTabletopCharacters() {
-	const { campaignId } = getRouteApi('/tabletop/$id/gm/').useLoaderData()
-	return useSuspenseQuery(tabletopCharactersQueryOptions(campaignId))
+export function useTabletopHeroes() {
+	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useLoaderData()
+	return useSuspenseQuery(tabletopHeroesQueryOptions(campaignId))
 }

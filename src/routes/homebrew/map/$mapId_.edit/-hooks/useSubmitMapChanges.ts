@@ -76,7 +76,7 @@ const submitMapChanges = createServerFn({ method: 'POST' })
 	})
 
 export const useSubmitMapChanges = () => {
-	const { id: mapId } = getRouteApi('/homebrew/map/$id_/edit/').useParams()
+	const { mapId } = getRouteApi('/homebrew/map/$mapId_/edit/').useParams()
 
 	const postSubmit = useServerFn(submitMapChanges)
 

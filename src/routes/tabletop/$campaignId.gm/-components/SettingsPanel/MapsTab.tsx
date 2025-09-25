@@ -9,7 +9,7 @@ import { requireAccount } from '~/supabase/requireAccount'
 import { useTabletopMaps, useTabletopTiles } from '../../-hooks/-useTabletopData'
 
 export default function MapsTab() {
-	const { id: campaignId } = getRouteApi('/tabletop/$id/gm/').useParams()
+	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useParams()
 	const { data: maps } = useTabletopMaps()
 
 	const [value, setValue] = useState<string | null>(null)

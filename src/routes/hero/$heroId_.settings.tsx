@@ -9,47 +9,45 @@ import { getUserId } from '~/supabase/getUserId'
 import { requireAccount } from '~/supabase/requireAccount'
 import { type FormResponse } from '~/types/formResponse'
 
-export const Route = createFileRoute('/character/$id_/settings')({
+export const Route = createFileRoute('/hero/$heroId_/settings')({
 	component: RouteComponent,
-	loader: async ({ params: { id } }) => await serverLoader({ data: { characterId: id } }),
+	loader: async ({ params: { heroId } }) => await serverLoader({ data: { heroId: +heroId } }),
 	head: ({ loaderData }) => ({
 		meta: loaderData
-			? [{ title: `Character: ${loaderData.characterName}` }]
+			? [{ title: `Hero: ${loaderData.heroName}` }]
 			: undefined
 	})
 })
 
 const serverLoaderSchema = type({
-	characterId: 'string.digits'
+	heroId: 'number'
 })
 
 const serverLoader = createServerFn({ method: 'GET' })
 	.validator(serverLoaderSchema)
-	.handler(async ({ data: { characterId: CharacterIdString } }) => {
-		const characterId = parseInt(CharacterIdString)
+	.handler(async ({ data: { heroId } }) => {
+		const { supabase } = await requireAccount({ backlink: '/hero' })
 
-		const { supabase } = await requireAccount({ backlink: '/character' })
-
-		const { data: characterData, error: characterError } = await supabase
-			.from('character_info')
+		const { data: heroData, error: heroError } = await supabase
+			.from('hero_info')
 			.select(`
-				character_name,
+				hero_name,
 				campaign_id,
 				user_id,
 				visibility
 			`)
-			.eq('character_id', characterId)
+			.eq('hero_id', heroId)
 			.limit(1)
 			.maybeSingle()
-		if (characterError) throw new Error(characterError.message, { cause: characterError })
-		if (!characterData) throw redirect({ to: '/character' })
+		if (heroError) throw new Error(heroError.message, { cause: heroError })
+		if (!heroData) throw redirect({ to: '/hero' })
 
-		const { character_name, campaign_id, user_id, visibility } = characterData
+		const { hero_name, campaign_id, user_id: heroUserId, visibility } = heroData
 
 		const { userId } = await getUserId(supabase)
-		if (user_id !== userId) throw redirect({
-			to: '/character/$id',
-			params: { id: characterId.toString() }
+		if (heroUserId !== userId) throw redirect({
+			to: '/hero/$heroId',
+			params: { heroId: heroId.toString() }
 		})
 
 		const { data: campaignData, error: campaignError } = await supabase
@@ -58,7 +56,7 @@ const serverLoader = createServerFn({ method: 'GET' })
 		if (campaignError) throw new Error(campaignError.message, { cause: campaignError })
 
 		return {
-			characterName: character_name,
+			heroName: hero_name,
 			currentCampaignId: campaign_id,
 			campaigns: campaignData,
 			visibility
@@ -67,12 +65,12 @@ const serverLoader = createServerFn({ method: 'GET' })
 
 function RouteComponent() {
 	const {
-		characterName,
+		heroName,
 		currentCampaignId,
 		campaigns,
 		visibility
 	} = Route.useLoaderData()
-	const { id: characterId } = Route.useParams()
+	const { heroId } = Route.useParams()
 
 	const form = useForm({
 		mode: 'uncontrolled',
@@ -82,8 +80,8 @@ function RouteComponent() {
 		}
 	})
 
-	const characterSettings = useMutation({
-		mutationFn: characterSettingsAction,
+	const heroSettings = useMutation({
+		mutationFn: heroSettingsAction,
 		onSuccess: () => {
 			form.resetDirty()
 			form.resetTouched()
@@ -92,9 +90,9 @@ function RouteComponent() {
 
 	return (
 		<Stack>
-			<Title>{characterName}</Title>
+			<Title>{heroName}</Title>
 
-			<form onSubmit={form.onSubmit(() => characterSettings.mutate({ data: { characterId, ...form.values } }))}>
+			<form onSubmit={form.onSubmit(() => heroSettings.mutate({ data: { heroId: +heroId, ...form.values } }))}>
 				<Stack maw={rem(240)}>
 					<Select
 						label='Linked Campaign'
@@ -110,7 +108,7 @@ function RouteComponent() {
 					<Switch
 						defaultChecked={visibility === 'PRIVATE'}
 						label='Private'
-						description='Private characters can still be viewed to members of the same campaign'
+						description='Private heroes can still be viewed to members of the same campaign'
 						key={form.key('private')}
 						{...form.getInputProps('private', { type: 'checkbox' })}
 					/>
@@ -123,10 +121,10 @@ function RouteComponent() {
 						Save
 					</Button>
 
-					{characterSettings.data && !form.isTouched()
+					{heroSettings.data && !form.isTouched()
 						? (
-							<Text c={characterSettings.data.error ? 'red' : 'green'}>
-								{characterSettings.data.message}
+							<Text c={heroSettings.data.error ? 'red' : 'green'}>
+								{heroSettings.data.message}
 							</Text>
 						)
 						: null}
@@ -136,52 +134,49 @@ function RouteComponent() {
 	)
 }
 
-const characterSettingsSchema = type({
-	characterId: 'string.digits',
+const heroSettingsSchema = type({
+	heroId: 'number',
 	campaignId: 'string.digits | null',
 	private: 'boolean'
 })
 
-const characterSettingsAction = createServerFn({ method: 'POST' })
-	.validator(characterSettingsSchema)
+const heroSettingsAction = createServerFn({ method: 'POST' })
+	.validator(heroSettingsSchema)
 	.handler(async ({ data }) => {
-		const { supabase } = await requireAccount({ backlink: '/character' })
+		const { supabase, user } = await requireAccount({ backlink: '/hero' })
 
-		const characterId = parseInt(data.characterId)
-
-		const { data: characterUserId, error: characterUserIdError } = await supabase
-			.from('character_info')
+		const { data: heroUserId, error: heroUserIdError } = await supabase
+			.from('hero_info')
 			.select('user_id')
-			.eq('character_id', characterId)
+			.eq('hero_id', data.heroId)
 			.limit(1)
 			.single()
-		if (characterUserIdError) return {
+		if (heroUserIdError) return {
 			error: true,
-			message: characterUserIdError.message
+			message: heroUserIdError.message
 		} satisfies FormResponse
 
-		const { userId } = (await getUserId(supabase))
-		if (characterUserId.user_id !== userId) return {
+		if (heroUserId.user_id !== user.id) return {
 			error: true,
-			message: 'You do not own this character'
+			message: 'You do not own this hero'
 		} satisfies FormResponse
 
 		const serviceClient = getServiceClient()
-		const { error: characterUpdateError } = await serviceClient
-			.from('character_info')
+		const { error: heroUpdateError } = await serviceClient
+			.from('hero_info')
 			.update({
 				campaign_id: data.campaignId ? parseInt(data.campaignId) : null,
 				visibility: data.private ? 'PRIVATE' : 'PUBLIC'
 			})
-			.eq('character_id', characterId)
-			.eq('user_id', userId)
-		if (characterUpdateError) return {
+			.eq('hero_id', data.heroId)
+			.eq('user_id', user.id)
+		if (heroUpdateError) return {
 			error: true,
-			message: characterUpdateError.message
+			message: heroUpdateError.message
 		} satisfies FormResponse
 
 		return {
 			error: false,
-			message: 'Character settings updated'
+			message: 'Hero settings updated'
 		} satisfies FormResponse
 	})

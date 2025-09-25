@@ -7,9 +7,9 @@ import { createHash } from 'node:crypto'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireAccount } from '~/supabase/requireAccount'
 
-export const Route = createFileRoute('/campaign/join/$id')({
+export const Route = createFileRoute('/campaign/join/$inviteId')({
 	component: RouteComponent,
-	loader: async ({ params: { id } }) => await serverLoader({ data: { inviteId: id } }),
+	loader: async ({ params: { inviteId } }) => await serverLoader({ data: { inviteId } }),
 	head: ({ loaderData }) => ({
 		meta: loaderData
 			? [{ title: `Join Campaign: ${loaderData.campaignName}` }]
@@ -35,8 +35,8 @@ const serverLoader = createServerFn({ method: 'GET' })
 			.limit(1)
 			.maybeSingle()
 		if (inviteData) throw redirect({
-			to: '/campaign/$id',
-			params: { id: inviteData.campaign_id.toString() }
+			to: '/campaign/$campaignId',
+			params: { campaignId: inviteData.campaign_id.toString() }
 		})
 
 		const serverClient = getServiceClient()
@@ -55,7 +55,7 @@ const serverLoader = createServerFn({ method: 'GET' })
 
 function RouteComponent() {
 	const { campaignName } = Route.useLoaderData()
-	const { id: inviteId } = Route.useParams()
+	const { inviteId } = Route.useParams()
 
 	const joinCampaign = useMutation({
 		mutationFn: joinCampaignAction
@@ -91,8 +91,8 @@ const joinCampaignAction = createServerFn({ method: 'POST' })
 			.limit(1)
 			.maybeSingle()
 		if (inviteData) throw redirect({
-			to: '/campaign/$id',
-			params: { id: inviteData.campaign_id.toString() }
+			to: '/campaign/$campaignId',
+			params: { campaignId: inviteData.campaign_id.toString() }
 		})
 
 		const serverClient = getServiceClient()
@@ -116,7 +116,7 @@ const joinCampaignAction = createServerFn({ method: 'POST' })
 			})
 
 		throw redirect({
-			to: '/campaign/$id',
-			params: { id: campaignId.toString() }
+			to: '/campaign/$campaignId',
+			params: { campaignId: campaignId.toString() }
 		})
 	})

@@ -86,7 +86,7 @@ const createMapAction = createServerFn({ method: 'POST' })
 		if (error) throw new Error(error.message, { cause: error })
 
 		throw redirect({
-			to: '/homebrew/map/$id',
-			params: { id: data.map_id.toString() }
+			to: '/homebrew/map/$mapId',
+			params: { mapId: data.map_id.toString() }
 		})
 	})

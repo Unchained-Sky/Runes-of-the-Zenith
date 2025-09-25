@@ -9,14 +9,14 @@ import { Fragment } from 'react'
 import { type Tables } from '~/supabase/databaseTypes'
 import { getSupabaseServerClient } from '~/supabase/getSupabaseServerClient'
 import { useSupabase } from '~/supabase/useSupabase'
-import { useTabletopCharacters } from '../../../-hooks/-useTabletopData'
+import { useTabletopHeroes } from '../../../-hooks/-useTabletopData'
 
-export default function Characters() {
-	const { data: characters } = useTabletopCharacters()
+export default function Heroes() {
+	const { data: heroes } = useTabletopHeroes()
 
 	return (
 		<Stack gap={0}>
-			<Title order={3}>Characters</Title>
+			<Title order={3}>Heroes</Title>
 			<Table>
 				<Table.Thead>
 					<Table.Tr>
@@ -28,12 +28,12 @@ export default function Characters() {
 					</Table.Tr>
 				</Table.Thead>
 				<Table.Tbody>
-					{Object.values(characters).map(character => {
-						if (character.tabletop_characters === null) return null
+					{Object.values(heroes).map(hero => {
+						if (hero.tabletop_heroes === null) return null
 						return (
-							<Character
-								key={character.character_id}
-								character_id={character.character_id}
+							<Hero
+								key={hero.hero_id}
+								hero_id={hero.hero_id}
 							/>
 						)
 					})}
@@ -43,42 +43,42 @@ export default function Characters() {
 	)
 }
 
-type CharacterProps = {
-	character_id: number
+type HeroProps = {
+	hero_id: number
 }
 
-function Character({ character_id }: CharacterProps) {
-	const { character_name, tabletop_characters } = useTabletopCharacters().data[character_id] ?? {}
+function Hero({ hero_id }: HeroProps) {
+	const { hero_name, tabletop_heroes } = useTabletopHeroes().data[hero_id] ?? {}
 
 	const [editMode, editModeHandlers] = useDisclosure(false)
 
-	const removeCharacter = useMutation({
-		mutationFn: removeCharacterAction
+	const removeHero = useMutation({
+		mutationFn: removeHeroAction
 	})
 
-	const getTabletopLifeValue = (value: keyof Tables<'tabletop_characters'> & (`health_${string}` | `shield_${string}`)) => {
-		return tabletop_characters?.[value] ?? 0
+	const getTabletopLifeValue = (value: keyof Tables<'tabletop_heroes'> & (`health_${string}` | `shield_${string}`)) => {
+		return tabletop_heroes?.[value] ?? 0
 	}
 
 	const getTabletopPosition = () => {
-		if (!tabletop_characters) return null
+		if (!tabletop_heroes) return null
 		if (
-			tabletop_characters.position_q === null
-			|| tabletop_characters.position_r === null
-			|| tabletop_characters.position_s === null
+			tabletop_heroes.position_q === null
+			|| tabletop_heroes.position_r === null
+			|| tabletop_heroes.position_s === null
 		) return null
 		const position = {
-			q: tabletop_characters.position_q,
-			r: tabletop_characters.position_r,
-			s: tabletop_characters.position_s
+			q: tabletop_heroes.position_q,
+			r: tabletop_heroes.position_r,
+			s: tabletop_heroes.position_s
 		}
 		return `${position.q},${position.r},${position.s}`
 	}
 
 	return (
 		<Fragment>
-			<CharacterEditModal
-				character_id={character_id}
+			<HeroEditModal
+				hero_id={hero_id}
 				opened={editMode}
 				close={editModeHandlers.close}
 			/>
@@ -87,7 +87,7 @@ function Character({ character_id }: CharacterProps) {
 				<Table.Td>
 					<Group gap='xs'>
 						<Avatar />
-						<Text size='lg'>{character_name}</Text>
+						<Text size='lg'>{hero_name}</Text>
 					</Group>
 				</Table.Td>
 				<Table.Td>
@@ -114,9 +114,9 @@ function Character({ character_id }: CharacterProps) {
 								<Menu.Item
 									color='red'
 									leftSection={<IconTrash size={14} />}
-									onClick={() => removeCharacter.mutate({ data: { characterId: character_id } })}
+									onClick={() => removeHero.mutate({ data: { hero_id } })}
 								>
-									Remove Character
+									Remove Hero
 								</Menu.Item>
 							</Menu.Dropdown>
 						</Menu>
@@ -127,24 +127,24 @@ function Character({ character_id }: CharacterProps) {
 	)
 }
 
-const removeCharacterSchema = type({
-	characterId: 'number'
+const removeHeroSchema = type({
+	hero_id: 'number'
 })
 
-const removeCharacterAction = createServerFn({ method: 'POST' })
-	.validator(removeCharacterSchema)
-	.handler(async ({ data: { characterId } }) => {
+const removeHeroAction = createServerFn({ method: 'POST' })
+	.validator(removeHeroSchema)
+	.handler(async ({ data: { hero_id } }) => {
 		const supabase = getSupabaseServerClient()
 
 		const { error } = await supabase
-			.from('tabletop_characters')
+			.from('tabletop_heroes')
 			.delete()
-			.eq('character_id', characterId)
+			.eq('hero_id', hero_id)
 		if (error) throw new Error(error.message, { cause: error })
 	})
 
-type CharacterEditModalProps = {
-	character_id: number
+type HeroEditModalProps = {
+	hero_id: number
 	opened: boolean
 	close: () => void
 }
@@ -156,19 +156,19 @@ const numberInputProps: NumberInputProps = {
 	stepHoldInterval: t => Math.max(1000 / t ** 2, 25)
 }
 
-function CharacterEditModal({ character_id, opened, close }: CharacterEditModalProps) {
-	const { character_name, tabletop_characters } = useTabletopCharacters().data[character_id] ?? {}
+function HeroEditModal({ hero_id, opened, close }: HeroEditModalProps) {
+	const { hero_name, tabletop_heroes } = useTabletopHeroes().data[hero_id] ?? {}
 
 	const supabase = useSupabase()
 
 	const form = useForm({
 		mode: 'uncontrolled',
 		initialValues: {
-			shieldDurability: tabletop_characters?.shield_durability ?? 0,
-			shieldCurrent: tabletop_characters?.shield_current ?? 0,
-			shieldMax: tabletop_characters?.shield_max ?? 0,
-			healthCurrent: tabletop_characters?.health_current ?? 0,
-			healthMax: tabletop_characters?.health_max ?? 0
+			shieldDurability: tabletop_heroes?.shield_durability ?? 0,
+			shieldCurrent: tabletop_heroes?.shield_current ?? 0,
+			shieldMax: tabletop_heroes?.shield_max ?? 0,
+			healthCurrent: tabletop_heroes?.health_current ?? 0,
+			healthMax: tabletop_heroes?.health_max ?? 0
 		},
 		validate: {
 			healthMax: value => value > 0 ? null : 'Max health must be greater than 0'
@@ -178,9 +178,9 @@ function CharacterEditModal({ character_id, opened, close }: CharacterEditModalP
 	const handleSubmit = (values: typeof form.values) => {
 		(async () => {
 			const { error } = await supabase
-				.from('tabletop_characters')
+				.from('tabletop_heroes')
 				.upsert({
-					character_id,
+					hero_id,
 					shield_durability: values.shieldDurability,
 					shield_current: values.shieldCurrent,
 					shield_max: values.shieldMax,
@@ -197,7 +197,7 @@ function CharacterEditModal({ character_id, opened, close }: CharacterEditModalP
 			opened={opened}
 			onClose={close}
 			onExitTransitionEnd={() => form.reset()}
-			title={`Edit ${character_name}`}
+			title={`Edit ${hero_name}`}
 		>
 			<form onSubmit={form.onSubmit(handleSubmit)}>
 				<Stack>

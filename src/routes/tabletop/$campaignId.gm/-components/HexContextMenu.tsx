@@ -6,7 +6,7 @@ import { Fragment, type ReactNode } from 'react'
 import ContextMenu from '~/components/ContextMenu'
 import { type CombatTileCord } from '~/data/mapTemplates/combat'
 import { getSupabaseServerClient } from '~/supabase/getSupabaseServerClient'
-import { useTabletopCharacters } from '../-hooks/-useTabletopData'
+import { useTabletopHeroes } from '../-hooks/-useTabletopData'
 
 type HexContextMenuProps = {
 	children: ReactNode
@@ -19,7 +19,7 @@ export default function HexContextMenu({ children, cord }: HexContextMenuProps) 
 			menuItems={(
 				<Fragment>
 					<Menu.Label>Units</Menu.Label>
-					<Characters cord={cord} />
+					<Heroes cord={cord} />
 				</Fragment>
 			)}
 		>
@@ -28,39 +28,39 @@ export default function HexContextMenu({ children, cord }: HexContextMenuProps) 
 	)
 }
 
-type CharactersProps = {
+type HeroesProps = {
 	cord: CombatTileCord
 }
 
-function Characters({ cord }: CharactersProps) {
-	const { data: characters } = useTabletopCharacters()
+function Heroes({ cord }: HeroesProps) {
+	const { data: heroes } = useTabletopHeroes()
 
-	const inactiveCharacters = Object.values(characters)
-		.filter(({ tabletop_characters }) => tabletop_characters === null)
+	const inactiveHeroes = Object.values(heroes)
+		.filter(({ tabletop_heroes }) => tabletop_heroes === null)
 
-	const addCharacter = useMutation({
-		mutationFn: addCharacterAction
+	const addHero = useMutation({
+		mutationFn: addHeroAction
 	})
 
 	return (
 		<Menu.Sub>
 			<Menu.Sub.Target>
-				<Menu.Sub.Item disabled={!inactiveCharacters.length}>Add Character</Menu.Sub.Item>
+				<Menu.Sub.Item disabled={!inactiveHeroes.length}>Add Hero</Menu.Sub.Item>
 			</Menu.Sub.Target>
 
 			<Menu.Sub.Dropdown>
-				{inactiveCharacters.map(character => {
+				{inactiveHeroes.map(hero => {
 					return (
 						<Menu.Item
-							key={character.character_id}
-							onClick={() => addCharacter.mutate({
+							key={hero.hero_id}
+							onClick={() => addHero.mutate({
 								data: {
-									characterId: character.character_id,
+									heroId: hero.hero_id,
 									cord
 								}
 							})}
 						>
-							{character.character_name}
+							{hero.hero_name}
 						</Menu.Item>
 					)
 				})}
@@ -69,20 +69,20 @@ function Characters({ cord }: CharactersProps) {
 	)
 }
 
-const addCharacterSchema = type({
-	characterId: 'number',
+const addHeroSchema = type({
+	heroId: 'number',
 	cord: ['number', 'number', 'number']
 })
 
-const addCharacterAction = createServerFn({ method: 'POST' })
-	.validator(addCharacterSchema)
-	.handler(async ({ data: { characterId, cord: [q, r, s] } }) => {
+const addHeroAction = createServerFn({ method: 'POST' })
+	.validator(addHeroSchema)
+	.handler(async ({ data: { heroId, cord: [q, r, s] } }) => {
 		const supabase = getSupabaseServerClient()
 
 		const { error } = await supabase
-			.from('tabletop_characters')
+			.from('tabletop_heroes')
 			.upsert({
-				character_id: characterId,
+				hero_id: heroId,
 				position_q: q,
 				position_r: r,
 				position_s: s

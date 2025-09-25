@@ -5,9 +5,9 @@ import { type } from 'arktype'
 import { getSupabaseServerClient } from '~/supabase/getSupabaseServerClient'
 import { getUserId } from '~/supabase/getUserId'
 
-export const Route = createFileRoute('/campaign/$id')({
+export const Route = createFileRoute('/campaign/$campaignId')({
 	component: RouteComponent,
-	loader: async ({ params: { id } }) => await serverLoader({ data: { campaignId: id } }),
+	loader: async ({ params: { campaignId } }) => await serverLoader({ data: { campaignId: +campaignId } }),
 	head: ({ loaderData }) => ({
 		meta: loaderData
 			? [{ title: `Campaign: ${loaderData.campaignName}` }]
@@ -16,14 +16,12 @@ export const Route = createFileRoute('/campaign/$id')({
 })
 
 const serverLoaderSchema = type({
-	campaignId: 'string.digits'
+	campaignId: 'number'
 })
 
 const serverLoader = createServerFn({ method: 'GET' })
 	.validator(serverLoaderSchema)
-	.handler(async ({ data: { campaignId: campaignIdString } }) => {
-		const campaignId = parseInt(campaignIdString)
-
+	.handler(async ({ data: { campaignId } }) => {
 		const supabase = getSupabaseServerClient()
 
 		const { data, error } = await supabase
@@ -32,9 +30,9 @@ const serverLoader = createServerFn({ method: 'GET' })
 				campaign_name,
 				invite_id,
 				campaign_owner_id: user_id,
-				character_info (
-					character_name,
-					character_id
+				hero_info (
+					hero_name,
+					hero_id
 				)	
 			`)
 			.eq('campaign_id', campaignId)
@@ -47,15 +45,15 @@ const serverLoader = createServerFn({ method: 'GET' })
 
 		return {
 			campaignName: data.campaign_name,
-			characterInfo: data.character_info,
+			heroInfo: data.hero_info,
 			inviteId: data.invite_id,
 			isOwner: data.campaign_owner_id === userId
 		}
 	})
 
 function RouteComponent() {
-	const { campaignName, characterInfo, inviteId, isOwner } = Route.useLoaderData()
-	const { id: campaignId } = Route.useParams()
+	const { campaignName, heroInfo, inviteId, isOwner } = Route.useLoaderData()
+	const { campaignId } = Route.useParams()
 
 	return (
 		<Stack>
@@ -66,17 +64,17 @@ function RouteComponent() {
 				<Code>{`http://localhost:5173/campaign/join/${inviteId}`}</Code>
 			</Group>
 
-			<Title order={2}>Characters:</Title>
+			<Title order={2}>Heroes:</Title>
 			<Group>
-				{characterInfo.length
-					? characterInfo.map(({ character_name, character_id }) => {
+				{heroInfo.length
+					? heroInfo.map(({ hero_name, hero_id }) => {
 						return (
 							<Button
-								key={character_id}
+								key={hero_id}
 								component={Link}
-								to={`/character/${character_id}`}
+								to='/hero/${hero_id}'
 							>
-								{character_name}
+								{hero_name}
 							</Button>
 						)
 					})

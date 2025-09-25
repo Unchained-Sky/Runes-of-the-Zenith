@@ -5,66 +5,63 @@ import { type } from 'arktype'
 import { getUserId } from '~/supabase/getUserId'
 import { requireAccount } from '~/supabase/requireAccount'
 
-export const Route = createFileRoute('/character/$id')({
+export const Route = createFileRoute('/hero/$heroId')({
 	component: RouteComponent,
-	loader: async ({ params: { id } }) => await serverLoader({ data: { characterId: id } }),
+	loader: async ({ params: { heroId } }) => await serverLoader({ data: { heroId: +heroId } }),
 	head: ({ loaderData }) => ({
 		meta: loaderData
-			? [{ title: `Character: ${loaderData.characterName}` }]
+			? [{ title: `Hero: ${loaderData.heroName}` }]
 			: undefined
 	})
 })
 
 const serverLoaderSchema = type({
-	characterId: 'string.digits'
+	heroId: 'number'
 })
 
 const serverLoader = createServerFn({ method: 'GET' })
 	.validator(serverLoaderSchema)
-	.handler(async ({ data: { characterId: CharacterIdString } }) => {
-		const characterId = parseInt(CharacterIdString)
-
-		const { supabase } = await requireAccount({ backlink: '/character' })
+	.handler(async ({ data: { heroId } }) => {
+		const { supabase } = await requireAccount({ backlink: '/hero' })
 
 		const { data, error } = await supabase
-			.from('character_info')
+			.from('hero_info')
 			.select(`
-				character_name,
+				hero_name,
 				user_id,
-				campaign_info(
+				campaign_info (
 					campaign_name
 				)
 			`)
-			.eq('character_id', characterId)
+			.eq('hero_id', heroId)
 			.limit(1)
 			.maybeSingle()
 		if (error) throw new Error(error.message, { cause: error })
-
-		if (!data) throw redirect({ to: '/character' })
+		if (!data) throw redirect({ to: '/hero' })
 
 		const { userId } = await getUserId(supabase)
 
 		return {
-			characterName: data.character_name,
+			heroId,
+			heroName: data.hero_name,
 			campaignName: data.campaign_info?.campaign_name ?? null,
-			characterId,
 			isOwner: data.user_id === userId
 		}
 	})
 
 function RouteComponent() {
-	const { characterName, campaignName, characterId, isOwner } = Route.useLoaderData()
+	const { heroId, heroName, campaignName, isOwner } = Route.useLoaderData()
 
 	return (
 		<Stack>
-			<Title>{characterName}</Title>
+			<Title>{heroName}</Title>
 
 			<Text>Linked campaign: {campaignName ?? 'None'}</Text>
 
 			{isOwner && (
 				<Button
 					component={Link}
-					to={`/character/${characterId}/settings`}
+					to={`/hero/${heroId}/settings`}
 					maw={rem(240)}
 				>
 					Edit Settings

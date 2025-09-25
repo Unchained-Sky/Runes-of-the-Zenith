@@ -7,49 +7,49 @@ import { type } from 'arktype'
 import { useState } from 'react'
 import { requireAccount } from '~/supabase/requireAccount'
 
-export const Route = createFileRoute('/character/create')({
+export const Route = createFileRoute('/hero/create')({
 	component: RouteComponent,
 	loader: async () => await serverLoader(),
 	head: () => ({
-		meta: [{ title: 'Create Character' }]
+		meta: [{ title: 'Create Hero' }]
 	})
 })
 
 const serverLoader = createServerFn({ method: 'GET' })
 	.handler(async () => {
-		await requireAccount({ backlink: '/character/create' })
+		await requireAccount({ backlink: '/hero/create' })
 	})
 
 function RouteComponent() {
-	const [characterName, setCharacterName] = useState('')
+	const [heroName, setHeroName] = useState('')
 
 	const { queryClient } = Route.useRouteContext()
-	const navigate = useNavigate({ from: '/character/create' })
+	const navigate = useNavigate({ from: '/hero/create' })
 
-	const createCharacter = useMutation({
-		mutationFn: createCharacterAction,
+	const createHero = useMutation({
+		mutationFn: createHeroAction,
 		onSuccess: async data => {
-			void queryClient.invalidateQueries({ queryKey: ['navbar', 'characterCount'] })
-			await navigate({ to: '/character/$id', params: { id: data } })
+			void queryClient.invalidateQueries({ queryKey: ['navbar', 'heroCount'] })
+			await navigate({ to: '/hero/$heroId', params: { heroId: data } })
 		}
 	})
 
 	return (
 		<Stack>
-			<Title>Create Character</Title>
+			<Title>Create Hero</Title>
 
 			<Group>
 				<TextInput
-					value={characterName}
-					onChange={event => setCharacterName(event.currentTarget.value)}
-					label='Character Name'
+					value={heroName}
+					onChange={event => setHeroName(event.currentTarget.value)}
+					label='Hero Name'
 					w={rem(240)}
-					name='character_name'
+					name='hero_name'
 					rightSection={(
 						<ActionIcon
-							loading={!!createCharacter.submittedAt}
+							loading={!!createHero.submittedAt}
 							onClick={() => {
-								createCharacter.mutate({ data: { characterName } })
+								createHero.mutate({ data: { heroName } })
 							}}
 						>
 							<IconCirclePlusFilled />
@@ -61,22 +61,22 @@ function RouteComponent() {
 	)
 }
 
-const createCharacterSchema = type({
-	characterName: 'string'
+const createHeroSchema = type({
+	heroName: 'string'
 })
 
-const createCharacterAction = createServerFn({ method: 'POST' })
-	.validator(createCharacterSchema)
-	.handler(async ({ data: { characterName } }) => {
+const createHeroAction = createServerFn({ method: 'POST' })
+	.validator(createHeroSchema)
+	.handler(async ({ data: { heroName } }) => {
 		const { supabase } = await requireAccount()
 
 		const { data, error } = await supabase
-			.from('character_info')
-			.insert({ character_name: characterName })
+			.from('hero_info')
+			.insert({ hero_name: heroName })
 			.select()
 			.limit(1)
 			.single()
 		if (error) throw new Error(error.message, { cause: error })
 
-		return data.character_id.toString()
+		return data.hero_id.toString()
 	})

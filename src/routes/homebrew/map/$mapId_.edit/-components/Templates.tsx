@@ -5,7 +5,7 @@ import { type CombatMap, getAllCombatMapTemplates } from '~/data/mapTemplates/co
 import { useMapEditStore } from '../-hooks/useMapEditStore'
 
 export default function Templates() {
-	const { map_name } = getRouteApi('/homebrew/map/$id_/edit/').useLoaderData()
+	const { map_name } = getRouteApi('/homebrew/map/$mapId_/edit/').useLoaderData()
 
 	const templates = getAllCombatMapTemplates()
 
