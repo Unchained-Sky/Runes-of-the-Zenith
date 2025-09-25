@@ -19,7 +19,7 @@ export type CombatTile = {
 }
 
 export type CombatTileCord = [q: number, r: number, s: number]
-export type CombatTileString = `${number},${number},${number}`
+export type CombatTileCordString = `${number},${number},${number}`
 
 const combatTemplateList = [
 	one,

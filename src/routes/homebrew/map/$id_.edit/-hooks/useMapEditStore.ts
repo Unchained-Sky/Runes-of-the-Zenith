@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
-import { type CombatTile, type CombatTileString } from '~/data/mapTemplates/combat'
+import { type CombatTile, type CombatTileCordString } from '~/data/mapTemplates/combat'
 import { createActionName, type DevTools, type Slice } from '~/types/storeTypes'
 import { typedObject } from '~/types/typedObject'
 import { type MapEditLoader } from '..'
@@ -11,12 +11,12 @@ type MapEditStateUtil = {
 	syncValue: number
 	submitting: boolean
 	hasChanged: Partial<Record<keyof MapEditStateValues, boolean>>
-	selectedTiles: CombatTileString[]
+	selectedTiles: CombatTileCordString[]
 }
 
 type MapEditStateValues = {
 	mapName: string | null
-	tiles: Record<CombatTileString, CombatTile>
+	tiles: Record<CombatTileCordString, CombatTile>
 }
 
 const mapEditState: MapEditState = {
@@ -31,7 +31,7 @@ const mapEditState: MapEditState = {
 
 type MapEditActions = {
 	syncLoader: (loader: MapEditLoader) => void
-	selectTile: (tile: CombatTileString) => void
+	selectTile: (tile: CombatTileCordString) => void
 	clearSelectedTiles: () => void
 
 	updateMapName: (mapName: MapEditState['mapName']) => void
@@ -47,7 +47,7 @@ export const createMapEditActions: Slice<MapEditStore, MapEditActions, [DevTools
 		if (loader.syncValue === get().syncValue) return
 
 		const tiles = typedObject.fromEntries(
-			loader.map_combat_tile.map<[CombatTileString, CombatTile]>(({ q, r, s, image, terrain_type }) => [
+			loader.map_combat_tile.map<[CombatTileCordString, CombatTile]>(({ q, r, s, image, terrain_type }) => [
 				`${q},${r},${s}` as const,
 				{
 					cord: [q, r, s],
@@ -114,7 +114,7 @@ export const createMapEditActions: Slice<MapEditStore, MapEditActions, [DevTools
 
 	addTiles: tiles => {
 		const newTiles = typedObject.fromEntries(
-			tiles.map<[CombatTileString, CombatTile]>(({ cord, image, terrainType }) => [
+			tiles.map<[CombatTileCordString, CombatTile]>(({ cord, image, terrainType }) => [
 				`${cord[0]},${cord[1]},${cord[2]}` as const,
 				{ cord, image, terrainType }
 			])

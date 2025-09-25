@@ -62,7 +62,11 @@ function Character({ character_id }: CharacterProps) {
 
 	const getTabletopPosition = () => {
 		if (!tabletop_characters) return null
-		if (!tabletop_characters.position_q || !tabletop_characters.position_r || !tabletop_characters.position_s) return null
+		if (
+			tabletop_characters.position_q === null
+			|| tabletop_characters.position_r === null
+			|| tabletop_characters.position_s === null
+		) return null
 		const position = {
 			q: tabletop_characters.position_q,
 			r: tabletop_characters.position_r,

@@ -1,4 +1,4 @@
-import { Box, type BoxComponentProps, Image, type PolymorphicComponentProps } from '@mantine/core'
+import { Box, type BoxComponentProps, Image, type PolymorphicComponentProps, Text } from '@mantine/core'
 import { forwardRef, type ReactNode } from 'react'
 import { type CombatTile } from '~/data/mapTemplates/combat'
 import useHexSize from './useHexSize'
@@ -37,6 +37,16 @@ const Hex = forwardRef<HTMLDivElement, HexProps>(function Hex({ tile: { cord, im
 			>
 				<Image src={`/combatTiles/${image}.png`} />
 			</Box>
+			<Text
+				pos='absolute'
+				top={96}
+				left={4}
+				c='white'
+				style={{
+					textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000'
+				}}
+			>{cord.toString()}
+			</Text>
 			{children}
 		</Box>
 	)

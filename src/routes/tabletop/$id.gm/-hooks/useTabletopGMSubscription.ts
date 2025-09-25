@@ -33,13 +33,29 @@ function useTabletopCharactersSubscription({ supabase, campaignId }: SubscribeHo
 			}, payload => {
 				type TabletopCharacters = Tables<'tabletop_characters'>
 				switch (payload.eventType) {
-					case 'INSERT':
+					case 'INSERT': {
+						void queryClient.invalidateQueries({ queryKey: ['tabletop', 'characters', campaignId] })
+						break
+					}
 					case 'UPDATE': {
-						const { character_id, ...newCharacter } = payload.new as TabletopCharacters
+						type TabletopCharactersCache = ReturnType<typeof useTabletopCharacters>['data']
+						const { character_id, ...tabletopCharacterData } = payload.new as TabletopCharacters
+
+						const charactersCache = queryClient.getQueryData(['tabletop', 'characters', campaignId]) as TabletopCharactersCache
+						const updatedCharacterName = charactersCache[character_id]?.character_name
+						if (!updatedCharacterName) {
+							void queryClient.invalidateQueries({ queryKey: ['tabletop', 'characters', campaignId] })
+							break
+						}
+
 						queryClient.setQueryData(['tabletop', 'characters', campaignId], (oldData: ReturnType<typeof useTabletopCharacters>['data']) => {
 							return {
 								...oldData,
-								[character_id]: newCharacter
+								[character_id]: {
+									character_id,
+									character_name: updatedCharacterName,
+									tabletop_characters: tabletopCharacterData
+								} satisfies ReturnType<typeof useTabletopCharacters>['data'][string]
 							}
 						})
 						break
