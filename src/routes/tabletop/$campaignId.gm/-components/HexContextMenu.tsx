@@ -36,7 +36,7 @@ function Heroes({ cord }: HeroesProps) {
 	const { data: heroes } = useTabletopHeroes()
 
 	const inactiveHeroes = Object.values(heroes)
-		.filter(({ tabletop_heroes }) => tabletop_heroes === null)
+		.filter(({ tabletopHero }) => tabletopHero === null)
 
 	const addHero = useMutation({
 		mutationFn: addHeroAction
@@ -52,15 +52,15 @@ function Heroes({ cord }: HeroesProps) {
 				{inactiveHeroes.map(hero => {
 					return (
 						<Menu.Item
-							key={hero.hero_id}
+							key={hero.heroId}
 							onClick={() => addHero.mutate({
 								data: {
-									heroId: hero.hero_id,
+									heroId: hero.heroId,
 									cord
 								}
 							})}
 						>
-							{hero.hero_name}
+							{hero.heroName}
 						</Menu.Item>
 					)
 				})}

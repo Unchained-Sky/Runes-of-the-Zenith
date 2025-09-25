@@ -42,7 +42,7 @@ function useTabletopHeroesSubscription({ supabase, campaignId }: SubscribeHookPr
 						const { hero_id, ...tabletopHeroData } = payload.new as TabletopHeroes
 
 						const heroesCache = queryClient.getQueryData(['tabletop', 'heroes', campaignId]) as TabletopHeroesCache
-						const updatedHeroName = heroesCache[hero_id]?.hero_name
+						const updatedHeroName = heroesCache[hero_id]?.heroName
 						if (!updatedHeroName) {
 							void queryClient.invalidateQueries({ queryKey: ['tabletop', 'heroes', campaignId] })
 							break
@@ -52,9 +52,9 @@ function useTabletopHeroesSubscription({ supabase, campaignId }: SubscribeHookPr
 							return {
 								...oldData,
 								[hero_id]: {
-									hero_id,
-									hero_name: updatedHeroName,
-									tabletop_heroes: tabletopHeroData
+									heroId: hero_id,
+									heroName: updatedHeroName,
+									tabletopHero: tabletopHeroData
 								} satisfies TabletopHeroesCache[string]
 							}
 						})

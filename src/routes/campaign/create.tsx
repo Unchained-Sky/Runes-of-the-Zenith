@@ -51,7 +51,6 @@ function RouteComponent() {
 				<Stack maw={rem(240)}>
 					<TextInput
 						label='Campaign Name'
-						name='campaign_name'
 						key={form.key('campaignName')}
 						{...form.getInputProps('campaignName')}
 						rightSection={(

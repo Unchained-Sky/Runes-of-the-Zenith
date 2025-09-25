@@ -47,12 +47,12 @@ export const createMapEditActions: Slice<MapEditStore, MapEditActions, [DevTools
 		if (loader.syncValue === get().syncValue) return
 
 		const tiles = typedObject.fromEntries(
-			loader.map_combat_tile.map<[CombatTileCordString, CombatTile]>(({ q, r, s, image, terrain_type }) => [
+			loader.mapCombatTiles.map<[CombatTileCordString, CombatTile]>(({ q, r, s, image, terrainType }) => [
 				`${q},${r},${s}` as const,
 				{
 					cord: [q, r, s],
 					image,
-					terrainType: terrain_type
+					terrainType
 				}
 			])
 		)

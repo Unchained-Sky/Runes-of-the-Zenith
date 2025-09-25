@@ -44,7 +44,6 @@ function RouteComponent() {
 					onChange={event => setHeroName(event.currentTarget.value)}
 					label='Hero Name'
 					w={rem(240)}
-					name='hero_name'
 					rightSection={(
 						<ActionIcon
 							loading={!!createHero.submittedAt}
@@ -73,10 +72,10 @@ const createHeroAction = createServerFn({ method: 'POST' })
 		const { data, error } = await supabase
 			.from('hero_info')
 			.insert({ hero_name: heroName })
-			.select()
+			.select('heroId: hero_id')
 			.limit(1)
 			.single()
 		if (error) throw new Error(error.message, { cause: error })
 
-		return data.hero_id.toString()
+		return data.heroId.toString()
 	})

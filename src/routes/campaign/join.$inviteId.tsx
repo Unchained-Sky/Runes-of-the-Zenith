@@ -30,26 +30,26 @@ const serverLoader = createServerFn({ method: 'GET' })
 		// they're already in it as either a player or the GM
 		const { data: inviteData } = await supabase
 			.from('campaign_info')
-			.select('campaign_id')
+			.select('campaignId: campaign_id')
 			.eq('invite_id', inviteId)
 			.limit(1)
 			.maybeSingle()
 		if (inviteData) throw redirect({
 			to: '/campaign/$campaignId',
-			params: { campaignId: inviteData.campaign_id.toString() }
+			params: { campaignId: inviteData.campaignId.toString() }
 		})
 
 		const serverClient = getServiceClient()
 		const { data: campaignData } = await serverClient
 			.from('campaign_info')
-			.select('campaign_name')
+			.select('campaignName: campaign_name')
 			.eq('invite_id', inviteId)
 			.limit(1)
 			.maybeSingle()
 		if (!campaignData) throw redirect({ to: '/campaign' })
 
 		return {
-			campaignName: campaignData.campaign_name
+			campaignName: campaignData.campaignName
 		}
 	})
 
@@ -86,25 +86,25 @@ const joinCampaignAction = createServerFn({ method: 'POST' })
 		// Same check as in loader
 		const { data: inviteData } = await supabase
 			.from('campaign_info')
-			.select('campaign_id')
+			.select('campaignId: campaign_id')
 			.eq('invite_id', inviteId)
 			.limit(1)
 			.maybeSingle()
 		if (inviteData) throw redirect({
 			to: '/campaign/$campaignId',
-			params: { campaignId: inviteData.campaign_id.toString() }
+			params: { campaignId: inviteData.campaignId.toString() }
 		})
 
 		const serverClient = getServiceClient()
 		const { data: campaignData } = await serverClient
 			.from('campaign_info')
-			.select('campaign_id')
+			.select('campaignId: campaign_id')
 			.eq('invite_id', inviteId)
 			.limit(1)
 			.maybeSingle()
 		if (!campaignData) throw redirect({ to: '/campaign' })
 
-		const campaignId = campaignData.campaign_id
+		const { campaignId } = campaignData
 		const idHash = createHash('md5').update(`${user.id}_${campaignId}`).digest('hex')
 
 		await supabase

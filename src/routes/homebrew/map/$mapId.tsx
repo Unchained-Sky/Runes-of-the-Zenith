@@ -8,7 +8,7 @@ export const Route = createFileRoute('/homebrew/map/$mapId')({
 	component: RouteComponent,
 	loader: async ({ params: { mapId } }) => await serverLoader({ data: { mapId: +mapId } }),
 	head: ({ loaderData }) => ({
-		meta: loaderData ? [{ title: `Map: ${loaderData.map_name}` }] : undefined
+		meta: loaderData ? [{ title: `Map: ${loaderData.mapName}` }] : undefined
 	})
 })
 
@@ -23,7 +23,10 @@ const serverLoader = createServerFn({ method: 'GET' })
 
 		const { data, error } = await supabase
 			.from('map_info')
-			.select('map_name, map_id')
+			.select(`
+				mapName: map_name,
+				mapId: map_id
+			`)
 			.eq('map_id', mapId)
 			.limit(1)
 			.maybeSingle()
@@ -34,15 +37,15 @@ const serverLoader = createServerFn({ method: 'GET' })
 	})
 
 function RouteComponent() {
-	const { map_name, map_id } = Route.useLoaderData()
+	const { mapName, mapId } = Route.useLoaderData()
 
 	return (
 		<Stack>
-			<Title>{map_name}</Title>
+			<Title>{mapName}</Title>
 			<Button
 				maw={rem(240)}
 				component={Link}
-				to={`/homebrew/map/${map_id}/edit`}
+				to={`/homebrew/map/${mapId}/edit`}
 			>
 				Edit
 			</Button>

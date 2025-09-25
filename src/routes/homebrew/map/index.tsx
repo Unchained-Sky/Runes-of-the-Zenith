@@ -18,7 +18,10 @@ const serverLoader = createServerFn({ method: 'GET' })
 
 		const { data, error } = await supabase
 			.from('map_info')
-			.select('map_id, map_name')
+			.select(`
+				mapId: map_id,
+				mapName: map_name
+			`)
 			.eq('user_id', user.id)
 			.order('map_id', { ascending: false })
 		if (error) throw new Error(error.message, { cause: error })
@@ -50,7 +53,7 @@ function RouteComponent() {
 			<Title>My Maps</Title>
 			<Group>
 				{maps.map(map => {
-					return <MapCard key={map.map_id} {...map} />
+					return <MapCard key={map.mapId} {...map} />
 				})}
 			</Group>
 		</Stack>
@@ -58,15 +61,15 @@ function RouteComponent() {
 }
 
 type MapCardProps = {
-	map_id: number
-	map_name: string
+	mapId: number
+	mapName: string
 }
 
-function MapCard({ map_id, map_name }: MapCardProps) {
+function MapCard({ mapId, mapName }: MapCardProps) {
 	return (
 		<Card>
-			<Title order={3}>{map_name}</Title>
-			<Button component={Link} to={`/homebrew/map/${map_id}`}>View Map</Button>
+			<Title order={3}>{mapName}</Title>
+			<Button component={Link} to={`/homebrew/map/${mapId}`}>View Map</Button>
 		</Card>
 	)
 }
@@ -80,13 +83,13 @@ const createMapAction = createServerFn({ method: 'POST' })
 			.insert({
 				map_type: 'COMBAT'
 			})
-			.select('map_id')
+			.select('mapId: map_id')
 			.limit(1)
 			.single()
 		if (error) throw new Error(error.message, { cause: error })
 
 		throw redirect({
 			to: '/homebrew/map/$mapId',
-			params: { mapId: data.map_id.toString() }
+			params: { mapId: data.mapId.toString() }
 		})
 	})

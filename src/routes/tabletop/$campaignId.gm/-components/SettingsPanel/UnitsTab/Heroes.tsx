@@ -29,11 +29,11 @@ export default function Heroes() {
 				</Table.Thead>
 				<Table.Tbody>
 					{Object.values(heroes).map(hero => {
-						if (hero.tabletop_heroes === null) return null
+						if (hero.tabletopHero === null) return null
 						return (
 							<Hero
-								key={hero.hero_id}
-								hero_id={hero.hero_id}
+								key={hero.heroId}
+								heroId={hero.heroId}
 							/>
 						)
 					})}
@@ -44,11 +44,11 @@ export default function Heroes() {
 }
 
 type HeroProps = {
-	hero_id: number
+	heroId: number
 }
 
-function Hero({ hero_id }: HeroProps) {
-	const { hero_name, tabletop_heroes } = useTabletopHeroes().data[hero_id] ?? {}
+function Hero({ heroId }: HeroProps) {
+	const { heroName, tabletopHero } = useTabletopHeroes().data[heroId] ?? {}
 
 	const [editMode, editModeHandlers] = useDisclosure(false)
 
@@ -57,20 +57,20 @@ function Hero({ hero_id }: HeroProps) {
 	})
 
 	const getTabletopLifeValue = (value: keyof Tables<'tabletop_heroes'> & (`health_${string}` | `shield_${string}`)) => {
-		return tabletop_heroes?.[value] ?? 0
+		return tabletopHero?.[value] ?? 0
 	}
 
 	const getTabletopPosition = () => {
-		if (!tabletop_heroes) return null
+		if (!tabletopHero) return null
 		if (
-			tabletop_heroes.position_q === null
-			|| tabletop_heroes.position_r === null
-			|| tabletop_heroes.position_s === null
+			tabletopHero.position_q === null
+			|| tabletopHero.position_r === null
+			|| tabletopHero.position_s === null
 		) return null
 		const position = {
-			q: tabletop_heroes.position_q,
-			r: tabletop_heroes.position_r,
-			s: tabletop_heroes.position_s
+			q: tabletopHero.position_q,
+			r: tabletopHero.position_r,
+			s: tabletopHero.position_s
 		}
 		return `${position.q},${position.r},${position.s}`
 	}
@@ -78,7 +78,7 @@ function Hero({ hero_id }: HeroProps) {
 	return (
 		<Fragment>
 			<HeroEditModal
-				hero_id={hero_id}
+				heroId={heroId}
 				opened={editMode}
 				close={editModeHandlers.close}
 			/>
@@ -87,7 +87,7 @@ function Hero({ hero_id }: HeroProps) {
 				<Table.Td>
 					<Group gap='xs'>
 						<Avatar />
-						<Text size='lg'>{hero_name}</Text>
+						<Text size='lg'>{heroName}</Text>
 					</Group>
 				</Table.Td>
 				<Table.Td>
@@ -114,7 +114,7 @@ function Hero({ hero_id }: HeroProps) {
 								<Menu.Item
 									color='red'
 									leftSection={<IconTrash size={14} />}
-									onClick={() => removeHero.mutate({ data: { hero_id } })}
+									onClick={() => removeHero.mutate({ data: { hero_id: heroId } })}
 								>
 									Remove Hero
 								</Menu.Item>
@@ -144,7 +144,7 @@ const removeHeroAction = createServerFn({ method: 'POST' })
 	})
 
 type HeroEditModalProps = {
-	hero_id: number
+	heroId: number
 	opened: boolean
 	close: () => void
 }
@@ -156,19 +156,19 @@ const numberInputProps: NumberInputProps = {
 	stepHoldInterval: t => Math.max(1000 / t ** 2, 25)
 }
 
-function HeroEditModal({ hero_id, opened, close }: HeroEditModalProps) {
-	const { hero_name, tabletop_heroes } = useTabletopHeroes().data[hero_id] ?? {}
+function HeroEditModal({ heroId, opened, close }: HeroEditModalProps) {
+	const { heroName, tabletopHero } = useTabletopHeroes().data[heroId] ?? {}
 
 	const supabase = useSupabase()
 
 	const form = useForm({
 		mode: 'uncontrolled',
 		initialValues: {
-			shieldDurability: tabletop_heroes?.shield_durability ?? 0,
-			shieldCurrent: tabletop_heroes?.shield_current ?? 0,
-			shieldMax: tabletop_heroes?.shield_max ?? 0,
-			healthCurrent: tabletop_heroes?.health_current ?? 0,
-			healthMax: tabletop_heroes?.health_max ?? 0
+			shieldDurability: tabletopHero?.shield_durability ?? 0,
+			shieldCurrent: tabletopHero?.shield_current ?? 0,
+			shieldMax: tabletopHero?.shield_max ?? 0,
+			healthCurrent: tabletopHero?.health_current ?? 0,
+			healthMax: tabletopHero?.health_max ?? 0
 		},
 		validate: {
 			healthMax: value => value > 0 ? null : 'Max health must be greater than 0'
@@ -180,7 +180,7 @@ function HeroEditModal({ hero_id, opened, close }: HeroEditModalProps) {
 			const { error } = await supabase
 				.from('tabletop_heroes')
 				.upsert({
-					hero_id,
+					hero_id: heroId,
 					shield_durability: values.shieldDurability,
 					shield_current: values.shieldCurrent,
 					shield_max: values.shieldMax,
@@ -197,7 +197,7 @@ function HeroEditModal({ hero_id, opened, close }: HeroEditModalProps) {
 			opened={opened}
 			onClose={close}
 			onExitTransitionEnd={() => form.reset()}
-			title={`Edit ${hero_name}`}
+			title={`Edit ${heroName}`}
 		>
 			<form onSubmit={form.onSubmit(handleSubmit)}>
 				<Stack>

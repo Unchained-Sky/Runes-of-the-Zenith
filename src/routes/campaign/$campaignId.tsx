@@ -2,8 +2,7 @@ import { Button, Code, Group, rem, Stack, Text, Title } from '@mantine/core'
 import { createFileRoute, Link, redirect } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
-import { getSupabaseServerClient } from '~/supabase/getSupabaseServerClient'
-import { getUserId } from '~/supabase/getUserId'
+import { requireAccount } from '~/supabase/requireAccount'
 
 export const Route = createFileRoute('/campaign/$campaignId')({
 	component: RouteComponent,
@@ -22,17 +21,17 @@ const serverLoaderSchema = type({
 const serverLoader = createServerFn({ method: 'GET' })
 	.validator(serverLoaderSchema)
 	.handler(async ({ data: { campaignId } }) => {
-		const supabase = getSupabaseServerClient()
+		const { supabase, user } = await requireAccount()
 
 		const { data, error } = await supabase
 			.from('campaign_info')
 			.select(`
-				campaign_name,
-				invite_id,
-				campaign_owner_id: user_id,
-				hero_info (
-					hero_name,
-					hero_id
+				campaignName: campaign_name,
+				inviteId: invite_id,
+				campaignOwnerId: user_id,
+				heroInfo: hero_info (
+					heroName: hero_name,
+					heroId:hero_id
 				)	
 			`)
 			.eq('campaign_id', campaignId)
@@ -41,13 +40,11 @@ const serverLoader = createServerFn({ method: 'GET' })
 		if (error) throw new Error(error.message, { cause: error })
 		if (!data) throw redirect({ to: '/campaign' })
 
-		const { userId } = await getUserId(supabase)
-
 		return {
-			campaignName: data.campaign_name,
-			heroInfo: data.hero_info,
-			inviteId: data.invite_id,
-			isOwner: data.campaign_owner_id === userId
+			campaignName: data.campaignName,
+			heroInfo: data.heroInfo,
+			inviteId: data.inviteId,
+			isOwner: data.campaignOwnerId === user.id
 		}
 	})
 
@@ -67,14 +64,14 @@ function RouteComponent() {
 			<Title order={2}>Heroes:</Title>
 			<Group>
 				{heroInfo.length
-					? heroInfo.map(({ hero_name, hero_id }) => {
+					? heroInfo.map(({ heroName, heroId }) => {
 						return (
 							<Button
-								key={hero_id}
+								key={heroId}
 								component={Link}
 								to='/hero/${hero_id}'
 							>
-								{hero_name}
+								{heroName}
 							</Button>
 						)
 					})

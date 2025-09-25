@@ -20,7 +20,7 @@ const nameLoader = createServerFn({ method: 'GET' })
 
 		const { data, error } = await supabase
 			.from('campaign_info')
-			.select('campaign_name')
+			.select('campaignName: campaign_name')
 			.eq('campaign_id', campaignId)
 			.eq('user_id', user.id)
 			.limit(1)
@@ -28,7 +28,7 @@ const nameLoader = createServerFn({ method: 'GET' })
 		if (error) throw new Error(error.message, { cause: error })
 		if (!data) throw redirect({ to: '/campaign/$campaignId', params: { campaignId: campaignId.toString() } })
 
-		return data.campaign_name
+		return data.campaignName
 	})
 
 export const tabletopNameQueryOptions = (campaignId: number) => queryOptions({
@@ -54,13 +54,13 @@ const tilesLoader = createServerFn({ method: 'GET' })
 		const { data, error } = await supabase
 			.from('tabletop_info')
 			.select(`
-				map_info(
-					map_combat_tile(
+				mapInfo: map_info (
+					mapCombatTiles: map_combat_tile (
 						q,
 						r,
 						s,
 						image,
-						terrain_type
+						terrainType: terrain_type
 					)
 				)
 			`)
@@ -70,10 +70,10 @@ const tilesLoader = createServerFn({ method: 'GET' })
 		if (error) throw new Error(error.message, { cause: error })
 		if (!data) return []
 
-		return data.map_info.map_combat_tile.map<CombatTile>(tile => ({
+		return data.mapInfo.mapCombatTiles.map<CombatTile>(tile => ({
 			cord: [tile.q, tile.r, tile.s],
 			image: tile.image,
-			terrainType: tile.terrain_type
+			terrainType: tile.terrainType
 		}))
 	})
 
@@ -98,8 +98,8 @@ const mapsLoader = createServerFn({ method: 'GET' })
 		const { data, error } = await supabase
 			.from('map_info')
 			.select(`
-				map_id,
-				map_name,
+				mapId: map_id,
+				mapName: map_name,
 				mapCombatTileCount: map_combat_tile(count)
 			`)
 			.eq('user_id', user.id)
@@ -107,7 +107,7 @@ const mapsLoader = createServerFn({ method: 'GET' })
 
 		const out = data.filter(map => map.mapCombatTileCount[0]?.count)
 
-		return out.map(map => ({ mapId: map.map_id, name: map.map_name }))
+		return out.map(map => ({ mapId: map.mapId, name: map.mapName }))
 	})
 
 export const tabletopMapsQueryOptions = () => queryOptions({
@@ -131,9 +131,9 @@ const heroesLoader = createServerFn({ method: 'GET' })
 		const { data, error } = await supabase
 			.from('hero_info')
 			.select(`
-				hero_id,
-				hero_name,
-				tabletop_heroes (
+				heroId: hero_id,
+				heroName: hero_name,
+				tabletopHero: tabletop_heroes (
 					shield_durability,
 					shield_current,
 					shield_max,
@@ -148,7 +148,7 @@ const heroesLoader = createServerFn({ method: 'GET' })
 		if (error) throw redirect({ to: '/campaign/$campaignId', params: { campaignId: campaignId.toString() } })
 
 		return Object.fromEntries(data.map(hero => [
-			hero.hero_id,
+			hero.heroId,
 			hero
 		]))
 	})

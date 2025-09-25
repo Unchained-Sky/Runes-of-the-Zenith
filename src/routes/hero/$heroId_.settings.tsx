@@ -31,9 +31,9 @@ const serverLoader = createServerFn({ method: 'GET' })
 		const { data: heroData, error: heroError } = await supabase
 			.from('hero_info')
 			.select(`
-				hero_name,
-				campaign_id,
-				user_id,
+				heroName: hero_name,
+				currentCampaignId: campaign_id,
+				heroUserId: user_id,
 				visibility
 			`)
 			.eq('hero_id', heroId)
@@ -42,7 +42,7 @@ const serverLoader = createServerFn({ method: 'GET' })
 		if (heroError) throw new Error(heroError.message, { cause: heroError })
 		if (!heroData) throw redirect({ to: '/hero' })
 
-		const { hero_name, campaign_id, user_id: heroUserId, visibility } = heroData
+		const { heroName, currentCampaignId, heroUserId, visibility } = heroData
 
 		const { userId } = await getUserId(supabase)
 		if (heroUserId !== userId) throw redirect({
@@ -52,12 +52,15 @@ const serverLoader = createServerFn({ method: 'GET' })
 
 		const { data: campaignData, error: campaignError } = await supabase
 			.from('campaign_info')
-			.select('campaign_id, campaign_name')
+			.select(`
+				campaignId: campaign_id,
+				campaignName: campaign_name
+			`)
 		if (campaignError) throw new Error(campaignError.message, { cause: campaignError })
 
 		return {
-			heroName: hero_name,
-			currentCampaignId: campaign_id,
+			heroName,
+			currentCampaignId,
 			campaigns: campaignData,
 			visibility
 		}
@@ -96,9 +99,9 @@ function RouteComponent() {
 				<Stack maw={rem(240)}>
 					<Select
 						label='Linked Campaign'
-						data={campaigns.map(({ campaign_id, campaign_name }) => ({
-							value: campaign_id.toString(),
-							label: campaign_name
+						data={campaigns.map(({ campaignId, campaignName }) => ({
+							value: campaignId.toString(),
+							label: campaignName
 						}))}
 						defaultValue={currentCampaignId?.toString()}
 						key={form.key('campaignId')}
@@ -147,7 +150,7 @@ const heroSettingsAction = createServerFn({ method: 'POST' })
 
 		const { data: heroUserId, error: heroUserIdError } = await supabase
 			.from('hero_info')
-			.select('user_id')
+			.select('userId: user_id')
 			.eq('hero_id', data.heroId)
 			.limit(1)
 			.single()
@@ -156,7 +159,7 @@ const heroSettingsAction = createServerFn({ method: 'POST' })
 			message: heroUserIdError.message
 		} satisfies FormResponse
 
-		if (heroUserId.user_id !== user.id) return {
+		if (heroUserId.userId !== user.id) return {
 			error: true,
 			message: 'You do not own this hero'
 		} satisfies FormResponse

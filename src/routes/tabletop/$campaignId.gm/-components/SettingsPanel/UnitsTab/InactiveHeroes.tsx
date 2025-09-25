@@ -5,7 +5,7 @@ export default function InactiveHeroes() {
 	const { data: heroes } = useTabletopHeroes()
 
 	const inactiveHeroes = Object.values(heroes)
-		.filter(({ tabletop_heroes }) => tabletop_heroes === null)
+		.filter(({ tabletopHero }) => tabletopHero === null)
 
 	return inactiveHeroes.length > 0 && (
 		<Stack gap={0}>
@@ -13,9 +13,9 @@ export default function InactiveHeroes() {
 			<Group>
 				{inactiveHeroes.map(hero => {
 					return (
-						<Card key={hero.hero_id} component={Stack} gap={0} align='center' p='sm' bg='dark.5'>
+						<Card key={hero.heroId} component={Stack} gap={0} align='center' p='sm' bg='dark.5'>
 							<Avatar />
-							<Text>{hero.hero_name}</Text>
+							<Text>{hero.heroName}</Text>
 						</Card>
 					)
 				})}

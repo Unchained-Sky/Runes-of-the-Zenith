@@ -5,13 +5,13 @@ import { type CombatMap, getAllCombatMapTemplates } from '~/data/mapTemplates/co
 import { useMapEditStore } from '../-hooks/useMapEditStore'
 
 export default function Templates() {
-	const { map_name } = getRouteApi('/homebrew/map/$mapId_/edit/').useLoaderData()
+	const { mapName } = getRouteApi('/homebrew/map/$mapId_/edit/').useLoaderData()
 
 	const templates = getAllCombatMapTemplates()
 
 	return (
 		<Box>
-			<Title>Templates - {map_name}</Title>
+			<Title>Templates - {mapName}</Title>
 
 			<Group align='flex-start' justify='space-around'>
 				{templates.map(template => {

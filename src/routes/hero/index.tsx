@@ -16,7 +16,10 @@ const serverLoader = createServerFn({ method: 'GET' }).handler(async () => {
 
 	const { data, error } = await supabase
 		.from('hero_info')
-		.select('hero_id, hero_name')
+		.select(`
+			heroId: hero_id,
+			heroName: hero_name
+		`)
 		.eq('user_id', user.id)
 	if (error) throw new Error(error.message, { cause: error })
 
@@ -43,7 +46,7 @@ function RouteComponent() {
 			<Title order={2}>My Heroes</Title>
 			<Group>
 				{heroes.map(hero => {
-					return <HeroCard key={hero.hero_id} {...hero} />
+					return <HeroCard key={hero.heroId} {...hero} />
 				})}
 			</Group>
 		</Stack>
@@ -51,15 +54,15 @@ function RouteComponent() {
 }
 
 type HeroCardProps = {
-	hero_id: number
-	hero_name: string
+	heroId: number
+	heroName: string
 }
 
-function HeroCard({ hero_id, hero_name }: HeroCardProps) {
+function HeroCard({ heroId, heroName }: HeroCardProps) {
 	return (
 		<Card>
-			<Title order={3}>{hero_name}</Title>
-			<Button component={Link}to={`/hero/${hero_id}`}>View Hero</Button>
+			<Title order={3}>{heroName}</Title>
+			<Button component={Link}to={`/hero/${heroId}`}>View Hero</Button>
 		</Card>
 	)
 }

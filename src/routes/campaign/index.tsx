@@ -16,16 +16,19 @@ const serverLoader = createServerFn({ method: 'GET' }).handler(async () => {
 
 	const { data: gmCampaigns, error: gmError } = await supabase
 		.from('campaign_info')
-		.select('campaign_id, campaign_name')
+		.select(`
+			campaignId: campaign_id,
+			campaignName: campaign_name
+		`)
 		.eq('user_id', user.id)
 	if (gmError) throw new Error(gmError.message, { cause: gmError })
 
 	const { data: playerCampaigns, error: playerError } = await supabase
 		.from('campaign_users')
 		.select(`
-			campaign_id,
-			campaign_info (
-				campaign_name
+			campaignId: campaign_id,
+			campaignInfo: campaign_info (
+				campaignName: campaign_name
 			)
 		`)
 	if (playerError) throw new Error(playerError.message, { cause: playerError })
@@ -50,19 +53,25 @@ function RouteComponent() {
 
 			<Title order={2}>GM</Title>
 			<Group>
-				{gmCampaigns.map(campaign => {
-					return <CampaignCard key={campaign.campaign_id} {...campaign} />
+				{gmCampaigns.map(({ campaignId, campaignName }) => {
+					return (
+						<CampaignCard
+							key={campaignId}
+							campaignId={campaignId}
+							campaignName={campaignName}
+						/>
+					)
 				})}
 			</Group>
 
 			<Title order={2}>Player</Title>
 			<Group>
-				{playerCampaigns.map(({ campaign_id, campaign_info }) => {
+				{playerCampaigns.map(({	campaignId, campaignInfo }) => {
 					return (
 						<CampaignCard
-							key={campaign_id}
-							campaign_id={campaign_id}
-							campaign_name={campaign_info.campaign_name}
+							key={campaignId}
+							campaignId={campaignId}
+							campaignName={campaignInfo.campaignName}
 						/>
 					)
 				})}
@@ -72,15 +81,15 @@ function RouteComponent() {
 }
 
 type CampaignCardProps = {
-	campaign_id: number
-	campaign_name: string
+	campaignId: number
+	campaignName: string
 }
 
-function CampaignCard({ campaign_id, campaign_name }: CampaignCardProps) {
+function CampaignCard({ campaignId, campaignName }: CampaignCardProps) {
 	return (
 		<Card>
-			<Title order={3}>{campaign_name}</Title>
-			<Button component={Link} to={`/campaign/${campaign_id}`}>View Campaign</Button>
+			<Title order={3}>{campaignName}</Title>
+			<Button component={Link} to={`/campaign/${campaignId}`}>View Campaign</Button>
 		</Card>
 	)
 }

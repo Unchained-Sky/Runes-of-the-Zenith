@@ -16,7 +16,7 @@ export const Route = createFileRoute('/homebrew/map/$mapId_/edit/')({
 	component: RouteComponent,
 	loader: async ({ params: { mapId } }) => await serverLoader({ data: { mapId: +mapId } }),
 	head: ({ loaderData }) => ({
-		meta: loaderData ? [{ title: `Edit Map: ${loaderData.map_name}` }] : undefined
+		meta: loaderData ? [{ title: `Edit Map: ${loaderData.mapName}` }] : undefined
 	})
 })
 
@@ -32,10 +32,16 @@ const serverLoader = createServerFn({ method: 'GET' })
 		const { data, error } = await supabase
 			.from('map_info')
 			.select(`
-				map_name,
-				map_id,
-				map_combat_tile(*),
-				tile_count:map_combat_tile(count)
+				mapName: map_name,
+				mapId: map_id,
+				mapCombatTiles: map_combat_tile(
+					q,
+					r,
+					s,
+					image,
+					terrainType: terrain_type
+				),
+				tileCount: map_combat_tile(count)
 			`)
 			.eq('map_id', mapId)
 			.limit(1)
@@ -72,7 +78,7 @@ function RouteComponent() {
 			<Fragment>
 				<LoadingOverlay visible={submitting} zIndex={1000} />
 
-				<MapTitle loaderMapName={loaderData.map_name} />
+				<MapTitle loaderMapName={loaderData.mapName} />
 
 				<CombatGridEdit />
 

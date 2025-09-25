@@ -23,7 +23,7 @@ const serverLoader = createServerFn({ method: 'GET' })
 
 		const { data, error } = await supabase
 			.from('campaign_info')
-			.select('campaign_name')
+			.select('campaignName: campaign_name')
 			.eq('campaign_id', campaignId)
 			.limit(1)
 			.maybeSingle()
@@ -31,7 +31,7 @@ const serverLoader = createServerFn({ method: 'GET' })
 		if (!data) throw redirect({ to: '/campaign' })
 
 		return {
-			campaignName: data.campaign_name
+			campaignName: data.campaignName
 		}
 	})
 
