@@ -1,5 +1,5 @@
 import { Avatar, Card, Group, Stack, Text, Title } from '@mantine/core'
-import { useTabletopHeroes } from '../../../-hooks/-useTabletopData'
+import { useTabletopHeroes } from '../../../-hooks/useTabletopData'
 
 export default function InactiveHeroes() {
 	const { data: heroes } = useTabletopHeroes()

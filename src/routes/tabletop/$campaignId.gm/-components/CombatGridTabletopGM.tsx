@@ -2,17 +2,17 @@ import { Avatar, Box } from '@mantine/core'
 import { type DragEventHandler } from 'react'
 import Hex from '~/components/HoneycombGrid/Hex'
 import useHoneycombGridSize from '~/components/HoneycombGrid/useHoneycombGridSize'
-import { useTabletopTiles } from '../-hooks/-useTabletopData'
+import { type CombatTileCord } from '~/data/mapTemplates/combat'
+import { useTabletopHeroes, useTabletopMapTiles, useTabletopTiles } from '../-hooks/useTabletopData'
 import HexContextMenu from './HexContextMenu'
 
 export default function CombatGridTabletopGM() {
-	const { data: tiles } = useTabletopTiles()
-
-	const { offset, minHeight, minWidth } = useHoneycombGridSize(tiles)
+	const { data: mapTiles } = useTabletopMapTiles()
+	const { offset, minHeight, minWidth } = useHoneycombGridSize(mapTiles)
 
 	return (
 		<Box pos='relative' w={minWidth} h={minHeight} onContextMenu={e => e.preventDefault()}>
-			{tiles.map(tile => {
+			{mapTiles.map(tile => {
 				const { cord } = tile
 				return (
 					<HexContextMenu key={cord.toString()} cord={cord}>
@@ -23,11 +23,36 @@ export default function CombatGridTabletopGM() {
 								onDragStart: (e: Parameters<DragEventHandler<HTMLButtonElement>>[0]) => e.preventDefault()
 							}}
 						>
-							<Avatar />
+							<CharacterIcon cord={cord} />
 						</Hex>
 					</HexContextMenu>
 				)
 			})}
 		</Box>
 	)
+}
+
+type CharacterIconProps = {
+	cord: CombatTileCord
+}
+
+function CharacterIcon({ cord }: CharacterIconProps) {
+	const { data: tiles } = useTabletopTiles()
+	const { data: heroesData } = useTabletopHeroes()
+
+	const tileData = tiles[`${cord[0]},${cord[1]},${cord[2]}`]
+	if (!tileData) return null
+
+	switch (tileData.characterType) {
+		case 'HERO': {
+			const heroData = Object.values(heroesData).find(hero => hero.tabletopHero?.characterId === tileData.characterId)
+			if (heroData) {
+				return <Avatar name={heroData.heroName} color='initials' pos='absolute' left='40%' top='40%' />
+			}
+			break
+		}
+		case 'ENEMY': {
+			return null
+		}
+	}
 }

@@ -3,7 +3,7 @@ import { Fragment } from 'react'
 import { safeParseInt } from '~/utils/safeParseInt'
 import CombatGridTabletopGM from './-components/CombatGridTabletopGM'
 import SettingsPanel from './-components/SettingsPanel'
-import { tabletopHeroesQueryOptions, tabletopMapsQueryOptions, tabletopNameQueryOptions, tabletopTilesQueryOptions } from './-hooks/-useTabletopData'
+import { tabletopHeroListQueryOptions, tabletopMapListQueryOptions, tabletopMapTilesQueryOptions, tabletopNameQueryOptions, tabletopTilesQueryOptions } from './-hooks/useTabletopData'
 import useTabletopGMSubscription from './-hooks/useTabletopGMSubscription'
 
 export const Route = createFileRoute('/tabletop/$campaignId/gm/')({
@@ -15,21 +15,24 @@ export const Route = createFileRoute('/tabletop/$campaignId/gm/')({
 		const [
 			campaignName,
 			tiles,
-			maps,
-			heroes
+			mapTiles,
+			mapList,
+			heroList
 		] = await Promise.all([
 			context.queryClient.ensureQueryData(tabletopNameQueryOptions(campaignId)),
 			context.queryClient.ensureQueryData(tabletopTilesQueryOptions(campaignId)),
-			context.queryClient.ensureQueryData(tabletopMapsQueryOptions()),
-			context.queryClient.ensureQueryData(tabletopHeroesQueryOptions(campaignId))
+			context.queryClient.ensureQueryData(tabletopMapTilesQueryOptions(campaignId)),
+			context.queryClient.ensureQueryData(tabletopMapListQueryOptions()),
+			context.queryClient.ensureQueryData(tabletopHeroListQueryOptions(campaignId))
 		])
 
 		return {
 			campaignId,
 			campaignName,
 			tiles,
-			maps,
-			heroes
+			mapTiles,
+			mapList,
+			heroList
 		}
 	},
 	head: ({ loaderData }) => ({

@@ -3,7 +3,10 @@ import { getRouteApi } from '@tanstack/react-router'
 import useMountEffect from '~/hooks/useMountEffect'
 import { type Database, type Tables } from '~/supabase/databaseTypes'
 import { useSupabase } from '~/supabase/useSupabase'
-import { type useTabletopHeroes } from './-useTabletopData'
+import { typedObject } from '~/types/typedObject'
+import { type useTabletopHeroes, type useTabletopTiles } from './useTabletopData'
+
+const LOG_PAYLOADS = process.env.NODE_ENV === 'development'
 
 export default function useTabletopGMSubscription() {
 	const supabase = useSupabase()
@@ -12,6 +15,7 @@ export default function useTabletopGMSubscription() {
 
 	useTabletopHeroesSubscription({ supabase, campaignId })
 	useTabletopInfoSubscription({ supabase, campaignId })
+	useTabletopCharactersSubscription({ supabase, campaignId })
 }
 
 type SubscribeHookProps = {
@@ -33,43 +37,47 @@ function useTabletopHeroesSubscription({ supabase, campaignId }: SubscribeHookPr
 			}, payload => {
 				type TabletopHeroes = Tables<'tabletop_heroes'>
 				type TabletopHeroesCache = ReturnType<typeof useTabletopHeroes>['data']
+
+				if (LOG_PAYLOADS) console.log(payload)
+
 				switch (payload.eventType) {
 					case 'INSERT': {
-						void queryClient.invalidateQueries({ queryKey: ['tabletop', 'heroes', campaignId] })
+						const { hero_id } = payload.new as TabletopHeroes
+						void queryClient.invalidateQueries({ queryKey: ['tabletop', 'hero', campaignId, hero_id] })
+						void queryClient.invalidateQueries({ queryKey: ['tabletop', 'tiles', campaignId] })
 						break
 					}
 					case 'UPDATE': {
 						const { hero_id, ...tabletopHeroData } = payload.new as TabletopHeroes
-
-						const heroesCache = queryClient.getQueryData(['tabletop', 'heroes', campaignId]) as TabletopHeroesCache
-						const updatedHeroName = heroesCache[hero_id]?.heroName
-						if (!updatedHeroName) {
-							void queryClient.invalidateQueries({ queryKey: ['tabletop', 'heroes', campaignId] })
-							break
-						}
-
-						queryClient.setQueryData(['tabletop', 'heroes', campaignId], (oldData: TabletopHeroesCache) => {
-							return {
-								...oldData,
-								[hero_id]: {
-									heroId: hero_id,
-									heroName: updatedHeroName,
-									tabletopHero: tabletopHeroData
-								} satisfies TabletopHeroesCache[string]
-							}
-						})
 						break
+
+						// const heroesCache = queryClient.getQueryData(['tabletop', 'heroes', campaignId]) as TabletopHeroesCache
+						// const updatedHeroName = heroesCache[hero_id]?.heroName
+						// if (!updatedHeroName) {
+						// 	void queryClient.invalidateQueries({ queryKey: ['tabletop', 'heroes', campaignId] })
+						// 	break
+						// }
+
+						// queryClient.setQueryData(['tabletop', 'heroes', campaignId], (oldData: TabletopHeroesCache) => {
+						// 	return {
+						// 		...oldData,
+						// 		[hero_id]: {
+						// 			heroId: hero_id,
+						// 			heroName: updatedHeroName
+						// 			// tabletopHero: tabletopHeroData
+						// 		}
+						// 		// } satisfies TabletopHeroesCache[string]
+						// 	}
+						// })
+						// break
 					}
 					case 'DELETE': {
 						const { hero_id } = payload.old as TabletopHeroes
-						queryClient.setQueryData(['tabletop', 'heroes', campaignId], (oldData: TabletopHeroesCache) => {
+						queryClient.setQueriesData({ queryKey: ['tabletop', 'hero', campaignId, hero_id] }, (oldData: TabletopHeroesCache[number]) => {
 							return {
 								...oldData,
-								[hero_id]: {
-									...oldData[hero_id],
-									tabletop_heroes: null
-								}
-							}
+								tabletopHero: null
+							} satisfies TabletopHeroesCache[number]
 						})
 						break
 					}
@@ -95,6 +103,8 @@ function useTabletopInfoSubscription({ supabase, campaignId }: SubscribeHookProp
 				schema: 'public',
 				table: 'tabletop_info'
 			}, payload => {
+				if (LOG_PAYLOADS) console.log(payload)
+
 				switch (payload.eventType) {
 					case 'INSERT':
 					case 'UPDATE': {
@@ -108,6 +118,60 @@ function useTabletopInfoSubscription({ supabase, campaignId }: SubscribeHookProp
 				}
 			})
 			.subscribe(status => console.log(`tabletop_info:${campaignId} ${status}`))
+
+		return () => {
+			const channel = supabase.channel(channelName)
+			void supabase.removeChannel(channel)
+		}
+	})
+}
+
+function useTabletopCharactersSubscription({ supabase, campaignId }: SubscribeHookProps) {
+	const { queryClient } = getRouteApi('/tabletop/$campaignId/gm/').useRouteContext()
+
+	useMountEffect(() => {
+		const channelName = `tabletop_characters:${campaignId}`
+		supabase
+			.channel(channelName)
+			.on('postgres_changes', {
+				event: '*',
+				schema: 'public',
+				table: 'tabletop_characters'
+			}, payload => {
+				type TabletopCharacters = Tables<'tabletop_characters'>
+
+				if (LOG_PAYLOADS) console.log(payload)
+
+				switch (payload.eventType) {
+					case 'INSERT': {
+						void queryClient.invalidateQueries({ queryKey: ['tabletop', 'tiles', campaignId] })
+						break
+					}
+					case 'UPDATE': {
+						void queryClient.invalidateQueries({ queryKey: ['tabletop', 'tiles', campaignId] })
+						break
+					}
+					case 'DELETE': {
+						const { character_id } = payload.old as TabletopCharacters
+
+						type TabletopTilesCache = ReturnType<typeof useTabletopTiles>['data']
+						const tilesCache = queryClient.getQueryData(['tabletop', 'tiles', campaignId]) as TabletopTilesCache
+						const tilesArray = typedObject.entries(tilesCache)
+						const tileIndex = tilesArray.findIndex(([_cord, tile]) => tile && tile.characterType === 'HERO' && tile.characterId === character_id)
+						const tileData = tilesArray[tileIndex]
+						if (tileData) {
+							queryClient.setQueryData(['tabletop', 'tiles', campaignId], (oldData: TabletopTilesCache) => {
+								return {
+									...oldData,
+									[tileData[0]]: null
+								}
+							})
+						}
+						break
+					}
+				}
+			})
+			.subscribe(status => console.log(`tabletop_characters:${campaignId} ${status}`))
 
 		return () => {
 			const channel = supabase.channel(channelName)

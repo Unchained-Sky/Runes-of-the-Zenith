@@ -6,11 +6,11 @@ import { type } from 'arktype'
 import { useState } from 'react'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireAccount } from '~/supabase/requireAccount'
-import { useTabletopMaps, useTabletopTiles } from '../../-hooks/-useTabletopData'
+import { useTabletopMapList, useTabletopMapTiles } from '../../-hooks/useTabletopData'
 
 export default function MapsTab() {
 	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useParams()
-	const { data: maps } = useTabletopMaps()
+	const { data: maps } = useTabletopMapList()
 
 	const [value, setValue] = useState<string | null>(null)
 
@@ -21,7 +21,7 @@ export default function MapsTab() {
 		}
 	})
 
-	const { isFetching } = useTabletopTiles()
+	const { isFetching } = useTabletopMapTiles()
 
 	return (
 		<Group align='flex-end'>
@@ -89,6 +89,16 @@ const changeMapAction = createServerFn({ method: 'POST' })
 		const serviceClient = getServiceClient()
 
 		{
+			// delete all characters on the map
+			const { error } = await serviceClient
+				.from('tabletop_tiles')
+				.delete()
+				.eq('campaign_id', campaignId)
+			if (error) throw new Error(error.message, { cause: error })
+		}
+
+		{
+			// update the map_id for the campaign
 			const { error } = await serviceClient
 				.from('tabletop_info')
 				.upsert({ campaign_id: campaignId, map_id: mapId })

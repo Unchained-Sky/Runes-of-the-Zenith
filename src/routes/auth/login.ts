@@ -10,7 +10,15 @@ const authLoginSearchSchema = type({
 
 export const Route = createFileRoute('/auth/login')({
 	preload: false,
-	validateSearch: authLoginSearchSchema,
+	validateSearch: search => {
+		const validator = authLoginSearchSchema(search)
+		if (validator instanceof type.errors) {
+			throw new Error(validator.summary)
+		}
+		return {
+			backlink: validator.backlink ?? '/'
+		}
+	},
 	loaderDeps: ({ search }) => search,
 	loader: async ({ deps: search }) => {
 		return await serverLoader({

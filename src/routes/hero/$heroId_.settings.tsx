@@ -146,6 +146,8 @@ const heroSettingsSchema = type({
 const heroSettingsAction = createServerFn({ method: 'POST' })
 	.validator(heroSettingsSchema)
 	.handler(async ({ data }) => {
+		// TODO check if the hero is in an active tabletop
+
 		const { supabase, user } = await requireAccount({ backlink: '/hero' })
 
 		const { data: heroUserId, error: heroUserIdError } = await supabase

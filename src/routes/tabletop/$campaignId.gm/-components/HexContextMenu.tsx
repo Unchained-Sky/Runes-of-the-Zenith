@@ -1,12 +1,15 @@
 import { Menu } from '@mantine/core'
+import { notifications } from '@mantine/notifications'
 import { useMutation } from '@tanstack/react-query'
+import { getRouteApi } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { Fragment, type ReactNode } from 'react'
 import ContextMenu from '~/components/ContextMenu'
 import { type CombatTileCord } from '~/data/mapTemplates/combat'
-import { getSupabaseServerClient } from '~/supabase/getSupabaseServerClient'
-import { useTabletopHeroes } from '../-hooks/-useTabletopData'
+import { getServiceClient } from '~/supabase/getServiceClient'
+import { requireAccount } from '~/supabase/requireAccount'
+import { useTabletopHeroes } from '../-hooks/useTabletopData'
 
 type HexContextMenuProps = {
 	children: ReactNode
@@ -33,13 +36,21 @@ type HeroesProps = {
 }
 
 function Heroes({ cord }: HeroesProps) {
+	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useLoaderData()
 	const { data: heroes } = useTabletopHeroes()
 
 	const inactiveHeroes = Object.values(heroes)
 		.filter(({ tabletopHero }) => tabletopHero === null)
 
 	const addHero = useMutation({
-		mutationFn: addHeroAction
+		mutationFn: addHeroAction,
+		onError: error => {
+			notifications.show({
+				title: 'Failed to add hero',
+				color: 'red',
+				message: error.message
+			})
+		}
 	})
 
 	return (
@@ -56,6 +67,7 @@ function Heroes({ cord }: HeroesProps) {
 							onClick={() => addHero.mutate({
 								data: {
 									heroId: hero.heroId,
+									campaignId,
 									cord
 								}
 							})}
@@ -71,21 +83,92 @@ function Heroes({ cord }: HeroesProps) {
 
 const addHeroSchema = type({
 	heroId: 'number',
+	campaignId: 'number',
 	cord: ['number', 'number', 'number']
 })
 
 const addHeroAction = createServerFn({ method: 'POST' })
 	.validator(addHeroSchema)
-	.handler(async ({ data: { heroId, cord: [q, r, s] } }) => {
-		const supabase = getSupabaseServerClient()
+	.handler(async ({ data: { heroId, campaignId, cord: [q, r, s] } }) => {
+		const { supabase, user } = await requireAccount()
 
-		const { error } = await supabase
-			.from('tabletop_heroes')
+		// Check if the user is the GM
+		const gmCheck = await supabase
+			.from('campaign_info')
+			.select('gmUserId: user_id')
+			.eq('campaign_id', campaignId)
+			.limit(1)
+			.single()
+		if (gmCheck.error) throw new Error(gmCheck.error.message, { cause: gmCheck.error })
+		if (gmCheck.data.gmUserId !== user.id) throw new Error('You are not the GM of this campaign')
+
+		const serviceClient = getServiceClient()
+
+		// Check if the tile is already occupied
+		const tileCharacter = await supabase
+			.from('tabletop_tiles')
+			.select('characterId: character_id')
+			.eq('q', q)
+			.eq('r', r)
+			.eq('s', s)
+			.limit(1)
+			.maybeSingle()
+		if (tileCharacter.error) throw new Error(tileCharacter.error.message, { cause: tileCharacter.error })
+		if (tileCharacter.data?.characterId) throw new Error('Tile already has a character')
+
+		const getCharacterId = async () => {
+			const { data: characterData, error: characterError } = await supabase
+				.from('tabletop_heroes')
+				.select(`
+					tabletopCharacters: tabletop_characters (
+						characterId: character_id
+					)
+				`)
+				.eq('hero_id', heroId)
+				.limit(1)
+				.maybeSingle()
+			if (characterError) throw new Error(characterError.message, { cause: characterError })
+
+			if (characterData?.tabletopCharacters.characterId) return characterData.tabletopCharacters.characterId
+
+			const { data, error: characterInsertError } = await serviceClient
+				.from('tabletop_characters')
+				.insert({
+					character_type: 'HERO'
+				})
+				.select('characterId: character_id')
+				.single()
+			if (characterInsertError) throw new Error(characterInsertError.message, { cause: characterInsertError })
+
+			const { error: heroInsertError } = await serviceClient
+				.from('tabletop_heroes')
+				.insert({
+					hero_id: heroId,
+					character_id: data.characterId
+				})
+			if (heroInsertError) throw new Error(heroInsertError.message, { cause: heroInsertError })
+
+			return data.characterId
+		}
+
+		const characterId = await getCharacterId()
+
+		// Check if the hero is already on the map
+		const { count: characterTileCount } = await supabase
+			.from('tabletop_tiles')
+			.select('', { count: 'exact' })
+			.eq('character_id', characterId)
+		if (characterTileCount) throw new Error('Character already has a tile')
+
+		// Insert the hero on the tile
+		const { error: tileInsertError } = await serviceClient
+			.from('tabletop_tiles')
 			.upsert({
-				hero_id: heroId,
-				position_q: q,
-				position_r: r,
-				position_s: s
+				campaign_id: campaignId,
+				q,
+				r,
+				s,
+				character_id: characterId
 			})
-		if (error) throw new Error(error.message, { cause: error })
+		if (tileInsertError) throw new Error(tileInsertError.message, { cause: tileInsertError })
 	})
