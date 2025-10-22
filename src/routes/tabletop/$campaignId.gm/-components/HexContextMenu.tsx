@@ -6,9 +6,9 @@ import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { Fragment, type ReactNode } from 'react'
 import ContextMenu from '~/components/ContextMenu'
-import { type CombatTileCord } from '~/data/mapTemplates/combat'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireAccount } from '~/supabase/requireAccount'
+import { type CombatTileCord } from '~/types/gameTypes/combatMap'
 import { useTabletopHeroes } from '../-hooks/useTabletopData'
 
 type HexContextMenuProps = {

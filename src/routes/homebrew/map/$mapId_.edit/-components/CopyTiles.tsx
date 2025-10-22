@@ -1,7 +1,7 @@
 import { UnstyledButton } from '@mantine/core'
 import { Fragment, useMemo } from 'react'
 import { COPY_TILE_WIDTH, HEX_GAP, HEX_SIZE, HEX_WIDTH_SCALER } from '~/components/HoneycombGrid/constants'
-import { type CombatTile } from '~/data/mapTemplates/combat'
+import { type CombatTile } from '~/types/gameTypes/combatMap'
 import { useMapEditStore } from '../-hooks/useMapEditStore'
 
 type CopyTilesProps = {

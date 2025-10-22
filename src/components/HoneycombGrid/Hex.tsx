@@ -1,6 +1,6 @@
 import { Box, type BoxComponentProps, Image, type PolymorphicComponentProps, Text } from '@mantine/core'
 import { forwardRef, type ReactNode } from 'react'
-import { type CombatTile } from '~/data/mapTemplates/combat'
+import { type CombatTile } from '~/types/gameTypes/combatMap'
 import useHexSize from './useHexSize'
 
 type HexProps = {

@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { type CombatTileCord } from '~/data/mapTemplates/combat'
+import { type CombatTileCord } from '~/types/gameTypes/combatMap'
 import { HEX_MULTIPLIER, HEX_SIZE, HEX_WIDTH_SCALER } from './constants'
 
 export default function useHexSize(cord: CombatTileCord, offset: [x: number, y: number]) {

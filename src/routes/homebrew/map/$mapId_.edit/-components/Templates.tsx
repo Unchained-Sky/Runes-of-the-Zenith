@@ -1,7 +1,7 @@
 import { Box, Button, Group, Stack, Title } from '@mantine/core'
 import { getRouteApi } from '@tanstack/react-router'
 import CombatGridPreview from '~/components/HoneycombGrid/CombatGridPreview'
-import { type CombatMap, getAllCombatMapTemplates } from '~/data/mapTemplates/combat'
+import { type CombatMapTemplate, getAllCombatMapTemplates } from '~/data/mapTemplates/combatMapTemplate'
 import { useMapEditStore } from '../-hooks/useMapEditStore'
 
 export default function Templates() {
@@ -22,7 +22,7 @@ export default function Templates() {
 	)
 }
 
-type TemplateProps = CombatMap
+type TemplateProps = CombatMapTemplate
 
 function Template({ name, tiles }: TemplateProps) {
 	const addTiles = useMapEditStore(state => state.addTiles)

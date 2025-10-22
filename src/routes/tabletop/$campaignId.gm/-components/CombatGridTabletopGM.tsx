@@ -2,7 +2,7 @@ import { Avatar, Box } from '@mantine/core'
 import { type DragEventHandler } from 'react'
 import Hex from '~/components/HoneycombGrid/Hex'
 import useHoneycombGridSize from '~/components/HoneycombGrid/useHoneycombGridSize'
-import { type CombatTileCord } from '~/data/mapTemplates/combat'
+import { type CombatTileCord } from '~/types/gameTypes/combatMap'
 import { useTabletopHeroes, useTabletopMapTiles, useTabletopTiles } from '../-hooks/useTabletopData'
 import HexContextMenu from './HexContextMenu'
 

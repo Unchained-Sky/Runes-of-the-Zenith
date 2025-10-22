@@ -1,4 +1,4 @@
-import { IconBook, IconCampfire, IconCoffee, IconHome, IconUser, type Icon } from '@tabler/icons-react'
+import { IconBook, IconCampfire, IconCoffee, IconHome, IconUser, IconVocabulary, type Icon } from '@tabler/icons-react'
 import { type LinkComponentProps } from '@tanstack/react-router'
 
 type LinkPath = LinkComponentProps['to']
@@ -24,6 +24,11 @@ export const navbarLinks = [
 	{ label: 'Home', icon: IconHome, link: '/' },
 	{ label: 'Campaigns', icon: IconCampfire, link: '/campaign' },
 	{ label: 'Heroes', icon: IconUser, link: '/hero' },
+	{ label: 'Compendium', icon: IconVocabulary, links: [
+		{ label: 'Encounters', link: '/' },
+		{ label: 'Maps', link: '/' },
+		{ label: 'Enemies', link: '/' }
+	] },
 	{ label: 'Homebrew', icon: IconCoffee, links: [
 		{ label: 'Encounters', link: '/' },
 		{ label: 'Maps', link: '/homebrew/map' },

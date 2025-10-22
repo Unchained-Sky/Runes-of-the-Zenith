@@ -1,7 +1,7 @@
-import { type CombatMapInternal } from '../combat'
+import { type CombatMap } from '~/types/gameTypes/combatMap'
 
 export default {
-	name: 'two',
+	name: 'Woods',
 	tiles: [
 		{ cord: [0, -1, 1], image: 'grass', terrainType: 'NORMAL' },
 		{ cord: [1, -1, 0], image: 'grass', terrainType: 'NORMAL' },
@@ -19,4 +19,4 @@ export default {
 
 		{ cord: [-1, 2, -1], image: 'grass', terrainType: 'NORMAL' }
 	]
-} as const satisfies CombatMapInternal
+} as const satisfies CombatMap

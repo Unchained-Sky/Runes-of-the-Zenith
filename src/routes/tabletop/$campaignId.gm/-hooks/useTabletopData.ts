@@ -2,8 +2,8 @@ import { queryOptions, useSuspenseQueries, useSuspenseQuery } from '@tanstack/re
 import { getRouteApi, redirect } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
-import { type CombatTile } from '~/data/mapTemplates/combat'
 import { requireAccount } from '~/supabase/requireAccount'
+import { type CombatTile } from '~/types/gameTypes/combatMap'
 import { typedObject } from '~/types/typedObject'
 
 const tabletopLoaderSchema = type({

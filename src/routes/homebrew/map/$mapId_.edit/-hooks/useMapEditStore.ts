@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
-import { type CombatTile, type CombatTileCordString } from '~/data/mapTemplates/combat'
+import { type CombatTile, type CombatTileCordString } from '~/types/gameTypes/combatMap'
 import { createActionName, type DevTools, type Slice } from '~/types/storeTypes'
 import { typedObject } from '~/types/typedObject'
 import { type MapEditLoader } from '..'

@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { type CombatTile } from '~/data/mapTemplates/combat'
+import { type CombatTile } from '~/types/gameTypes/combatMap'
 import { HEX_GAP, HEX_MULTIPLIER, HEX_SIZE, HEX_WIDTH_SCALER } from './constants'
 
 type UseHoneycombGridSizeOptions = Partial<{
