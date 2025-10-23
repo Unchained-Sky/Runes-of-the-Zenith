@@ -35,7 +35,7 @@ const Hex = forwardRef<HTMLDivElement, HexProps>(function Hex({ tile: { cord, im
 				]}
 				{...props}
 			>
-				<Image src={`/combatTiles/${image}.png`} />
+				<Image src={`/combatTiles/${image}.png`} onMouseDown={e => e.preventDefault()} />
 			</Box>
 			<Text
 				pos='absolute'

@@ -20,11 +20,13 @@ import { Route as AuthLogoutRouteImport } from './routes/auth/logout'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
 import { Route as HomebrewMapIndexRouteImport } from './routes/homebrew/map/index'
+import { Route as CompendiumMapIndexRouteImport } from './routes/compendium/map/index'
 import { Route as HomebrewMapMapIdRouteImport } from './routes/homebrew/map/$mapId'
 import { Route as HeroHeroIdSettingsRouteImport } from './routes/hero/$heroId_.settings'
 import { Route as CampaignJoinInviteIdRouteImport } from './routes/campaign/join.$inviteId'
 import { Route as TabletopCampaignIdPlayerIndexRouteImport } from './routes/tabletop/$campaignId.player/index'
 import { Route as TabletopCampaignIdGmIndexRouteImport } from './routes/tabletop/$campaignId.gm/index'
+import { Route as CompendiumMapSourceNameRouteImport } from './routes/compendium/map/$source.$name'
 import { Route as HomebrewMapMapIdEditIndexRouteImport } from './routes/homebrew/map/$mapId_.edit/index'
 
 const IndexRoute = IndexRouteImport.update({
@@ -82,6 +84,11 @@ const HomebrewMapIndexRoute = HomebrewMapIndexRouteImport.update({
   path: '/homebrew/map/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CompendiumMapIndexRoute = CompendiumMapIndexRouteImport.update({
+  id: '/compendium/map/',
+  path: '/compendium/map/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HomebrewMapMapIdRoute = HomebrewMapMapIdRouteImport.update({
   id: '/homebrew/map/$mapId',
   path: '/homebrew/map/$mapId',
@@ -109,6 +116,11 @@ const TabletopCampaignIdGmIndexRoute =
     path: '/tabletop/$campaignId/gm/',
     getParentRoute: () => rootRouteImport,
   } as any)
+const CompendiumMapSourceNameRoute = CompendiumMapSourceNameRouteImport.update({
+  id: '/compendium/map/$source/$name',
+  path: '/compendium/map/$source/$name',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HomebrewMapMapIdEditIndexRoute =
   HomebrewMapMapIdEditIndexRouteImport.update({
     id: '/homebrew/map/$mapId_/edit/',
@@ -130,7 +142,9 @@ export interface FileRoutesByFullPath {
   '/campaign/join/$inviteId': typeof CampaignJoinInviteIdRoute
   '/hero/$heroId/settings': typeof HeroHeroIdSettingsRoute
   '/homebrew/map/$mapId': typeof HomebrewMapMapIdRoute
+  '/compendium/map': typeof CompendiumMapIndexRoute
   '/homebrew/map': typeof HomebrewMapIndexRoute
+  '/compendium/map/$source/$name': typeof CompendiumMapSourceNameRoute
   '/tabletop/$campaignId/gm': typeof TabletopCampaignIdGmIndexRoute
   '/tabletop/$campaignId/player': typeof TabletopCampaignIdPlayerIndexRoute
   '/homebrew/map/$mapId/edit': typeof HomebrewMapMapIdEditIndexRoute
@@ -149,7 +163,9 @@ export interface FileRoutesByTo {
   '/campaign/join/$inviteId': typeof CampaignJoinInviteIdRoute
   '/hero/$heroId/settings': typeof HeroHeroIdSettingsRoute
   '/homebrew/map/$mapId': typeof HomebrewMapMapIdRoute
+  '/compendium/map': typeof CompendiumMapIndexRoute
   '/homebrew/map': typeof HomebrewMapIndexRoute
+  '/compendium/map/$source/$name': typeof CompendiumMapSourceNameRoute
   '/tabletop/$campaignId/gm': typeof TabletopCampaignIdGmIndexRoute
   '/tabletop/$campaignId/player': typeof TabletopCampaignIdPlayerIndexRoute
   '/homebrew/map/$mapId/edit': typeof HomebrewMapMapIdEditIndexRoute
@@ -169,7 +185,9 @@ export interface FileRoutesById {
   '/campaign/join/$inviteId': typeof CampaignJoinInviteIdRoute
   '/hero/$heroId_/settings': typeof HeroHeroIdSettingsRoute
   '/homebrew/map/$mapId': typeof HomebrewMapMapIdRoute
+  '/compendium/map/': typeof CompendiumMapIndexRoute
   '/homebrew/map/': typeof HomebrewMapIndexRoute
+  '/compendium/map/$source/$name': typeof CompendiumMapSourceNameRoute
   '/tabletop/$campaignId/gm/': typeof TabletopCampaignIdGmIndexRoute
   '/tabletop/$campaignId/player/': typeof TabletopCampaignIdPlayerIndexRoute
   '/homebrew/map/$mapId_/edit/': typeof HomebrewMapMapIdEditIndexRoute
@@ -190,7 +208,9 @@ export interface FileRouteTypes {
     | '/campaign/join/$inviteId'
     | '/hero/$heroId/settings'
     | '/homebrew/map/$mapId'
+    | '/compendium/map'
     | '/homebrew/map'
+    | '/compendium/map/$source/$name'
     | '/tabletop/$campaignId/gm'
     | '/tabletop/$campaignId/player'
     | '/homebrew/map/$mapId/edit'
@@ -209,7 +229,9 @@ export interface FileRouteTypes {
     | '/campaign/join/$inviteId'
     | '/hero/$heroId/settings'
     | '/homebrew/map/$mapId'
+    | '/compendium/map'
     | '/homebrew/map'
+    | '/compendium/map/$source/$name'
     | '/tabletop/$campaignId/gm'
     | '/tabletop/$campaignId/player'
     | '/homebrew/map/$mapId/edit'
@@ -228,7 +250,9 @@ export interface FileRouteTypes {
     | '/campaign/join/$inviteId'
     | '/hero/$heroId_/settings'
     | '/homebrew/map/$mapId'
+    | '/compendium/map/'
     | '/homebrew/map/'
+    | '/compendium/map/$source/$name'
     | '/tabletop/$campaignId/gm/'
     | '/tabletop/$campaignId/player/'
     | '/homebrew/map/$mapId_/edit/'
@@ -248,7 +272,9 @@ export interface RootRouteChildren {
   CampaignJoinInviteIdRoute: typeof CampaignJoinInviteIdRoute
   HeroHeroIdSettingsRoute: typeof HeroHeroIdSettingsRoute
   HomebrewMapMapIdRoute: typeof HomebrewMapMapIdRoute
+  CompendiumMapIndexRoute: typeof CompendiumMapIndexRoute
   HomebrewMapIndexRoute: typeof HomebrewMapIndexRoute
+  CompendiumMapSourceNameRoute: typeof CompendiumMapSourceNameRoute
   TabletopCampaignIdGmIndexRoute: typeof TabletopCampaignIdGmIndexRoute
   TabletopCampaignIdPlayerIndexRoute: typeof TabletopCampaignIdPlayerIndexRoute
   HomebrewMapMapIdEditIndexRoute: typeof HomebrewMapMapIdEditIndexRoute
@@ -333,6 +359,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HomebrewMapIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/compendium/map/': {
+      id: '/compendium/map/'
+      path: '/compendium/map'
+      fullPath: '/compendium/map'
+      preLoaderRoute: typeof CompendiumMapIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/homebrew/map/$mapId': {
       id: '/homebrew/map/$mapId'
       path: '/homebrew/map/$mapId'
@@ -368,6 +401,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TabletopCampaignIdGmIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/compendium/map/$source/$name': {
+      id: '/compendium/map/$source/$name'
+      path: '/compendium/map/$source/$name'
+      fullPath: '/compendium/map/$source/$name'
+      preLoaderRoute: typeof CompendiumMapSourceNameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/homebrew/map/$mapId_/edit/': {
       id: '/homebrew/map/$mapId_/edit/'
       path: '/homebrew/map/$mapId/edit'
@@ -392,7 +432,9 @@ const rootRouteChildren: RootRouteChildren = {
   CampaignJoinInviteIdRoute: CampaignJoinInviteIdRoute,
   HeroHeroIdSettingsRoute: HeroHeroIdSettingsRoute,
   HomebrewMapMapIdRoute: HomebrewMapMapIdRoute,
+  CompendiumMapIndexRoute: CompendiumMapIndexRoute,
   HomebrewMapIndexRoute: HomebrewMapIndexRoute,
+  CompendiumMapSourceNameRoute: CompendiumMapSourceNameRoute,
   TabletopCampaignIdGmIndexRoute: TabletopCampaignIdGmIndexRoute,
   TabletopCampaignIdPlayerIndexRoute: TabletopCampaignIdPlayerIndexRoute,
   HomebrewMapMapIdEditIndexRoute: HomebrewMapMapIdEditIndexRoute,

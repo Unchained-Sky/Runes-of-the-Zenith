@@ -26,7 +26,7 @@ export const navbarLinks = [
 	{ label: 'Heroes', icon: IconUser, link: '/hero' },
 	{ label: 'Compendium', icon: IconVocabulary, links: [
 		{ label: 'Encounters', link: '/' },
-		{ label: 'Maps', link: '/' },
+		{ label: 'Maps', link: '/compendium/map' },
 		{ label: 'Enemies', link: '/' }
 	] },
 	{ label: 'Homebrew', icon: IconCoffee, links: [

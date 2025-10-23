@@ -1,6 +1,6 @@
 import { type TablesInsert } from '~/supabase/databaseTypes'
 import { getServiceClient } from '~/supabase/getServiceClient'
-import { adminUUID } from './adminAccount'
+import { adminUUID } from '../src/supabase/adminAccount'
 import combatMaps, { type CompendiumCombatMap } from './data/maps/combat/combatMapData'
 
 const supabase = getServiceClient()
@@ -54,7 +54,6 @@ async function getMapId(combatMap: CompendiumCombatMap) {
 				.upsert({
 					map_id: mapId,
 					map_hash: hash,
-					map_name: combatMap.name,
 					map_source: combatMap.source
 				})
 				.eq('user_id', adminUUID)
