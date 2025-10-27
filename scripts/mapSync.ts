@@ -1,18 +1,17 @@
 import { type TablesInsert } from '~/supabase/databaseTypes'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { adminUUID } from '../src/supabase/adminAccount'
+import { createCompendiumHash } from './compendiumTypes'
 import combatMaps, { type CompendiumCombatMap } from './data/maps/combat/combatMapData'
 
 const supabase = getServiceClient()
-
-const createMapHash = (combatMap: CompendiumCombatMap) => `${combatMap.source}-${combatMap.name}`.toLowerCase()
 
 async function getMapId(combatMap: CompendiumCombatMap) {
 	{
 		const { data, error } = await supabase
 			.from('compendium_map')
 			.select('map_id')
-			.eq('map_hash', createMapHash(combatMap))
+			.eq('map_hash', createCompendiumHash(combatMap))
 			.limit(1)
 			.maybeSingle()
 		if (error) throw new Error(error.message, { cause: error })
@@ -38,7 +37,7 @@ async function getMapId(combatMap: CompendiumCombatMap) {
 {
 	for (const combatMap of combatMaps) {
 		const mapId = await getMapId(combatMap)
-		const hash = createMapHash(combatMap)
+		const hash = createCompendiumHash(combatMap)
 
 		{
 			const { error } = await supabase

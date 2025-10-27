@@ -1,10 +1,9 @@
+import { type Compendium } from '~/scripts/compendiumTypes'
 import { type CombatMap } from '~/types/gameTypes/combatMap'
 import rocks from './base/rocks'
 import woods from './base/woods'
 
-export type CompendiumCombatMap = CombatMap & {
-	source: string
-}
+export type CompendiumCombatMap = CombatMap & Compendium
 
 const base = [
 	woods,
