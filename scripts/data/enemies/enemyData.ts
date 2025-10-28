@@ -13,7 +13,7 @@ const base = [
 ]
 
 const all = [
-	base.map(enemy => ({ ...enemy, source: 'Base' } satisfies CompendiumEnemy))
+	base
 ].flat(1) satisfies CompendiumEnemy[]
 
 export default all

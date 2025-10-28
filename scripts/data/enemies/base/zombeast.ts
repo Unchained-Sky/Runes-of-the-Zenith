@@ -1,8 +1,8 @@
 import { type CompendiumEnemy } from '../enemyData'
 
 export default {
-	name: 'Zombeast',
 	source: 'Base',
+	name: 'Zombeast',
 	stats: {
 		maxHealth: 800,
 		shield: 25,

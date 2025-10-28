@@ -6,12 +6,12 @@ import woods from './base/woods'
 export type CompendiumCombatMap = CombatMap & Compendium
 
 const base = [
-	woods,
-	rocks
+	rocks,
+	woods
 ]
 
 const all = [
-	base.map(map => ({ ...map, source: 'Base' } satisfies CompendiumCombatMap))
+	base
 ].flat(1) satisfies CompendiumCombatMap[]
 
 export default all

@@ -1,8 +1,8 @@
 import { type CompendiumEnemy } from '../enemyData'
 
 export default {
-	name: 'Zombrero',
 	source: 'Base',
+	name: 'Zombrero',
 	stats: {
 		maxHealth: 350,
 		shield: 10,

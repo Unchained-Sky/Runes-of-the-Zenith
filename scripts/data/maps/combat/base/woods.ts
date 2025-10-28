@@ -1,6 +1,7 @@
-import { type CombatMap } from '~/types/gameTypes/combatMap'
+import { type CompendiumCombatMap } from '../combatMapData'
 
 export default {
+	source: 'Base',
 	name: 'Woods',
 	tiles: [
 		{ cord: [0, -1, 1], image: 'grass', terrainType: 'NORMAL' },
@@ -19,4 +20,4 @@ export default {
 
 		{ cord: [-1, 2, -1], image: 'grass', terrainType: 'NORMAL' }
 	]
-} as const satisfies CombatMap
+} as const satisfies CompendiumCombatMap

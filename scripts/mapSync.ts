@@ -34,47 +34,44 @@ async function getMapId(combatMap: CompendiumCombatMap) {
 	}
 }
 
-{
-	for (const combatMap of combatMaps) {
-		const mapId = await getMapId(combatMap)
-		const hash = createCompendiumHash(combatMap)
+for (const combatMap of combatMaps) {
+	const mapId = await getMapId(combatMap)
+	const hash = createCompendiumHash(combatMap)
 
-		{
-			const { error } = await supabase
-				.from('map_combat_tile')
-				.delete()
-				.eq('map_id', mapId)
-			if (error) throw new Error(error.message, { cause: error })
-		}
-
-		{
-			const { error } = await supabase
-				.from('compendium_map')
-				.upsert({
-					map_id: mapId,
-					map_hash: hash,
-					map_source: combatMap.source
-				})
-				.eq('user_id', adminUUID)
-				.eq('map_hash', hash)
-			if (error) throw new Error(error.message, { cause: error })
-		}
-
-		{
-			const { error } = await supabase
-				.from('map_combat_tile')
-				.insert(combatMap.tiles.map(tile => {
-					return {
-						map_id: mapId,
-						q: tile.cord[0],
-						r: tile.cord[1],
-						s: tile.cord[2],
-						image: tile.image,
-						terrain_type: tile.terrainType
-					} satisfies TablesInsert<'map_combat_tile'>
-				}))
-			if (error) throw new Error(error.message, { cause: error })
-		}
-		console.log(`Synced Map: ${hash}`)
+	{
+		const { error } = await supabase
+			.from('map_combat_tile')
+			.delete()
+			.eq('map_id', mapId)
+		if (error) throw new Error(error.message, { cause: error })
 	}
+
+	{
+		const { error } = await supabase
+			.from('compendium_map')
+			.upsert({
+				map_id: mapId,
+				map_hash: hash,
+				map_source: combatMap.source
+			})
+			.eq('map_hash', hash)
+		if (error) throw new Error(error.message, { cause: error })
+	}
+
+	{
+		const { error } = await supabase
+			.from('map_combat_tile')
+			.insert(combatMap.tiles.map(tile => {
+				return {
+					map_id: mapId,
+					q: tile.cord[0],
+					r: tile.cord[1],
+					s: tile.cord[2],
+					image: tile.image,
+					terrain_type: tile.terrainType
+				} satisfies TablesInsert<'map_combat_tile'>
+			}))
+		if (error) throw new Error(error.message, { cause: error })
+	}
+	console.log(`Synced Map: ${hash}`)
 }

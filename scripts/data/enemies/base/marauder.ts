@@ -1,8 +1,8 @@
 import { type CompendiumEnemy } from '../enemyData'
 
 export default {
-	name: 'Marauder',
 	source: 'Base',
+	name: 'Marauder',
 	stats: {
 		maxHealth: 400,
 		shield: 20,
