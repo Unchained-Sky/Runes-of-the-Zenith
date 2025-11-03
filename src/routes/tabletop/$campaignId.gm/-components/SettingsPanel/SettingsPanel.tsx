@@ -2,7 +2,7 @@ import { ActionIcon, Drawer, rem, Tabs } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { IconMenu2, IconX } from '@tabler/icons-react'
 import { Fragment } from 'react'
-import MapsTab from './MapsTab'
+import MapTab from './MapTab'
 import UnitsTab from './UnitsTab'
 
 export default function SettingsPanel() {
@@ -42,7 +42,7 @@ export default function SettingsPanel() {
 				}}
 			>
 				<Tabs
-					defaultValue='maps'
+					defaultValue='units'
 					styles={{
 						panel: {
 							paddingTop: 'var(--mantine-spacing-md)'
@@ -50,19 +50,19 @@ export default function SettingsPanel() {
 					}}
 				>
 					<Tabs.List>
-						<Tabs.Tab value='maps'>
-							Maps
-						</Tabs.Tab>
 						<Tabs.Tab value='units'>
 							Units
 						</Tabs.Tab>
+						<Tabs.Tab value='map'>
+							Maps
+						</Tabs.Tab>
 					</Tabs.List>
 
-					<Tabs.Panel value='maps'>
-						<MapsTab />
-					</Tabs.Panel>
 					<Tabs.Panel value='units'>
 						<UnitsTab />
+					</Tabs.Panel>
+					<Tabs.Panel value='map'>
+						<MapTab />
 					</Tabs.Panel>
 				</Tabs>
 			</Drawer>

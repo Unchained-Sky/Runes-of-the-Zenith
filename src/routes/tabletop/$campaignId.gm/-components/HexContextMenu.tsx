@@ -134,6 +134,7 @@ const addHeroAction = createServerFn({ method: 'POST' })
 			const { data, error: characterInsertError } = await serviceClient
 				.from('tabletop_characters')
 				.insert({
+					campaign_id: campaignId,
 					character_type: 'HERO'
 				})
 				.select('characterId: character_id')

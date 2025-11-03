@@ -10,7 +10,7 @@ export default {
 	mapHash: createCompendiumHash(rocks),
 	tiles: [
 		{
-			cord: [-1, -1, 0],
+			cord: [-1, 1, 0],
 			enemyHash: createCompendiumHash(zombeast)
 		},
 		{

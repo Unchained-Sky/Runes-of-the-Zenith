@@ -48,7 +48,7 @@ function useTabletopHeroesSubscription({ supabase, campaignId }: SubscribeHookPr
 						break
 					}
 					case 'UPDATE': {
-						const { hero_id, ...tabletopHeroData } = payload.new as TabletopHeroes
+						const { hero_id: _ } = payload.new as TabletopHeroes
 						break
 
 						// const heroesCache = queryClient.getQueryData(['tabletop', 'heroes', campaignId]) as TabletopHeroesCache
@@ -109,9 +109,12 @@ function useTabletopInfoSubscription({ supabase, campaignId }: SubscribeHookProp
 					case 'INSERT':
 					case 'UPDATE': {
 						void queryClient.invalidateQueries({ queryKey: ['tabletop', 'tiles', campaignId] })
+						void queryClient.invalidateQueries({ queryKey: ['tabletop', 'encounter-name', campaignId] })
+						void queryClient.invalidateQueries({ queryKey: ['tabletop', 'enemy', campaignId] })
 						break
 					}
 					case 'DELETE': {
+						void queryClient.cancelQueries({ queryKey: ['tabletop', 'tiles', campaignId] })
 						queryClient.setQueryData(['tabletop', 'tiles', campaignId], [])
 						break
 					}
@@ -155,12 +158,13 @@ function useTabletopCharactersSubscription({ supabase, campaignId }: SubscribeHo
 						const { character_id } = payload.old as TabletopCharacters
 
 						type TabletopTilesCache = ReturnType<typeof useTabletopTiles>['data']
-						const tilesCache = queryClient.getQueryData(['tabletop', 'tiles', campaignId]) as TabletopTilesCache
+						const tilesCache = queryClient.getQueryData(['tabletop', 'tiles', 'characters', campaignId]) as TabletopTilesCache
 						const tilesArray = typedObject.entries(tilesCache)
 						const tileIndex = tilesArray.findIndex(([_cord, tile]) => tile && tile.characterType === 'HERO' && tile.characterId === character_id)
 						const tileData = tilesArray[tileIndex]
 						if (tileData) {
-							queryClient.setQueryData(['tabletop', 'tiles', campaignId], (oldData: TabletopTilesCache) => {
+							void queryClient.cancelQueries({ queryKey: ['tabletop', 'tiles', campaignId] })
+							queryClient.setQueryData(['tabletop', 'tiles', 'characters', campaignId], (oldData: TabletopTilesCache) => {
 								return {
 									...oldData,
 									[tileData[0]]: null

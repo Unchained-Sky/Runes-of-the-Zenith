@@ -2,6 +2,7 @@ import { queryOptions, useSuspenseQueries, useSuspenseQuery } from '@tanstack/re
 import { getRouteApi, redirect } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
+import { adminUUID } from '~/supabase/adminAccount'
 import { requireAccount } from '~/supabase/requireAccount'
 import { type CombatTile } from '~/types/gameTypes/combatMap'
 import { typedObject } from '~/types/typedObject'
@@ -77,7 +78,7 @@ const tilesLoader = createServerFn({ method: 'GET' })
 	})
 
 export const tabletopTilesQueryOptions = (campaignId: number) => queryOptions({
-	queryKey: ['tabletop', 'tiles', campaignId],
+	queryKey: ['tabletop', 'tiles', campaignId, 'characters'],
 	queryFn: () => tilesLoader({ data: { campaignId } })
 })
 
@@ -94,13 +95,15 @@ const mapTilesLoader = createServerFn({ method: 'GET' })
 		const { data, error } = await supabase
 			.from('tabletop_info')
 			.select(`
-				mapInfo: map_info (
-					mapCombatTiles: map_combat_tile (
-						q,
-						r,
-						s,
-						image,
-						terrainType: terrain_type
+				encounterId: encounter_id (
+					mapInfo: map_info (
+						mapCombatTiles: map_combat_tile (
+							q,
+							r,
+							s,
+							image,
+							terrainType: terrain_type
+						)
 					)
 				)
 			`)
@@ -108,9 +111,9 @@ const mapTilesLoader = createServerFn({ method: 'GET' })
 			.limit(1)
 			.maybeSingle()
 		if (error) throw new Error(error.message, { cause: error })
-		if (!data) return []
+		if (!data || !data.encounterId) return []
 
-		return data.mapInfo.mapCombatTiles.map<CombatTile>(tile => ({
+		return data.encounterId.mapInfo.mapCombatTiles.map<CombatTile>(tile => ({
 			cord: [tile.q, tile.r, tile.s],
 			image: tile.image,
 			terrainType: tile.terrainType
@@ -118,7 +121,7 @@ const mapTilesLoader = createServerFn({ method: 'GET' })
 	})
 
 export const tabletopMapTilesQueryOptions = (campaignId: number) => queryOptions({
-	queryKey: ['tabletop', 'map-tiles', campaignId],
+	queryKey: ['tabletop', 'tiles', campaignId, 'map'],
 	queryFn: () => mapTilesLoader({ data: { campaignId } })
 })
 
@@ -127,39 +130,107 @@ export function useTabletopMapTiles() {
 	return useSuspenseQuery(tabletopMapTilesQueryOptions(campaignId))
 }
 
-const mapListLoader = createServerFn({ method: 'GET' })
-	.handler(async () => {
-		const { supabase, user } = await requireAccount({ backlink: '/campaigns' })
+/*
+	Encounters
+*/
+
+const currentEncounterLoader = createServerFn({ method: 'GET' })
+	.validator(tabletopLoaderSchema)
+	.handler(async ({ data: { campaignId } }) => {
+		const { supabase } = await requireAccount({ backlink: '/campaigns' })
 
 		const { data, error } = await supabase
-			.from('map_info')
+			.from('tabletop_info')
 			.select(`
-				mapId: map_id,
-				mapName: map_name,
-				mapCombatTileCount: map_combat_tile(count)
+				encounterInfo: encounter_info (
+					encounterName: encounter_name
+				)
 			`)
-			.eq('user_id', user.id)
+			.eq('campaign_id', campaignId)
+			.limit(1)
+			.maybeSingle()
 		if (error) throw new Error(error.message, { cause: error })
 
-		const out = data.filter(map => map.mapCombatTileCount[0]?.count)
-
-		return out.map(map => ({ mapId: map.mapId, name: map.mapName }))
+		return data?.encounterInfo?.encounterName ?? null
 	})
 
-export const tabletopMapListQueryOptions = () => queryOptions({
-	queryKey: ['tabletop', 'maps'],
-	queryFn: () => mapListLoader()
+export const tabletopCurrentEncounterQueryOptions = (campaignId: number) => queryOptions({
+	queryKey: ['tabletop', 'encounter-name', campaignId],
+	queryFn: () => currentEncounterLoader({ data: { campaignId } })
 })
 
-export function useTabletopMapList() {
-	return useSuspenseQuery(tabletopMapListQueryOptions())
+export function useTabletopCurrentEncounter() {
+	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useLoaderData()
+	return useSuspenseQuery(tabletopCurrentEncounterQueryOptions(campaignId))
+}
+
+const encounterListLoader = createServerFn({ method: 'GET' })
+	.validator(tabletopLoaderSchema)
+	.handler(async ({ data: { campaignId } }) => {
+		const { supabase, user } = await requireAccount({ backlink: '/campaigns' })
+
+		const tabletopInfo = await supabase
+			.from('tabletop_info')
+			.select('encounter_id')
+			.eq('campaign_id', campaignId)
+			.limit(1)
+			.maybeSingle()
+		if (tabletopInfo.error) throw new Error(tabletopInfo.error.message, { cause: tabletopInfo.error })
+
+		if (!tabletopInfo.data) {
+			const { error } = await supabase
+				.from('tabletop_info')
+				.insert({ campaign_id: campaignId, map_id: -1 }) // TODO remove map_id
+			if (error) throw new Error(error.message, { cause: error })
+		}
+
+		const compendiumEncounters = await supabase
+			.from('encounter_info')
+			.select(`
+				encounterId: encounter_id,
+				encounterName: encounter_name
+			`)
+			.eq('user_id', adminUUID)
+		if (compendiumEncounters.error) throw new Error(compendiumEncounters.error.message, { cause: compendiumEncounters.error })
+
+		const homebrewEncounters = await supabase
+			.from('encounter_info')
+			.select(`
+				encounterId: encounter_id,
+				encounterName: encounter_name,
+				mapInfo: map_info (
+					mapCombatTileCount: map_combat_tile(count)
+				)
+			`)
+			.eq('user_id', user.id)
+		if (homebrewEncounters.error) throw new Error(homebrewEncounters.error.message, { cause: homebrewEncounters.error })
+
+		return {
+			compendium: compendiumEncounters.data,
+			homebrew: homebrewEncounters.data
+				.filter(encounter => encounter.mapInfo.mapCombatTileCount[0]?.count)
+				.map(encounter => ({
+					encounterId: encounter.encounterId,
+					encounterName: encounter.encounterName
+				}))
+		}
+	})
+
+export const tabletopEncounterListQueryOptions = (campaignId: number) => queryOptions({
+	queryKey: ['tabletop', 'encounters', campaignId],
+	queryFn: () => encounterListLoader({ data: { campaignId } })
+})
+
+export function useTabletopEncounterList() {
+	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useLoaderData()
+	return useSuspenseQuery(tabletopEncounterListQueryOptions(campaignId))
 }
 
 /*
 	Heroes
 */
 
-export const heroListLoader = createServerFn({ method: 'GET' })
+const heroListLoader = createServerFn({ method: 'GET' })
 	.validator(tabletopLoaderSchema)
 	.handler(async ({ data: { campaignId } }) => {
 		const { supabase } = await requireAccount({ backlink: '/campaigns' })
@@ -188,7 +259,7 @@ const heroLoaderSchema = tabletopLoaderSchema.and({
 	heroId: 'number'
 })
 
-export const heroLoader = createServerFn({ method: 'GET' })
+const heroLoader = createServerFn({ method: 'GET' })
 	.validator(heroLoaderSchema)
 	.handler(async ({ data: { campaignId, heroId } }) => {
 		const { supabase } = await requireAccount({ backlink: '/campaigns' })
@@ -229,6 +300,90 @@ export function useTabletopHeroes() {
 
 	// using the built in combine wasn't updating when setting the data manually in the subscriptions
 	const combine = typedObject.fromEntries(queries.map(hero => [hero.data.heroId, hero.data]))
+
+	return {
+		data: combine,
+		queries
+	}
+}
+
+/*
+	Enemies
+*/
+
+const enemyListLoader = createServerFn({ method: 'GET' })
+	.validator(tabletopLoaderSchema)
+	.handler(async ({ data: { campaignId } }) => {
+		const { supabase } = await requireAccount({ backlink: '/campaigns' })
+
+		const { data, error } = await supabase
+			.from('tabletop_characters')
+			.select('characterId: character_id')
+			.eq('campaign_id', campaignId)
+			.eq('character_type', 'ENEMY')
+		if (error) throw new Error(error.message, { cause: error })
+
+		console.log(data)
+
+		return data.map(enemy => enemy.characterId)
+	})
+
+export const tabletopEnemyListQueryOptions = (campaignId: number) => queryOptions({
+	queryKey: ['tabletop', 'enemy-list', campaignId],
+	queryFn: () => enemyListLoader({ data: { campaignId } })
+})
+
+export function useTabletopEnemyList() {
+	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useLoaderData()
+	return useSuspenseQuery(tabletopEnemyListQueryOptions(campaignId))
+}
+
+const enemyLoaderSchema = type({
+	characterId: 'number'
+})
+
+const enemyLoader = createServerFn({ method: 'GET' })
+	.validator(enemyLoaderSchema)
+	.handler(async ({ data: { characterId } }) => {
+		const { supabase } = await requireAccount({ backlink: '/campaigns' })
+
+		const { data, error } = await supabase
+			.from('tabletop_characters')
+			.select(`
+				tabletopEnemy: tabletop_enemy (
+					enemyId: enemy_id,
+					enemyInfo: enemy_info (
+						enemyName: enemy_name
+					)
+				)
+			`)
+			.eq('character_id', characterId)
+			.limit(1)
+			.single()
+		if (error) throw new Error(error.message, { cause: error })
+
+		return {
+			tabletopCharacter: characterId,
+			data
+		}
+	})
+
+const tabletopEnemyQueryOptions = (campaignId: number, characterId: number) => queryOptions({
+	queryKey: ['tabletop', 'enemy', campaignId, characterId],
+	queryFn: () => enemyLoader({ data: { characterId } })
+})
+
+export function useTabletopEnemies() {
+	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useLoaderData()
+	const characterIds = useTabletopEnemyList().data
+	const queries = useSuspenseQueries({
+		queries: characterIds.map(characterIds => tabletopEnemyQueryOptions(campaignId, characterIds))
+	})
+
+	const combine = typedObject.fromEntries(queries.map(enemy => [
+		enemy.data.tabletopCharacter,
+		enemy.data
+	]))
 
 	return {
 		data: combine,

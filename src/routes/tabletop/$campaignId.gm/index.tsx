@@ -3,7 +3,7 @@ import { Fragment } from 'react'
 import { safeParseInt } from '~/utils/safeParseInt'
 import CombatGridTabletopGM from './-components/CombatGridTabletopGM'
 import SettingsPanel from './-components/SettingsPanel'
-import { tabletopHeroListQueryOptions, tabletopMapListQueryOptions, tabletopMapTilesQueryOptions, tabletopNameQueryOptions, tabletopTilesQueryOptions } from './-hooks/useTabletopData'
+import { tabletopCurrentEncounterQueryOptions, tabletopEncounterListQueryOptions, tabletopEnemyListQueryOptions, tabletopHeroListQueryOptions, tabletopMapTilesQueryOptions, tabletopNameQueryOptions, tabletopTilesQueryOptions } from './-hooks/useTabletopData'
 import useTabletopGMSubscription from './-hooks/useTabletopGMSubscription'
 
 export const Route = createFileRoute('/tabletop/$campaignId/gm/')({
@@ -16,14 +16,18 @@ export const Route = createFileRoute('/tabletop/$campaignId/gm/')({
 			campaignName,
 			tiles,
 			mapTiles,
-			mapList,
-			heroList
+			currentEncounter,
+			encounterList,
+			heroList,
+			enemyList
 		] = await Promise.all([
 			context.queryClient.ensureQueryData(tabletopNameQueryOptions(campaignId)),
 			context.queryClient.ensureQueryData(tabletopTilesQueryOptions(campaignId)),
 			context.queryClient.ensureQueryData(tabletopMapTilesQueryOptions(campaignId)),
-			context.queryClient.ensureQueryData(tabletopMapListQueryOptions()),
-			context.queryClient.ensureQueryData(tabletopHeroListQueryOptions(campaignId))
+			context.queryClient.ensureQueryData(tabletopCurrentEncounterQueryOptions(campaignId)),
+			context.queryClient.ensureQueryData(tabletopEncounterListQueryOptions(campaignId)),
+			context.queryClient.ensureQueryData(tabletopHeroListQueryOptions(campaignId)),
+			context.queryClient.ensureQueryData(tabletopEnemyListQueryOptions(campaignId))
 		])
 
 		return {
@@ -31,8 +35,10 @@ export const Route = createFileRoute('/tabletop/$campaignId/gm/')({
 			campaignName,
 			tiles,
 			mapTiles,
-			mapList,
-			heroList
+			currentEncounter,
+			encounterList,
+			heroList,
+			enemyList
 		}
 	},
 	head: ({ loaderData }) => ({

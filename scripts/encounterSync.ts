@@ -66,16 +66,29 @@ for (const encounter of encounters) {
 		if (error) throw new Error(error.message, { cause: error })
 	}
 
+	const enemyHashList = encounter.tiles.map(tile => tile.enemyHash)
+
+	const enemyList = await supabase
+		.from('compendium_enemy')
+		.select(`
+			enemyId: enemy_id,
+			enemyHash: enemy_hash
+		`)
+		.in('enemy_hash', enemyHashList)
+	if (enemyList.error) throw new Error(enemyList.error.message, { cause: enemyList.error })
+
 	{
 		const { error } = await supabase
 			.from('encounter_tile')
 			.insert(encounter.tiles.map(tile => {
+				const enemyId = enemyList.data.find(enemy => enemy.enemyHash === tile.enemyHash)?.enemyId
+				if (!enemyId) throw new Error('Invalid enemy data')
 				return {
 					encounter_id: encounterId,
 					q: tile.cord[0],
 					r: tile.cord[1],
 					s: tile.cord[2],
-					enemy_hash: tile.enemyHash
+					enemy_id: enemyId
 				} satisfies TablesInsert<'encounter_tile'>
 			}))
 		if (error) throw new Error(error.message, { cause: error })

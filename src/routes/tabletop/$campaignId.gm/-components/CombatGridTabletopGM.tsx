@@ -3,7 +3,7 @@ import { type DragEventHandler } from 'react'
 import Hex from '~/components/HoneycombGrid/Hex'
 import useHoneycombGridSize from '~/components/HoneycombGrid/useHoneycombGridSize'
 import { type CombatTileCord } from '~/types/gameTypes/combatMap'
-import { useTabletopHeroes, useTabletopMapTiles, useTabletopTiles } from '../-hooks/useTabletopData'
+import { useTabletopEnemies, useTabletopHeroes, useTabletopMapTiles, useTabletopTiles } from '../-hooks/useTabletopData'
 import HexContextMenu from './HexContextMenu'
 
 export default function CombatGridTabletopGM() {
@@ -39,6 +39,7 @@ type CharacterIconProps = {
 function CharacterIcon({ cord }: CharacterIconProps) {
 	const { data: tiles } = useTabletopTiles()
 	const { data: heroesData } = useTabletopHeroes()
+	const { data: enemiesData } = useTabletopEnemies()
 
 	const tileData = tiles[`${cord[0]},${cord[1]},${cord[2]}`]
 	if (!tileData) return null
@@ -47,12 +48,16 @@ function CharacterIcon({ cord }: CharacterIconProps) {
 		case 'HERO': {
 			const heroData = Object.values(heroesData).find(hero => hero.tabletopHero?.characterId === tileData.characterId)
 			if (heroData) {
-				return <Avatar name={heroData.heroName} color='initials' pos='absolute' left='40%' top='40%' />
+				return <Avatar name={heroData.heroName} color='green' pos='absolute' left='40%' top='40%' />
 			}
 			break
 		}
 		case 'ENEMY': {
-			return null
+			const enemyData = Object.values(enemiesData).find(enemy => enemy.tabletopCharacter === tileData.characterId)
+			if (enemyData) {
+				return <Avatar name={enemyData.data.tabletopEnemy?.enemyInfo.enemyName} color='red' pos='absolute' left='40%' top='40%' />
+			}
+			break
 		}
 	}
 }
