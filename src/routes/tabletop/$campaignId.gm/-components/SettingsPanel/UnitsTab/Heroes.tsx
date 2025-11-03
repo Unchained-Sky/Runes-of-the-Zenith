@@ -10,7 +10,6 @@ import { type } from 'arktype'
 import { Fragment } from 'react'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireAccount } from '~/supabase/requireAccount'
-import { useSupabase } from '~/supabase/useSupabase'
 import { useTabletopHeroes } from '../../../-hooks/useTabletopData'
 
 export default function Heroes() {
@@ -129,7 +128,7 @@ function Hero({ heroId }: HeroProps) {
 									onClick={() => removeHero.mutate({
 										data: {
 											campaignId,
-											characterId: tabletopHero.characterId
+											characterId: tabletopHero.tabletopCharacterId
 										}
 									})}
 								>
@@ -187,9 +186,7 @@ const numberInputProps: NumberInputProps = {
 }
 
 function HeroEditModal({ heroId, opened, close }: HeroEditModalProps) {
-	const { heroName, tabletopHero } = useTabletopHeroes().data[heroId] ?? {}
-
-	const supabase = useSupabase()
+	const { heroName, tabletopHero: _ } = useTabletopHeroes().data[heroId] ?? {}
 
 	const form = useForm({
 		mode: 'uncontrolled',

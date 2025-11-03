@@ -210,7 +210,7 @@ const changeEncounterAction = createServerFn({ method: 'POST' })
 						character_type: 'ENEMY'
 					}) satisfies TablesInsert<'tabletop_characters'>)
 				)
-				.select('characterId: character_id')
+				.select('characterId: tt_character_id')
 			if (characterError) throw new Error(characterError.message, { cause: characterError })
 
 			{
@@ -219,7 +219,7 @@ const changeEncounterAction = createServerFn({ method: 'POST' })
 					.insert(
 						tilesWithEnemies.map(({ enemyId }, index) => ({
 							enemy_id: enemyId,
-							character_id: characterIds[index]?.characterId ?? -1
+							tt_character_id: characterIds[index]?.characterId ?? -1
 						}))
 					)
 				if (error) throw new Error(error.message, { cause: error })
@@ -236,7 +236,7 @@ const changeEncounterAction = createServerFn({ method: 'POST' })
 							q: enemy.q,
 							r: enemy.r,
 							s: enemy.s,
-							character_id: characterId
+							tt_character_id: characterId
 						} satisfies TablesUpdate<'tabletop_tiles'>
 					})
 				)

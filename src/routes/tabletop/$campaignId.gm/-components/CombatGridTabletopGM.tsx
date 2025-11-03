@@ -1,4 +1,4 @@
-import { Avatar, Box } from '@mantine/core'
+import { Avatar, type AvatarProps, Box } from '@mantine/core'
 import { type DragEventHandler } from 'react'
 import Hex from '~/components/HoneycombGrid/Hex'
 import useHoneycombGridSize from '~/components/HoneycombGrid/useHoneycombGridSize'
@@ -32,6 +32,12 @@ export default function CombatGridTabletopGM() {
 	)
 }
 
+const avatarSettings = {
+	pos: 'absolute',
+	left: '40%',
+	top: '40%'
+} satisfies AvatarProps
+
 type CharacterIconProps = {
 	cord: CombatTileCord
 }
@@ -46,16 +52,16 @@ function CharacterIcon({ cord }: CharacterIconProps) {
 
 	switch (tileData.characterType) {
 		case 'HERO': {
-			const heroData = Object.values(heroesData).find(hero => hero.tabletopHero?.characterId === tileData.characterId)
+			const heroData = Object.values(heroesData).find(hero => hero.tabletopHero?.tabletopCharacterId === tileData.tabletopCharacterId)
 			if (heroData) {
-				return <Avatar name={heroData.heroName} color='green' pos='absolute' left='40%' top='40%' />
+				return <Avatar name={heroData.heroName} color='green' {...avatarSettings} />
 			}
 			break
 		}
 		case 'ENEMY': {
-			const enemyData = Object.values(enemiesData).find(enemy => enemy.tabletopCharacter === tileData.characterId)
-			if (enemyData) {
-				return <Avatar name={enemyData.data.tabletopEnemy?.enemyInfo.enemyName} color='red' pos='absolute' left='40%' top='40%' />
+			const enemyData = Object.values(enemiesData).find(enemy => enemy.tabletopCharacter === tileData.tabletopCharacterId)
+			if (enemyData?.data) {
+				return <Avatar name={enemyData.data.tabletopEnemy?.enemyInfo.enemyName} color='red' {...avatarSettings} />
 			}
 			break
 		}

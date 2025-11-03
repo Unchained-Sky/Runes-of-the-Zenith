@@ -9,7 +9,11 @@ type RequireAccountProps = {
 export const requireAccount = serverOnly(async (props: RequireAccountProps = {}) => {
 	const supabase = getSupabaseServerClient()
 	const { data: userData } = await supabase.auth.getUser()
-	if (!userData.user) throw redirect({ to: '/auth/login', params: { backlink: props.backlink } })
+	if (!userData.user) throw redirect({
+		to: '/auth/login',
+		params: { backlink: props.backlink },
+		search: { backlink: props.backlink ?? '/' }
+	})
 	return {
 		supabase,
 		user: userData.user

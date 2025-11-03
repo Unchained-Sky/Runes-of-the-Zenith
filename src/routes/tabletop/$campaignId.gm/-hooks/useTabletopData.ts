@@ -33,7 +33,7 @@ const nameLoader = createServerFn({ method: 'GET' })
 	})
 
 export const tabletopNameQueryOptions = (campaignId: number) => queryOptions({
-	queryKey: ['tabletop', 'name', campaignId],
+	queryKey: [campaignId, 'tabletop', 'name'],
 	queryFn: () => nameLoader({ data: { campaignId } }),
 	staleTime: Infinity
 })
@@ -59,7 +59,7 @@ const tilesLoader = createServerFn({ method: 'GET' })
 				r,
 				s,
 				character: tabletop_characters (
-					characterId: character_id,
+					tabletopCharacterId: tt_character_id,
 					characterType: character_type
 				)
 			`)
@@ -70,7 +70,7 @@ const tilesLoader = createServerFn({ method: 'GET' })
 			`${tile.q},${tile.r},${tile.s}` as const,
 			tile.character
 				? {
-					characterId: tile.character.characterId,
+					tabletopCharacterId: tile.character.tabletopCharacterId,
 					characterType: tile.character.characterType
 				}
 				: null
@@ -78,7 +78,7 @@ const tilesLoader = createServerFn({ method: 'GET' })
 	})
 
 export const tabletopTilesQueryOptions = (campaignId: number) => queryOptions({
-	queryKey: ['tabletop', 'tiles', campaignId, 'characters'],
+	queryKey: [campaignId, 'tabletop', 'tiles', 'characters'],
 	queryFn: () => tilesLoader({ data: { campaignId } })
 })
 
@@ -121,7 +121,7 @@ const mapTilesLoader = createServerFn({ method: 'GET' })
 	})
 
 export const tabletopMapTilesQueryOptions = (campaignId: number) => queryOptions({
-	queryKey: ['tabletop', 'tiles', campaignId, 'map'],
+	queryKey: [campaignId, 'tabletop', 'tiles', 'map'],
 	queryFn: () => mapTilesLoader({ data: { campaignId } })
 })
 
@@ -155,7 +155,7 @@ const currentEncounterLoader = createServerFn({ method: 'GET' })
 	})
 
 export const tabletopCurrentEncounterQueryOptions = (campaignId: number) => queryOptions({
-	queryKey: ['tabletop', 'encounter-name', campaignId],
+	queryKey: [campaignId, 'tabletop', 'encounter-name'],
 	queryFn: () => currentEncounterLoader({ data: { campaignId } })
 })
 
@@ -217,7 +217,7 @@ const encounterListLoader = createServerFn({ method: 'GET' })
 	})
 
 export const tabletopEncounterListQueryOptions = (campaignId: number) => queryOptions({
-	queryKey: ['tabletop', 'encounters', campaignId],
+	queryKey: [campaignId, 'tabletop', 'encounters'],
 	queryFn: () => encounterListLoader({ data: { campaignId } })
 })
 
@@ -245,7 +245,7 @@ const heroListLoader = createServerFn({ method: 'GET' })
 	})
 
 export const tabletopHeroListQueryOptions = (campaignId: number) => queryOptions({
-	queryKey: ['tabletop', 'hero-list', campaignId],
+	queryKey: [campaignId, 'tabletop', 'hero-list'],
 	queryFn: () => heroListLoader({ data: { campaignId } }),
 	staleTime: Infinity
 })
@@ -270,7 +270,7 @@ const heroLoader = createServerFn({ method: 'GET' })
 				heroId: hero_id,
 				heroName: hero_name,
 				tabletopHero: tabletop_heroes (
-					characterId: character_id
+					tabletopCharacterId: tt_character_id
 				)
 			`)
 			.eq('hero_id', heroId)
@@ -282,7 +282,7 @@ const heroLoader = createServerFn({ method: 'GET' })
 	})
 
 const tabletopHeroQueryOptions = (campaignId: number, heroId: number) => queryOptions({
-	queryKey: ['tabletop', 'hero', campaignId, heroId],
+	queryKey: [campaignId, 'tabletop', 'hero', heroId],
 	queryFn: () => heroLoader({ data: { campaignId, heroId } })
 })
 
@@ -318,18 +318,16 @@ const enemyListLoader = createServerFn({ method: 'GET' })
 
 		const { data, error } = await supabase
 			.from('tabletop_characters')
-			.select('characterId: character_id')
+			.select('tabletopCharacterId: tt_character_id')
 			.eq('campaign_id', campaignId)
 			.eq('character_type', 'ENEMY')
 		if (error) throw new Error(error.message, { cause: error })
 
-		console.log(data)
-
-		return data.map(enemy => enemy.characterId)
+		return data.map(enemy => enemy.tabletopCharacterId)
 	})
 
 export const tabletopEnemyListQueryOptions = (campaignId: number) => queryOptions({
-	queryKey: ['tabletop', 'enemy-list', campaignId],
+	queryKey: [campaignId, 'tabletop', 'enemy-list'],
 	queryFn: () => enemyListLoader({ data: { campaignId } })
 })
 
@@ -357,9 +355,9 @@ const enemyLoader = createServerFn({ method: 'GET' })
 					)
 				)
 			`)
-			.eq('character_id', characterId)
+			.eq('tt_character_id', characterId)
 			.limit(1)
-			.single()
+			.maybeSingle()
 		if (error) throw new Error(error.message, { cause: error })
 
 		return {
@@ -369,15 +367,15 @@ const enemyLoader = createServerFn({ method: 'GET' })
 	})
 
 const tabletopEnemyQueryOptions = (campaignId: number, characterId: number) => queryOptions({
-	queryKey: ['tabletop', 'enemy', campaignId, characterId],
+	queryKey: [campaignId, 'tabletop', 'enemy', characterId],
 	queryFn: () => enemyLoader({ data: { characterId } })
 })
 
 export function useTabletopEnemies() {
 	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useLoaderData()
-	const characterIds = useTabletopEnemyList().data
+	const { data: tabletopCharacterIds } = useTabletopEnemyList()
 	const queries = useSuspenseQueries({
-		queries: characterIds.map(characterIds => tabletopEnemyQueryOptions(campaignId, characterIds))
+		queries: tabletopCharacterIds.map(tabletopCharacterId => tabletopEnemyQueryOptions(campaignId, tabletopCharacterId))
 	})
 
 	const combine = typedObject.fromEntries(queries.map(enemy => [

@@ -43,8 +43,8 @@ function useTabletopHeroesSubscription({ supabase, campaignId }: SubscribeHookPr
 				switch (payload.eventType) {
 					case 'INSERT': {
 						const { hero_id } = payload.new as TabletopHeroes
-						void queryClient.invalidateQueries({ queryKey: ['tabletop', 'hero', campaignId, hero_id] })
-						void queryClient.invalidateQueries({ queryKey: ['tabletop', 'tiles', campaignId] })
+						void queryClient.invalidateQueries({ queryKey: [campaignId, 'tabletop', 'hero', hero_id] })
+						void queryClient.invalidateQueries({ queryKey: [campaignId, 'tabletop', 'tiles'] })
 						break
 					}
 					case 'UPDATE': {
@@ -73,7 +73,7 @@ function useTabletopHeroesSubscription({ supabase, campaignId }: SubscribeHookPr
 					}
 					case 'DELETE': {
 						const { hero_id } = payload.old as TabletopHeroes
-						queryClient.setQueriesData({ queryKey: ['tabletop', 'hero', campaignId, hero_id] }, (oldData: TabletopHeroesCache[number]) => {
+						queryClient.setQueriesData({ queryKey: [campaignId, 'tabletop', 'hero', hero_id] }, (oldData: TabletopHeroesCache[number]) => {
 							return {
 								...oldData,
 								tabletopHero: null
@@ -108,14 +108,14 @@ function useTabletopInfoSubscription({ supabase, campaignId }: SubscribeHookProp
 				switch (payload.eventType) {
 					case 'INSERT':
 					case 'UPDATE': {
-						void queryClient.invalidateQueries({ queryKey: ['tabletop', 'tiles', campaignId] })
-						void queryClient.invalidateQueries({ queryKey: ['tabletop', 'encounter-name', campaignId] })
-						void queryClient.invalidateQueries({ queryKey: ['tabletop', 'enemy', campaignId] })
+						void queryClient.invalidateQueries({ queryKey: [campaignId, 'tabletop', 'tiles'] })
+						void queryClient.invalidateQueries({ queryKey: [campaignId, 'tabletop', 'encounter-name'] })
+						void queryClient.invalidateQueries({ queryKey: [campaignId, 'tabletop', 'enemy'] })
 						break
 					}
 					case 'DELETE': {
-						void queryClient.cancelQueries({ queryKey: ['tabletop', 'tiles', campaignId] })
-						queryClient.setQueryData(['tabletop', 'tiles', campaignId], [])
+						void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'tiles'] })
+						queryClient.setQueryData([campaignId, 'tabletop', 'tiles'], [])
 						break
 					}
 				}
@@ -147,23 +147,23 @@ function useTabletopCharactersSubscription({ supabase, campaignId }: SubscribeHo
 
 				switch (payload.eventType) {
 					case 'INSERT': {
-						void queryClient.invalidateQueries({ queryKey: ['tabletop', 'tiles', campaignId] })
+						void queryClient.invalidateQueries({ queryKey: [campaignId, 'tabletop', 'tiles'] })
 						break
 					}
 					case 'UPDATE': {
-						void queryClient.invalidateQueries({ queryKey: ['tabletop', 'tiles', campaignId] })
+						void queryClient.invalidateQueries({ queryKey: [campaignId, 'tabletop', 'tiles'] })
 						break
 					}
 					case 'DELETE': {
-						const { character_id } = payload.old as TabletopCharacters
+						const { tt_character_id } = payload.old as TabletopCharacters
 
 						type TabletopTilesCache = ReturnType<typeof useTabletopTiles>['data']
-						const tilesCache = queryClient.getQueryData(['tabletop', 'tiles', 'characters', campaignId]) as TabletopTilesCache
+						const tilesCache = queryClient.getQueryData([campaignId, 'tabletop', 'tiles', 'characters']) as TabletopTilesCache
 						const tilesArray = typedObject.entries(tilesCache)
-						const tileIndex = tilesArray.findIndex(([_cord, tile]) => tile && tile.characterType === 'HERO' && tile.characterId === character_id)
+						const tileIndex = tilesArray.findIndex(([_cord, tile]) => tile && tile.characterType === 'HERO' && tile.tabletopCharacterId === tt_character_id)
 						const tileData = tilesArray[tileIndex]
 						if (tileData) {
-							void queryClient.cancelQueries({ queryKey: ['tabletop', 'tiles', campaignId] })
+							void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'tiles'] })
 							queryClient.setQueryData(['tabletop', 'tiles', 'characters', campaignId], (oldData: TabletopTilesCache) => {
 								return {
 									...oldData,

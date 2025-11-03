@@ -107,7 +107,7 @@ const addHeroAction = createServerFn({ method: 'POST' })
 		// Check if the tile is already occupied
 		const tileCharacter = await supabase
 			.from('tabletop_tiles')
-			.select('characterId: character_id')
+			.select('characterId: tt_character_id')
 			.eq('q', q)
 			.eq('r', r)
 			.eq('s', s)
@@ -121,7 +121,7 @@ const addHeroAction = createServerFn({ method: 'POST' })
 				.from('tabletop_heroes')
 				.select(`
 					tabletopCharacters: tabletop_characters (
-						characterId: character_id
+						characterId: tt_character_id
 					)
 				`)
 				.eq('hero_id', heroId)
@@ -137,7 +137,7 @@ const addHeroAction = createServerFn({ method: 'POST' })
 					campaign_id: campaignId,
 					character_type: 'HERO'
 				})
-				.select('characterId: character_id')
+				.select('characterId: tt_character_id')
 				.single()
 			if (characterInsertError) throw new Error(characterInsertError.message, { cause: characterInsertError })
 
@@ -145,7 +145,7 @@ const addHeroAction = createServerFn({ method: 'POST' })
 				.from('tabletop_heroes')
 				.insert({
 					hero_id: heroId,
-					character_id: data.characterId
+					tt_character_id: data.characterId
 				})
 			if (heroInsertError) throw new Error(heroInsertError.message, { cause: heroInsertError })
 
