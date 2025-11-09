@@ -6,10 +6,12 @@ import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { Fragment, type ReactNode } from 'react'
 import ContextMenu from '~/components/ContextMenu'
+import { type TablesInsert } from '~/supabase/databaseTypes'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireAccount } from '~/supabase/requireAccount'
 import { type CombatTileCord } from '~/types/gameTypes/combatMap'
-import { useTabletopHeroes } from '../-hooks/useTabletopData'
+import { useTabletopHeroes } from '../-hooks/tabletopData/useTabletopHeroes'
+import { useTabletopTiles } from '../-hooks/tabletopData/useTabletopTiles'
 
 type HexContextMenuProps = {
 	children: ReactNode
@@ -37,10 +39,9 @@ type HeroesProps = {
 
 function Heroes({ cord }: HeroesProps) {
 	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useLoaderData()
-	const { data: heroes } = useTabletopHeroes()
 
-	const inactiveHeroes = Object.values(heroes)
-		.filter(({ tabletopHero }) => tabletopHero === null)
+	const { data: heroesData } = useTabletopHeroes()
+	const inactiveHeroes = heroesData.getInactive()
 
 	const addHero = useMutation({
 		mutationFn: addHeroAction,
@@ -53,26 +54,30 @@ function Heroes({ cord }: HeroesProps) {
 		}
 	})
 
+	const { data: tilesData } = useTabletopTiles()
+	const tile = tilesData[`${cord[0]},${cord[1]},${cord[2]}`]
+
 	return (
 		<Menu.Sub>
 			<Menu.Sub.Target>
-				<Menu.Sub.Item disabled={!inactiveHeroes.length}>Add Hero</Menu.Sub.Item>
+				<Menu.Sub.Item disabled={!inactiveHeroes.length || !!tile?.characterType}>Add Hero</Menu.Sub.Item>
 			</Menu.Sub.Target>
 
 			<Menu.Sub.Dropdown>
-				{inactiveHeroes.map(hero => {
+				{inactiveHeroes.map(heroId => {
+					const heroData = heroesData.getFromHeroId(heroId)
 					return (
 						<Menu.Item
-							key={hero.heroId}
+							key={heroId}
 							onClick={() => addHero.mutate({
 								data: {
-									heroId: hero.heroId,
+									heroId,
 									campaignId,
 									cord
 								}
 							})}
 						>
-							{hero.heroName}
+							{heroData.heroName}
 						</Menu.Item>
 					)
 				})}
@@ -146,7 +151,7 @@ const addHeroAction = createServerFn({ method: 'POST' })
 				.insert({
 					hero_id: heroId,
 					tt_character_id: data.characterId
-				})
+				} satisfies TablesInsert<'tabletop_heroes'>)
 			if (heroInsertError) throw new Error(heroInsertError.message, { cause: heroInsertError })
 
 			return data.characterId
@@ -158,7 +163,7 @@ const addHeroAction = createServerFn({ method: 'POST' })
 		const { count: characterTileCount } = await supabase
 			.from('tabletop_tiles')
 			.select('', { count: 'exact' })
-			.eq('character_id', characterId)
+			.eq('tt_character_id', characterId)
 		if (characterTileCount) throw new Error('Character already has a tile')
 
 		// Insert the hero on the tile
@@ -169,7 +174,7 @@ const addHeroAction = createServerFn({ method: 'POST' })
 				q,
 				r,
 				s,
-				character_id: characterId
-			})
+				tt_character_id: characterId
+			} satisfies TablesInsert<'tabletop_tiles'>)
 		if (tileInsertError) throw new Error(tileInsertError.message, { cause: tileInsertError })
 	})

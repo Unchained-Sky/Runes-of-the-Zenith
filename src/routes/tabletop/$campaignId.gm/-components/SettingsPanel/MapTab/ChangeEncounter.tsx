@@ -8,7 +8,8 @@ import { useState } from 'react'
 import { type TablesInsert, type TablesUpdate } from '~/supabase/databaseTypes'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireAccount } from '~/supabase/requireAccount'
-import { useTabletopCurrentEncounter, useTabletopEncounterList } from '../../../-hooks/useTabletopData'
+import { useTabletopCurrentEncounter } from '../../../-hooks/tabletopData/useTabletopCurrentEncounter'
+import { useTabletopEncounterList } from '../../../-hooks/tabletopData/useTabletopEncounterList'
 
 export default function ChangeEncounter() {
 	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useParams()

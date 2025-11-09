@@ -3,8 +3,14 @@ import { Fragment } from 'react'
 import { safeParseInt } from '~/utils/safeParseInt'
 import CombatGridTabletopGM from './-components/CombatGridTabletopGM'
 import SettingsPanel from './-components/SettingsPanel'
-import { tabletopCurrentEncounterQueryOptions, tabletopEncounterListQueryOptions, tabletopEnemyListQueryOptions, tabletopHeroListQueryOptions, tabletopMapTilesQueryOptions, tabletopNameQueryOptions, tabletopTilesQueryOptions } from './-hooks/useTabletopData'
-import useTabletopGMSubscription from './-hooks/useTabletopGMSubscription'
+import { tabletopCurrentEncounterQueryOptions } from './-hooks/tabletopData/useTabletopCurrentEncounter'
+import { tabletopEncounterListQueryOptions } from './-hooks/tabletopData/useTabletopEncounterList'
+import { tabletopEnemyListQueryOptions } from './-hooks/tabletopData/useTabletopEnemyList'
+import { tabletopHeroListQueryOptions } from './-hooks/tabletopData/useTabletopHeroList'
+import { tabletopMapTilesQueryOptions } from './-hooks/tabletopData/useTabletopMapTiles'
+import { tabletopNameQueryOptions } from './-hooks/tabletopData/useTabletopName'
+import { tabletopTilesQueryOptions } from './-hooks/tabletopData/useTabletopTiles'
+import useTabletopGMSubscription from './-hooks/useTabletopSubscription'
 
 export const Route = createFileRoute('/tabletop/$campaignId/gm/')({
 	component: RouteComponent,

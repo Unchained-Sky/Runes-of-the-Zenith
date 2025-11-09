@@ -3,7 +3,10 @@ import { type DragEventHandler } from 'react'
 import Hex from '~/components/HoneycombGrid/Hex'
 import useHoneycombGridSize from '~/components/HoneycombGrid/useHoneycombGridSize'
 import { type CombatTileCord } from '~/types/gameTypes/combatMap'
-import { useTabletopEnemies, useTabletopHeroes, useTabletopMapTiles, useTabletopTiles } from '../-hooks/useTabletopData'
+import { useTabletopEnemies } from '../-hooks/tabletopData/useTabletopEnemies'
+import { useTabletopHeroes } from '../-hooks/tabletopData/useTabletopHeroes'
+import { useTabletopMapTiles } from '../-hooks/tabletopData/useTabletopMapTiles'
+import { useTabletopTiles } from '../-hooks/tabletopData/useTabletopTiles'
 import HexContextMenu from './HexContextMenu'
 
 export default function CombatGridTabletopGM() {
@@ -52,16 +55,16 @@ function CharacterIcon({ cord }: CharacterIconProps) {
 
 	switch (tileData.characterType) {
 		case 'HERO': {
-			const heroData = Object.values(heroesData).find(hero => hero.tabletopHero?.tabletopCharacterId === tileData.tabletopCharacterId)
+			const heroData = heroesData.getFromCharacterId(tileData.tabletopCharacterId)
 			if (heroData) {
 				return <Avatar name={heroData.heroName} color='green' {...avatarSettings} />
 			}
 			break
 		}
 		case 'ENEMY': {
-			const enemyData = Object.values(enemiesData).find(enemy => enemy.tabletopCharacter === tileData.tabletopCharacterId)
-			if (enemyData?.data) {
-				return <Avatar name={enemyData.data.tabletopEnemy?.enemyInfo.enemyName} color='red' {...avatarSettings} />
+			const enemyData = enemiesData[tileData.tabletopCharacterId]
+			if (enemyData) {
+				return <Avatar name={enemyData.tabletopEnemy.enemyInfo.enemyName} color='red' {...avatarSettings} />
 			}
 			break
 		}

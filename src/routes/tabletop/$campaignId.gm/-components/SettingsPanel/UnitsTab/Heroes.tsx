@@ -10,10 +10,10 @@ import { type } from 'arktype'
 import { Fragment } from 'react'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireAccount } from '~/supabase/requireAccount'
-import { useTabletopHeroes } from '../../../-hooks/useTabletopData'
+import { useTabletopHeroes } from '../../../-hooks/tabletopData/useTabletopHeroes'
 
 export default function Heroes() {
-	const { data: heroes } = useTabletopHeroes()
+	const { data: heroesData } = useTabletopHeroes()
 
 	return (
 		<Stack gap={0}>
@@ -29,12 +29,12 @@ export default function Heroes() {
 					</Table.Tr>
 				</Table.Thead>
 				<Table.Tbody>
-					{Object.values(heroes).map(hero => {
-						if (hero.tabletopHero === null) return null
+					{heroesData.getAll().map(heroData => {
+						if (heroData.tabletopCharacter === null) return null
 						return (
 							<Hero
-								key={hero.heroId}
-								heroId={hero.heroId}
+								key={heroData.heroId}
+								heroId={heroData.heroId}
 							/>
 						)
 					})}
@@ -50,7 +50,7 @@ type HeroProps = {
 
 function Hero({ heroId }: HeroProps) {
 	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useLoaderData()
-	const { heroName, tabletopHero } = useTabletopHeroes().data[heroId] ?? {}
+	const { heroName, tabletopCharacter } = useTabletopHeroes().data.getFromHeroId(heroId)
 
 	const [editMode, editModeHandlers] = useDisclosure(false)
 
@@ -84,7 +84,7 @@ function Hero({ heroId }: HeroProps) {
 	// return `${position.q},${position.r},${position.s}`
 	// }
 
-	if (!tabletopHero) return null
+	if (!tabletopCharacter) return null
 
 	return (
 		<Fragment>
@@ -128,7 +128,7 @@ function Hero({ heroId }: HeroProps) {
 									onClick={() => removeHero.mutate({
 										data: {
 											campaignId,
-											characterId: tabletopHero.tabletopCharacterId
+											tabletopCharacterId: tabletopCharacter.tabletopCharacterId
 										}
 									})}
 								>
@@ -144,13 +144,13 @@ function Hero({ heroId }: HeroProps) {
 }
 
 const removeHeroSchema = type({
-	characterId: 'number',
+	tabletopCharacterId: 'number',
 	campaignId: 'number'
 })
 
 const removeHeroAction = createServerFn({ method: 'POST' })
 	.validator(removeHeroSchema)
-	.handler(async ({ data: { campaignId, characterId } }) => {
+	.handler(async ({ data: { campaignId, tabletopCharacterId } }) => {
 		const { supabase, user } = await requireAccount()
 
 		// Check if the user is the GM
@@ -168,7 +168,7 @@ const removeHeroAction = createServerFn({ method: 'POST' })
 		const { error } = await serviceClient
 			.from('tabletop_characters')
 			.delete()
-			.eq('character_id', characterId)
+			.eq('tt_character_id', tabletopCharacterId)
 		if (error) throw new Error(error.message, { cause: error })
 	})
 
@@ -186,7 +186,7 @@ const numberInputProps: NumberInputProps = {
 }
 
 function HeroEditModal({ heroId, opened, close }: HeroEditModalProps) {
-	const { heroName, tabletopHero: _ } = useTabletopHeroes().data[heroId] ?? {}
+	const { heroName } = useTabletopHeroes().data.getFromHeroId(heroId)
 
 	const form = useForm({
 		mode: 'uncontrolled',
