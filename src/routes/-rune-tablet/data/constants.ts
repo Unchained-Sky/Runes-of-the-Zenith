@@ -1,3 +1,0 @@
-export const RUNE_SQUARE_SIZE = 48
-export const TABLE_SCALE = 2
-export const TABLET_SQUARE_SIZE = RUNE_SQUARE_SIZE * TABLE_SCALE

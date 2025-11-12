@@ -2,7 +2,7 @@ import { getRouteApi } from '@tanstack/react-router'
 import useMountEffect from '~/hooks/useMountEffect'
 import { type Tables } from '~/supabase/databaseTypes'
 import { typedObject } from '~/types/typedObject'
-import { type useTabletopTiles } from '../tabletopData/useTabletopTiles'
+import { type TabletopTiles } from '../tabletopData/useTabletopTiles'
 import { LOG_SUBSCRIPTION_PAYLOADS, type SubscribeHookProps } from './useTabletopSubscription'
 
 export default function useTabletopCharactersSubscription({ supabase, campaignId }: SubscribeHookProps) {
@@ -33,15 +33,13 @@ export default function useTabletopCharactersSubscription({ supabase, campaignId
 					case 'DELETE': {
 						const { tt_character_id } = payload.old as TabletopCharacters
 
-						type TabletopTilesCache = ReturnType<typeof useTabletopTiles>['data']
-						// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-						const tilesCache = queryClient.getQueryData<TabletopTilesCache>([campaignId, 'tabletop', 'tiles', 'characters'])!
+						const tilesCache = queryClient.getQueryData<TabletopTiles>([campaignId, 'tabletop', 'tiles', 'characters']) ?? {}
 						const tilesArray = typedObject.entries(tilesCache)
 						const tileIndex = tilesArray.findIndex(([_cord, tile]) => tile && tile.characterType === 'HERO' && tile.tabletopCharacterId === tt_character_id)
 						const tileData = tilesArray[tileIndex]
 						if (tileData) {
-							void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'tiles'] })
-							queryClient.setQueryData(['tabletop', 'tiles', 'characters', campaignId], (oldData: TabletopTilesCache) => {
+							void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'tiles', 'characters'] })
+							queryClient.setQueryData([campaignId, 'tabletop', 'tiles', 'characters'], (oldData: TabletopTiles) => {
 								return {
 									...oldData,
 									[tileData[0]]: null

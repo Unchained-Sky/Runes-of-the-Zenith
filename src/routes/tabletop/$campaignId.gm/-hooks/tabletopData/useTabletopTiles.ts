@@ -48,3 +48,6 @@ export function useTabletopTiles() {
 	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useLoaderData()
 	return useSuspenseQuery(tabletopTilesQueryOptions(campaignId))
 }
+
+export type TabletopTiles = ReturnType<typeof useTabletopTiles>['data']
+export type TabletopTile = NonNullable<TabletopTiles[keyof TabletopTiles]>

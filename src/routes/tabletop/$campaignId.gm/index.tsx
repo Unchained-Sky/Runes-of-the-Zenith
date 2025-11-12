@@ -1,7 +1,7 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
-import { Fragment } from 'react'
 import { safeParseInt } from '~/utils/safeParseInt'
 import CombatGridTabletopGM from './-components/CombatGridTabletopGM'
+import DragDrop from './-components/DragDrop'
 import SettingsPanel from './-components/SettingsPanel'
 import { tabletopCurrentEncounterQueryOptions } from './-hooks/tabletopData/useTabletopCurrentEncounter'
 import { tabletopEncounterListQueryOptions } from './-hooks/tabletopData/useTabletopEncounterList'
@@ -56,10 +56,10 @@ function RouteComponent() {
 	useTabletopGMSubscription()
 
 	return (
-		<Fragment>
+		<DragDrop>
 			<CombatGridTabletopGM />
 
 			<SettingsPanel />
-		</Fragment>
+		</DragDrop>
 	)
 }

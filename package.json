@@ -22,8 +22,8 @@
     "cf:deploy": "npm run vite:build && wrangler deploy"
   },
   "dependencies": {
-    "@dnd-kit/core": "^6.3.1",
-    "@dnd-kit/modifiers": "^9.0.0",
+    "@dnd-kit/helpers": "^0.1.21",
+    "@dnd-kit/react": "^0.1.21",
     "@mantine/core": "^8.3.6",
     "@mantine/form": "^8.3.6",
     "@mantine/hooks": "^8.3.6",
@@ -43,7 +43,6 @@
     "arktype": "^2.1.25",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-zoom-pan-pinch": "^3.7.0",
     "vite-tsconfig-paths": "^5.1.4",
     "zustand": "^5.0.8"
   },
