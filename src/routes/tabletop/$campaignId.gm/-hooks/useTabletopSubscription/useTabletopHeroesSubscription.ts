@@ -4,6 +4,8 @@ import { type Tables } from '~/supabase/databaseTypes'
 import { type HeroData } from '../tabletopData/useTabletopHeroes'
 import { LOG_SUBSCRIPTION_PAYLOADS, type SubscribeHookProps } from './useTabletopSubscription'
 
+type TabletopHeroesTable = Tables<'tabletop_heroes'>
+
 export default function useTabletopHeroesSubscription({ supabase, campaignId }: SubscribeHookProps) {
 	const { queryClient } = getRouteApi('/tabletop/$campaignId/gm/').useRouteContext()
 
@@ -16,19 +18,17 @@ export default function useTabletopHeroesSubscription({ supabase, campaignId }: 
 				schema: 'public',
 				table: 'tabletop_heroes'
 			}, payload => {
-				type TabletopHeroes = Tables<'tabletop_heroes'>
-
 				if (LOG_SUBSCRIPTION_PAYLOADS) console.log(payload)
 
 				switch (payload.eventType) {
 					case 'INSERT': {
-						const { hero_id } = payload.new as TabletopHeroes
+						const { hero_id } = payload.new as TabletopHeroesTable
 						void queryClient.invalidateQueries({ queryKey: [campaignId, 'tabletop', 'hero', hero_id] })
 						void queryClient.invalidateQueries({ queryKey: [campaignId, 'tabletop', 'tiles'] })
 						break
 					}
 					case 'UPDATE': {
-						const { hero_id: _ } = payload.new as TabletopHeroes
+						const { hero_id: _ } = payload.new as TabletopHeroesTable
 						break
 
 						// const heroesCache = queryClient.getQueryData(['tabletop', 'heroes', campaignId]) as TabletopHeroesCache
@@ -52,7 +52,7 @@ export default function useTabletopHeroesSubscription({ supabase, campaignId }: 
 						// break
 					}
 					case 'DELETE': {
-						const { hero_id } = payload.old as TabletopHeroes
+						const { hero_id } = payload.old as TabletopHeroesTable
 						queryClient.setQueriesData({ queryKey: [campaignId, 'tabletop', 'hero', hero_id] }, (oldData: HeroData) => {
 							return {
 								...oldData,
@@ -64,6 +64,7 @@ export default function useTabletopHeroesSubscription({ supabase, campaignId }: 
 				}
 			})
 			.subscribe(status => console.log(`tabletop_heroes:${campaignId} ${status}`))
+
 		return () => {
 			const channel = supabase.channel(channelName)
 			void supabase.removeChannel(channel)

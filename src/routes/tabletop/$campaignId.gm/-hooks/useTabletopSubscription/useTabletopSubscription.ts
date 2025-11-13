@@ -5,6 +5,7 @@ import { useSupabase } from '~/supabase/useSupabase'
 import useTabletopCharactersSubscription from './useTabletopCharactersSubscription'
 import useTabletopHeroesSubscription from './useTabletopHeroesSubscription'
 import useTabletopInfoSubscription from './useTabletopInfoSubscription'
+import useTabletopTilesSubscription from './useTabletopTilesSubscription'
 
 export const LOG_SUBSCRIPTION_PAYLOADS = process.env.NODE_ENV === 'development'
 
@@ -13,9 +14,10 @@ export default function useTabletopGMSubscription() {
 
 	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useLoaderData()
 
+	useTabletopCharactersSubscription({ supabase, campaignId })
 	useTabletopHeroesSubscription({ supabase, campaignId })
 	useTabletopInfoSubscription({ supabase, campaignId })
-	useTabletopCharactersSubscription({ supabase, campaignId })
+	useTabletopTilesSubscription({ supabase, campaignId })
 }
 
 export type SubscribeHookProps = {

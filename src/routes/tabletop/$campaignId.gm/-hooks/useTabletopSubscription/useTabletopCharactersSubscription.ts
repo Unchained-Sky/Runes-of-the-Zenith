@@ -5,6 +5,8 @@ import { typedObject } from '~/types/typedObject'
 import { type TabletopTiles } from '../tabletopData/useTabletopTiles'
 import { LOG_SUBSCRIPTION_PAYLOADS, type SubscribeHookProps } from './useTabletopSubscription'
 
+type TabletopCharacters = Tables<'tabletop_characters'>
+
 export default function useTabletopCharactersSubscription({ supabase, campaignId }: SubscribeHookProps) {
 	const { queryClient } = getRouteApi('/tabletop/$campaignId/gm/').useRouteContext()
 
@@ -17,8 +19,6 @@ export default function useTabletopCharactersSubscription({ supabase, campaignId
 				schema: 'public',
 				table: 'tabletop_characters'
 			}, payload => {
-				type TabletopCharacters = Tables<'tabletop_characters'>
-
 				if (LOG_SUBSCRIPTION_PAYLOADS) console.log(payload)
 
 				switch (payload.eventType) {
