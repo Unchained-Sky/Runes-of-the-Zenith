@@ -7,7 +7,7 @@ import { type } from 'arktype'
 import { useState } from 'react'
 import { type TablesInsert, type TablesUpdate } from '~/supabase/databaseTypes'
 import { getServiceClient } from '~/supabase/getServiceClient'
-import { requireAccount } from '~/supabase/requireAccount'
+import { requireGM } from '~/supabase/requireGM'
 import { useTabletopCurrentEncounter } from '../../../-hooks/tabletopData/useTabletopCurrentEncounter'
 import { useTabletopEncounterList } from '../../../-hooks/tabletopData/useTabletopEncounterList'
 
@@ -130,19 +130,7 @@ const changeEncounterSchema = type({
 const changeEncounterAction = createServerFn({ method: 'POST' })
 	.validator(changeEncounterSchema)
 	.handler(async ({ data: { campaignId, encounterId } }) => {
-		const { supabase, user } = await requireAccount()
-
-		{
-			// check if user is GM
-			const { error } = await supabase
-				.from('campaign_info')
-				.select('user_id')
-				.eq('campaign_id', campaignId)
-				.eq('user_id', user.id)
-				.limit(1)
-				.single()
-			if (error) throw new Error(error.message, { cause: error })
-		}
+		const { supabase } = await requireGM({ campaignId })
 
 		// check if encounter exists and get data
 		const { data: encounterData, error: encounterError } = await supabase

@@ -44,7 +44,7 @@ const tabletopHeroQueryOptions = (campaignId: number, heroId: number) => queryOp
 })
 
 export type HeroData = Awaited<ReturnType<typeof heroLoader>>
-interface HeroDataTabletop extends HeroData {
+export interface HeroDataTabletop extends HeroData {
 	tabletopCharacter: NonNullable<HeroData['tabletopCharacter']>
 }
 

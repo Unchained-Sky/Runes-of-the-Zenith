@@ -8,7 +8,7 @@ import { Fragment, type ReactNode } from 'react'
 import ContextMenu from '~/components/ContextMenu'
 import { type TablesInsert } from '~/supabase/databaseTypes'
 import { getServiceClient } from '~/supabase/getServiceClient'
-import { requireAccount } from '~/supabase/requireAccount'
+import { requireGM } from '~/supabase/requireGM'
 import { type CombatTileCord } from '~/types/gameTypes/combatMap'
 import { useTabletopHeroes } from '../-hooks/tabletopData/useTabletopHeroes'
 import { useTabletopTiles } from '../-hooks/tabletopData/useTabletopTiles'
@@ -95,31 +95,23 @@ const addHeroSchema = type({
 const addHeroAction = createServerFn({ method: 'POST' })
 	.validator(addHeroSchema)
 	.handler(async ({ data: { heroId, campaignId, cord: [q, r, s] } }) => {
-		const { supabase, user } = await requireAccount()
-
-		// Check if the user is the GM
-		const gmCheck = await supabase
-			.from('campaign_info')
-			.select('gmUserId: user_id')
-			.eq('campaign_id', campaignId)
-			.limit(1)
-			.single()
-		if (gmCheck.error) throw new Error(gmCheck.error.message, { cause: gmCheck.error })
-		if (gmCheck.data.gmUserId !== user.id) throw new Error('You are not the GM of this campaign')
+		const { supabase } = await requireGM({ campaignId })
 
 		const serviceClient = getServiceClient()
 
-		// Check if the tile is already occupied
-		const tileCharacter = await supabase
-			.from('tabletop_tiles')
-			.select('characterId: tt_character_id')
-			.eq('q', q)
-			.eq('r', r)
-			.eq('s', s)
-			.limit(1)
-			.maybeSingle()
-		if (tileCharacter.error) throw new Error(tileCharacter.error.message, { cause: tileCharacter.error })
-		if (tileCharacter.data?.characterId) throw new Error('Tile already has a character')
+		{
+			// Check if the tile is already occupied
+			const { data, error } = await supabase
+				.from('tabletop_tiles')
+				.select('characterId: tt_character_id')
+				.eq('q', q)
+				.eq('r', r)
+				.eq('s', s)
+				.limit(1)
+				.maybeSingle()
+			if (error) throw new Error(error.message, { cause: error })
+			if (data?.characterId) throw new Error('Tile already has a character')
+		}
 
 		const getCharacterId = async () => {
 			const { data: characterData, error: characterError } = await supabase
@@ -159,22 +151,26 @@ const addHeroAction = createServerFn({ method: 'POST' })
 
 		const characterId = await getCharacterId()
 
-		// Check if the hero is already on the map
-		const { count: characterTileCount } = await supabase
-			.from('tabletop_tiles')
-			.select('', { count: 'exact' })
-			.eq('tt_character_id', characterId)
-		if (characterTileCount) throw new Error('Character already has a tile')
+		{
+			// Check if the hero is already on the map
+			const { count } = await supabase
+				.from('tabletop_tiles')
+				.select('', { count: 'exact' })
+				.eq('tt_character_id', characterId)
+			if (count) throw new Error('Character already has a tile')
+		}
 
-		// Insert the hero on the tile
-		const { error: tileInsertError } = await serviceClient
-			.from('tabletop_tiles')
-			.upsert({
-				campaign_id: campaignId,
-				q,
-				r,
-				s,
-				tt_character_id: characterId
-			} satisfies TablesInsert<'tabletop_tiles'>)
-		if (tileInsertError) throw new Error(tileInsertError.message, { cause: tileInsertError })
+		{
+			// Insert the hero on the tile
+			const { error } = await serviceClient
+				.from('tabletop_tiles')
+				.upsert({
+					campaign_id: campaignId,
+					q,
+					r,
+					s,
+					tt_character_id: characterId
+				} satisfies TablesInsert<'tabletop_tiles'>)
+			if (error) throw new Error(error.message, { cause: error })
+		}
 	})

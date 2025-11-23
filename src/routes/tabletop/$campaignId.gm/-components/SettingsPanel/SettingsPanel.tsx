@@ -3,6 +3,7 @@ import { useDisclosure } from '@mantine/hooks'
 import { IconMenu2, IconX } from '@tabler/icons-react'
 import { Fragment } from 'react'
 import MapTab from './MapTab'
+import RoundTab from './RoundTab'
 import UnitsTab from './UnitsTab'
 
 export default function SettingsPanel() {
@@ -53,6 +54,9 @@ export default function SettingsPanel() {
 						<Tabs.Tab value='units'>
 							Units
 						</Tabs.Tab>
+						<Tabs.Tab value='round'>
+							Round
+						</Tabs.Tab>
 						<Tabs.Tab value='map'>
 							Maps
 						</Tabs.Tab>
@@ -60,6 +64,9 @@ export default function SettingsPanel() {
 
 					<Tabs.Panel value='units'>
 						<UnitsTab />
+					</Tabs.Panel>
+					<Tabs.Panel value='round'>
+						<RoundTab />
 					</Tabs.Panel>
 					<Tabs.Panel value='map'>
 						<MapTab />

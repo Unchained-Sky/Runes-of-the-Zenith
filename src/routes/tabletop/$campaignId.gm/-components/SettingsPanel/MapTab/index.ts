@@ -1,2 +1,2 @@
-import MapsTab from './MapsTab'
-export default MapsTab
+import MapTab from './MapTab'
+export default MapTab

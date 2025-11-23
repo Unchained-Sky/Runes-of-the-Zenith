@@ -9,7 +9,7 @@ import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { Fragment } from 'react'
 import { getServiceClient } from '~/supabase/getServiceClient'
-import { requireAccount } from '~/supabase/requireAccount'
+import { requireGM } from '~/supabase/requireGM'
 import { useTabletopHeroes } from '../../../-hooks/tabletopData/useTabletopHeroes'
 
 export default function Heroes() {
@@ -151,17 +151,7 @@ const removeHeroSchema = type({
 const removeHeroAction = createServerFn({ method: 'POST' })
 	.validator(removeHeroSchema)
 	.handler(async ({ data: { campaignId, tabletopCharacterId } }) => {
-		const { supabase, user } = await requireAccount()
-
-		// Check if the user is the GM
-		const gmCheck = await supabase
-			.from('campaign_info')
-			.select('gmUserId: user_id')
-			.eq('campaign_id', campaignId)
-			.limit(1)
-			.single()
-		if (gmCheck.error) throw new Error(gmCheck.error.message, { cause: gmCheck.error })
-		if (gmCheck.data.gmUserId !== user.id) throw new Error('You are not the GM of this campaign')
+		await requireGM({ campaignId })
 
 		const serviceClient = getServiceClient()
 

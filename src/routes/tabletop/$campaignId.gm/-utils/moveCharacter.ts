@@ -6,9 +6,9 @@ import { type } from 'arktype'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireAccount } from '~/supabase/requireAccount'
 import { typedObject } from '~/types/typedObject'
-import { type TabletopTile, type TabletopTiles } from './tabletopData/useTabletopTiles'
+import { type TabletopTile, type TabletopTiles } from '../-hooks/tabletopData/useTabletopTiles'
 
-export default function useMoveCharacter() {
+export function useMoveCharacter() {
 	const routeApi = getRouteApi('/tabletop/$campaignId/gm/')
 	const { queryClient } = routeApi.useRouteContext()
 	const { campaignId } = routeApi.useLoaderData()
@@ -49,7 +49,7 @@ const moveCharacterActionSchema = type({
 	characterType: '"HERO" | "ENEMY"'
 })
 
-const moveCharacterAction = createServerFn({ method: 'POST' })
+export const moveCharacterAction = createServerFn({ method: 'POST' })
 	.validator(moveCharacterActionSchema)
 	.handler(async ({ data: { cord: [q, r, s], tabletopCharacterId } }) => {
 		const { supabase, user } = await requireAccount()
