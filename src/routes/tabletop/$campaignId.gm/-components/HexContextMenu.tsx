@@ -1,5 +1,4 @@
 import { Menu } from '@mantine/core'
-import { notifications } from '@mantine/notifications'
 import { useMutation } from '@tanstack/react-query'
 import { getRouteApi } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
@@ -10,6 +9,7 @@ import { type TablesInsert } from '~/supabase/databaseTypes'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
 import { type CombatTileCord } from '~/types/gameTypes/combatMap'
+import { mutationError } from '~/utils/mutationError'
 import { useTabletopHeroes } from '../-hooks/tabletopData/useTabletopHeroes'
 import { useTabletopTiles } from '../-hooks/tabletopData/useTabletopTiles'
 
@@ -46,11 +46,7 @@ function Heroes({ cord }: HeroesProps) {
 	const addHero = useMutation({
 		mutationFn: addHeroAction,
 		onError: error => {
-			notifications.show({
-				title: 'Failed to add hero',
-				color: 'red',
-				message: error.message
-			})
+			mutationError(error, 'Failed to add hero')
 		}
 	})
 

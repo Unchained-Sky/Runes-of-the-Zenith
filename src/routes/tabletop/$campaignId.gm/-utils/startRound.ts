@@ -1,4 +1,3 @@
-import { notifications } from '@mantine/notifications'
 import { useMutation } from '@tanstack/react-query'
 import { getRouteApi } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
@@ -6,19 +5,29 @@ import { type } from 'arktype'
 import { type TablesInsert } from '~/supabase/databaseTypes'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
+import { mutationError } from '~/utils/mutationError'
+import { type HeroTurn } from '../-hooks/tabletopData/useTabletopHeroRounds'
 
 export function useStartRound() {
 	const routeApi = getRouteApi('/tabletop/$campaignId/gm/')
+	const { queryClient } = routeApi.useRouteContext()
 	const { campaignId } = routeApi.useLoaderData()
 
 	return useMutation({
 		mutationFn: () => startRoundAction({ data: { campaignId } }),
-		onError: error => {
-			notifications.show({
-				title: 'Failed to start round',
-				color: 'red',
-				message: error.message
+		onMutate: () => {
+			void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'hero-rounds'] })
+			queryClient.setQueryData([campaignId, 'tabletop', 'hero-rounds'], (oldData: HeroTurn[]) => {
+				return oldData.map<HeroTurn>(turn => ({
+					used: false,
+					order: null,
+					tabletopCharacterId: turn.tabletopCharacterId,
+					turnType: turn.turnType
+				}))
 			})
+		},
+		onError: error => {
+			mutationError(error, 'Failed to start round')
 		}
 	})
 }

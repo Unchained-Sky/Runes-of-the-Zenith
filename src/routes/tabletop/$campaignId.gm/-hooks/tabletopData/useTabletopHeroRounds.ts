@@ -41,7 +41,7 @@ export function useTabletopHeroRounds() {
 	return useSuspenseQuery(tabletopHeroRoundsQueryOptions(campaignId))
 }
 
-type HeroTurn = UsedHeroTurn | UnusedHeroTurn
+export type HeroTurn = UsedHeroTurn | UnusedHeroTurn
 
 type HeroTurnFallback = {
 	tabletopCharacterId: number

@@ -1,5 +1,4 @@
 import { Button, Card, Group, Modal, Stack, Text, Title, useModalsStack } from '@mantine/core'
-import { notifications } from '@mantine/notifications'
 import { useMutation } from '@tanstack/react-query'
 import { getRouteApi } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
@@ -8,6 +7,7 @@ import { useState } from 'react'
 import { type TablesInsert, type TablesUpdate } from '~/supabase/databaseTypes'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
+import { mutationError } from '~/utils/mutationError'
 import { useTabletopCurrentEncounter } from '../../../-hooks/tabletopData/useTabletopCurrentEncounter'
 import { useTabletopEncounterList } from '../../../-hooks/tabletopData/useTabletopEncounterList'
 
@@ -34,11 +34,7 @@ export default function ChangeEncounter() {
 	const changeEncounter = useMutation({
 		mutationFn: changeEncounterAction,
 		onError: error => {
-			notifications.show({
-				title: 'Failed change encounter',
-				color: 'red',
-				message: error.message
-			})
+			mutationError(error, 'Failed to change the encounter')
 		}
 	})
 

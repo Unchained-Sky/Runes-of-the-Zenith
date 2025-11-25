@@ -48,15 +48,21 @@ export interface HeroDataTabletop extends HeroData {
 	tabletopCharacter: NonNullable<HeroData['tabletopCharacter']>
 }
 
+function hasTabletopCharacter(heroData: HeroData): heroData is HeroDataTabletop {
+	return !!heroData.tabletopCharacter
+}
+
 class HeroDataMap {
 	#map: Map<`hero-${number}` | `character-${number}`, HeroData>
 	// set of heroIds that don't have tabletop characters
 	#inactive: Set<number>
+	#entries: [`hero-${number}` | `character-${number}`, HeroData][]
 
 	constructor(data: { data: HeroData }[]) {
 		this.#map = new Map()
 		this.#inactive = new Set()
 		data.forEach(({ data }) => this.#set(data.heroId, data.tabletopCharacter?.tabletopCharacterId, data))
+		this.#entries = [...this.#map.entries()]
 	}
 
 	#set(heroId: number, tabletopCharacterId: number | undefined, value: HeroData) {
@@ -75,11 +81,17 @@ class HeroDataMap {
 	}
 
 	getFromCharacterId(tabletopCharacterId: number) {
-		return this.#map.get(`character-${tabletopCharacterId}`) as HeroDataTabletop | undefined
+		const heroData = this.#map.get(`character-${tabletopCharacterId}`)
+		if (heroData && !hasTabletopCharacter(heroData)) throw new Error(`Character not found: ${tabletopCharacterId}`)
+		return heroData
 	}
 
 	getAll() {
-		return [...this.#map.entries()].flatMap(([key, value]) => key.startsWith('hero-') ? [value] : [])
+		return this.#entries.flatMap(([key, value]) => key.startsWith('hero-') ? [value] : [])
+	}
+
+	getAllTabletop() {
+		return this.#entries.flatMap(([key, value]) => key.startsWith('character-') && hasTabletopCharacter(value) ? [value] : [])
 	}
 
 	getInactive() {

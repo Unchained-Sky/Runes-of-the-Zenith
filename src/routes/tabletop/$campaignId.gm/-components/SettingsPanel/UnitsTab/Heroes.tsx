@@ -1,7 +1,6 @@
 import { ActionIcon, Avatar, Button, Group, Menu, Modal, NumberInput, Stack, Table, Text, Title, type NumberInputProps } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { useDisclosure } from '@mantine/hooks'
-import { notifications } from '@mantine/notifications'
 import { IconPencil, IconTrash, IconX } from '@tabler/icons-react'
 import { useMutation } from '@tanstack/react-query'
 import { getRouteApi } from '@tanstack/react-router'
@@ -10,6 +9,7 @@ import { type } from 'arktype'
 import { Fragment } from 'react'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
+import { mutationError } from '~/utils/mutationError'
 import { useTabletopHeroes } from '../../../-hooks/tabletopData/useTabletopHeroes'
 
 export default function Heroes() {
@@ -29,8 +29,7 @@ export default function Heroes() {
 					</Table.Tr>
 				</Table.Thead>
 				<Table.Tbody>
-					{heroesData.getAll().map(heroData => {
-						if (heroData.tabletopCharacter === null) return null
+					{heroesData.getAllTabletop().map(heroData => {
 						return (
 							<Hero
 								key={heroData.heroId}
@@ -57,11 +56,7 @@ function Hero({ heroId }: HeroProps) {
 	const removeHero = useMutation({
 		mutationFn: removeHeroAction,
 		onError: error => {
-			notifications.show({
-				title: 'Failed to remove hero',
-				color: 'red',
-				message: error.message
-			})
+			mutationError(error, 'Failed to remove hero')
 		}
 	})
 

@@ -1,11 +1,11 @@
-import { notifications } from '@mantine/notifications'
 import { useMutation } from '@tanstack/react-query'
 import { getRouteApi } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { getServiceClient } from '~/supabase/getServiceClient'
-import { requireAccount } from '~/supabase/requireAccount'
+import { requireGM } from '~/supabase/requireGM'
 import { typedObject } from '~/types/typedObject'
+import { mutationError } from '~/utils/mutationError'
 import { type TabletopTile, type TabletopTiles } from '../-hooks/tabletopData/useTabletopTiles'
 
 export function useMoveCharacter() {
@@ -34,11 +34,7 @@ export function useMoveCharacter() {
 			})
 		},
 		onError: error => {
-			notifications.show({
-				title: 'Failed to move character',
-				color: 'red',
-				message: error.message
-			})
+			mutationError(error, 'Failed to move character')
 		}
 	})
 }
@@ -52,24 +48,7 @@ const moveCharacterActionSchema = type({
 export const moveCharacterAction = createServerFn({ method: 'POST' })
 	.validator(moveCharacterActionSchema)
 	.handler(async ({ data: { cord: [q, r, s], tabletopCharacterId } }) => {
-		const { supabase, user } = await requireAccount()
-
-		// Check if the user is the GM
-		const { data, error } = await supabase
-			.from('tabletop_characters')
-			.select(`
-				campaignId: campaign_id,
-				campaign_info (
-					gmUserId: user_id
-				)
-			`)
-			.eq('tt_character_id', tabletopCharacterId)
-			.limit(1)
-			.single()
-		if (error)	throw new Error(error.message, { cause: error })
-		if (data.campaign_info.gmUserId !== user.id) throw new Error('You are not the GM of this campaign')
-
-		const { campaignId } = data
+		const { supabase, campaignId } = await requireGM({ tabletopCharacterId })
 
 		{
 			// Check if a character is already on the tile
