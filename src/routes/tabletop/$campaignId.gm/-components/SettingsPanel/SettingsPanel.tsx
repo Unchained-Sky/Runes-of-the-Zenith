@@ -1,18 +1,25 @@
 import { ActionIcon, Drawer, rem, Tabs } from '@mantine/core'
-import { useDisclosure } from '@mantine/hooks'
 import { IconMenu2, IconX } from '@tabler/icons-react'
 import { Fragment } from 'react'
+import CharacterTab from './CharacterTab'
 import MapTab from './MapTab'
 import RoundTab from './RoundTab'
 import UnitsTab from './UnitsTab'
+import { useSettingsPanelStore } from './useSettingsPanelStore'
 
 export default function SettingsPanel() {
-	const [opened, handlers] = useDisclosure(false)
+	const {
+		activeTab,
+		closePanel,
+		openLastTab,
+		selectedCharacter: [selectedCharacterId],
+		setActiveTab
+	} = useSettingsPanelStore()
 
 	return (
 		<Fragment>
 			<ActionIcon
-				onClick={handlers.toggle}
+				onClick={openLastTab}
 				pos='absolute'
 				right={rem(16)}
 				top={rem(16)}
@@ -24,8 +31,8 @@ export default function SettingsPanel() {
 			</ActionIcon>
 
 			<Drawer
-				opened={opened}
-				onClose={handlers.close}
+				opened={!!activeTab}
+				onClose={closePanel}
 				withOverlay={false}
 				position='right'
 				size='lg'
@@ -43,7 +50,8 @@ export default function SettingsPanel() {
 				}}
 			>
 				<Tabs
-					defaultValue='units'
+					value={activeTab}
+					onChange={value => value && setActiveTab(value)}
 					styles={{
 						panel: {
 							paddingTop: 'var(--mantine-spacing-md)'
@@ -51,6 +59,9 @@ export default function SettingsPanel() {
 					}}
 				>
 					<Tabs.List>
+						<Tabs.Tab value='character' disabled={!selectedCharacterId}>
+							Character
+						</Tabs.Tab>
 						<Tabs.Tab value='units'>
 							Units
 						</Tabs.Tab>
@@ -62,6 +73,9 @@ export default function SettingsPanel() {
 						</Tabs.Tab>
 					</Tabs.List>
 
+					<Tabs.Panel value='character'>
+						<CharacterTab />
+					</Tabs.Panel>
 					<Tabs.Panel value='units'>
 						<UnitsTab />
 					</Tabs.Panel>

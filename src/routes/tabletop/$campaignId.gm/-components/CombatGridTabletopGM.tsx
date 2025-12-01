@@ -1,13 +1,12 @@
-import { useDraggable, useDroppable } from '@dnd-kit/react'
-import { Avatar, type AvatarProps, Box } from '@mantine/core'
+import { useDroppable } from '@dnd-kit/react'
+import { Box } from '@mantine/core'
 import Hex from '~/components/HoneycombGrid/Hex'
 import useHoneycombGridSize from '~/components/HoneycombGrid/useHoneycombGridSize'
 import { type CombatTile } from '~/types/gameTypes/combatMap'
-import { useTabletopEnemies } from '../-hooks/tabletopData/useTabletopEnemies'
-import { useTabletopHeroes } from '../-hooks/tabletopData/useTabletopHeroes'
 import { useTabletopMapTiles } from '../-hooks/tabletopData/useTabletopMapTiles'
 import { type TabletopTile, useTabletopTiles } from '../-hooks/tabletopData/useTabletopTiles'
-import { type CharacterDraggable, type TileDroppable } from './DragDrop'
+import CharacterIcon from './CharacterIcon'
+import { type TileDroppable } from './DragDrop'
 import HexContextMenu from './HexContextMenu'
 
 export default function CombatGridTabletopGM() {
@@ -61,51 +60,5 @@ function Tile({ tile, tileData, offset }: TileProps) {
 				{tileData && <CharacterIcon tileData={tileData} />}
 			</Hex>
 		</HexContextMenu>
-	)
-}
-
-const avatarSettings = {
-	pos: 'absolute',
-	left: '40%',
-	top: '40%',
-	style: {
-		cursor: 'grab'
-	}
-} satisfies AvatarProps
-
-type CharacterIconProps = {
-	tileData: TabletopTile
-}
-
-function CharacterIcon({ tileData }: CharacterIconProps) {
-	const { data: heroesData } = useTabletopHeroes()
-	const { data: enemiesData } = useTabletopEnemies()
-
-	const { ref } = useDraggable({
-		id: `character-${tileData.tabletopCharacterId}`,
-		type: 'character',
-		data: {
-			draggableType: 'CHARACTER',
-			tabletopCharacterId: tileData.tabletopCharacterId,
-			characterType: tileData.characterType
-		} satisfies CharacterDraggable
-	})
-
-	const getName = () => {
-		switch (tileData.characterType) {
-			case 'HERO':
-				return heroesData.getFromCharacterId(tileData.tabletopCharacterId)?.heroName ?? ''
-			case 'ENEMY':
-				return enemiesData[tileData.tabletopCharacterId]?.tabletopEnemy.enemyInfo.enemyName ?? ''
-		}
-	}
-
-	return (
-		<Avatar
-			ref={ref}
-			name={getName()}
-			color={tileData.characterType === 'HERO' ? 'green' : 'red'}
-			{...avatarSettings}
-		/>
 	)
 }

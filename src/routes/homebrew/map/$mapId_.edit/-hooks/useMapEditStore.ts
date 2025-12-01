@@ -42,7 +42,7 @@ type MapEditActions = {
 
 const actionName = createActionName<MapEditActions>('mapEdit')
 
-export const createMapEditActions: Slice<MapEditStore, MapEditActions, [DevTools]> = (set, get) => ({
+const createMapEditActions: Slice<MapEditStore, MapEditActions, [DevTools]> = (set, get) => ({
 	syncLoader: loader => {
 		if (loader.syncValue === get().syncValue) return
 
