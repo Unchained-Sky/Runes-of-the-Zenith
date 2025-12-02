@@ -16,7 +16,7 @@ function Hero() {
 	const [selectedCharacterId] = useSettingsPanelStore(state => state.selectedCharacter)
 	const { data: heroesData } = useTabletopHeroes()
 	const heroData = heroesData.getFromCharacterId(selectedCharacterId)
-	if (!heroData) throw new Error(`Hero not found: ${selectedCharacterId}`)
+	if (!heroData) return null
 
 	return (
 		<Stack>
@@ -29,7 +29,7 @@ function Enemy() {
 	const [selectedCharacterId] = useSettingsPanelStore(state => state.selectedCharacter)
 	const { data: enemiesData } = useTabletopEnemies()
 	const enemyData = enemiesData[selectedCharacterId]
-	if (!enemyData) throw new Error(`Enemy not found: ${selectedCharacterId}`)
+	if (!enemyData) return null
 
 	return (
 		<Stack>

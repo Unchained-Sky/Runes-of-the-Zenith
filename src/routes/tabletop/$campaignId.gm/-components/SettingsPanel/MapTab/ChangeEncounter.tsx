@@ -187,13 +187,33 @@ const changeEncounterAction = createServerFn({ method: 'POST' })
 			}
 			const tilesWithEnemies = encounterData.encounterTiles.filter(hasEnemyId)
 
+			const enemiesData = await supabase
+				.from('character_info')
+				.select(`
+					maxHealth: max_health,
+					maxShield: max_shield,
+					enemyInfo: enemy_info (
+						enemyId: enemy_id
+					)
+				`)
+				.in('enemy_info.character_id', tilesWithEnemies.map(({ enemyId }) => enemyId))
+				// enemy_info should always be a single row
+				.overrideTypes<{ maxHealth: number, maxShield: number, enemyInfo: [{ enemyId: number }] }[], { merge: false }>()
+			if (enemiesData.error) throw new Error(enemiesData.error.message, { cause: enemiesData.error })
+
 			const { data: characterIds, error: characterError } = await serverClient
 				.from('tabletop_characters')
 				.insert(
-					Array.from({ length: tilesWithEnemies.length }).map(() => ({
-						campaign_id: campaignId,
-						character_type: 'ENEMY'
-					}) satisfies TablesInsert<'tabletop_characters'>)
+					tilesWithEnemies.map(({ enemyId }) => {
+						const enemyData = enemiesData.data.find(({ enemyInfo }) => enemyInfo[0].enemyId === enemyId)
+						if (!enemyData) throw new Error(`No enemy data for ${enemyId}`)
+						return {
+							campaign_id: campaignId,
+							character_type: 'ENEMY',
+							health: enemyData.maxHealth,
+							shield: enemyData.maxShield
+						} satisfies TablesInsert<'tabletop_characters'>
+					})
 				)
 				.select('characterId: tt_character_id')
 			if (characterError) throw new Error(characterError.message, { cause: characterError })

@@ -115,6 +115,12 @@ const addHeroAction = createServerFn({ method: 'POST' })
 				.select(`
 					tabletopCharacters: tabletop_characters (
 						characterId: tt_character_id
+					),
+					heroInfo: hero_info (
+						characterInfo: character_info (
+							maxHealth: max_health,
+							maxShield: max_shield
+						)
 					)
 				`)
 				.eq('hero_id', heroId)
@@ -128,9 +134,12 @@ const addHeroAction = createServerFn({ method: 'POST' })
 				.from('tabletop_characters')
 				.insert({
 					campaign_id: campaignId,
-					character_type: 'HERO'
+					character_type: 'HERO',
+					health: characterData?.heroInfo.characterInfo.maxHealth ?? 0,
+					shield: characterData?.heroInfo.characterInfo.maxShield ?? 0
 				})
 				.select('characterId: tt_character_id')
+				.limit(1)
 				.single()
 			if (characterInsertError) throw new Error(characterInsertError.message, { cause: characterInsertError })
 

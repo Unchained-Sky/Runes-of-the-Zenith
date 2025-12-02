@@ -11,11 +11,11 @@ async function insertEnemy(enemy: CompendiumEnemy) {
 		.insert({
 			character_type: 'ENEMY',
 			max_health: enemy.stats.maxHealth,
-			shield: enemy.stats.shield,
+			max_shield: enemy.stats.shield,
 			int: enemy.stats.int,
 			str: enemy.stats.str,
 			dex: enemy.stats.dex,
-			movement: enemy.stats.movement,
+			max_movement: enemy.stats.movement,
 			crit_chance: enemy.stats.critChance
 		})
 		.select('character_id')

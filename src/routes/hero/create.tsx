@@ -5,6 +5,7 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { useState } from 'react'
+import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireAccount } from '~/supabase/requireAccount'
 
 export const Route = createFileRoute('/hero/create')({
@@ -69,13 +70,35 @@ const createHeroAction = createServerFn({ method: 'POST' })
 	.handler(async ({ data: { heroName } }) => {
 		const { supabase } = await requireAccount()
 
-		const { data, error } = await supabase
+		const serviceClient = getServiceClient()
+
+		const character = await serviceClient
+			.from('character_info')
+			.insert({
+				character_type: 'HERO',
+				max_health: 300,
+				max_shield: 20,
+				int: 20,
+				str: 20,
+				dex: 20,
+				max_movement: 3,
+				crit_chance: 5
+			})
+			.select('characterId: character_id')
+			.limit(1)
+			.single()
+		if (character.error) throw new Error(character.error.message, { cause: character.error })
+
+		const hero = await supabase
 			.from('hero_info')
-			.insert({ hero_name: heroName })
+			.insert({
+				hero_name: heroName,
+				character_id: 0
+			})
 			.select('heroId: hero_id')
 			.limit(1)
 			.single()
-		if (error) throw new Error(error.message, { cause: error })
+		if (hero.error) throw new Error(hero.error.message, { cause: hero.error })
 
-		return data.heroId.toString()
+		return hero.data.heroId.toString()
 	})
