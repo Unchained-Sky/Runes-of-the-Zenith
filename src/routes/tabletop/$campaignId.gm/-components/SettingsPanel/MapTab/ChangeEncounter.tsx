@@ -10,6 +10,7 @@ import { requireGM } from '~/supabase/requireGM'
 import { mutationError } from '~/utils/mutationError'
 import { useTabletopCurrentEncounter } from '../../../-hooks/tabletopData/useTabletopCurrentEncounter'
 import { useTabletopEncounterList } from '../../../-hooks/tabletopData/useTabletopEncounterList'
+import { useSettingsPanelStore } from '../useSettingsPanelStore'
 
 export default function ChangeEncounter() {
 	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useParams()
@@ -40,8 +41,9 @@ export default function ChangeEncounter() {
 
 	const handleConfirmSelection = () => {
 		if (!selectedEncounter) return
-		changeEncounter.mutate({ data: { campaignId: +campaignId, encounterId: selectedEncounter } })
+		useSettingsPanelStore.getState().deselectCharacter()
 		handleCleanupModal()
+		changeEncounter.mutate({ data: { campaignId: +campaignId, encounterId: selectedEncounter } })
 	}
 
 	return (
@@ -187,6 +189,7 @@ const changeEncounterAction = createServerFn({ method: 'POST' })
 			}
 			const tilesWithEnemies = encounterData.encounterTiles.filter(hasEnemyId)
 
+			// TODO this seems to output all characters not just enemies?
 			const enemiesData = await supabase
 				.from('character_info')
 				.select(`
@@ -196,16 +199,14 @@ const changeEncounterAction = createServerFn({ method: 'POST' })
 						enemyId: enemy_id
 					)
 				`)
-				.in('enemy_info.character_id', tilesWithEnemies.map(({ enemyId }) => enemyId))
-				// enemy_info should always be a single row
-				.overrideTypes<{ maxHealth: number, maxShield: number, enemyInfo: [{ enemyId: number }] }[], { merge: false }>()
+				.in('enemy_info.enemy_id', tilesWithEnemies.map(({ enemyId }) => enemyId))
 			if (enemiesData.error) throw new Error(enemiesData.error.message, { cause: enemiesData.error })
 
 			const { data: characterIds, error: characterError } = await serverClient
 				.from('tabletop_characters')
 				.insert(
 					tilesWithEnemies.map(({ enemyId }) => {
-						const enemyData = enemiesData.data.find(({ enemyInfo }) => enemyInfo[0].enemyId === enemyId)
+						const enemyData = enemiesData.data.find(({ enemyInfo }) => enemyInfo[0]?.enemyId === enemyId)
 						if (!enemyData) throw new Error(`No enemy data for ${enemyId}`)
 						return {
 							campaign_id: campaignId,

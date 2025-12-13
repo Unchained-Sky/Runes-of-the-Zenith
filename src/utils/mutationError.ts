@@ -1,7 +1,7 @@
 import { notifications } from '@mantine/notifications'
 
 export const mutationError = (error: Error, title: string) => {
-	console.error(error)
+	console.error(title, error)
 	notifications.show({
 		title,
 		color: 'red',
