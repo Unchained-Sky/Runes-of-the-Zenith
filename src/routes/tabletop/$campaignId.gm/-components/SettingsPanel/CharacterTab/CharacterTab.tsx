@@ -33,7 +33,7 @@ function Enemy() {
 
 	return (
 		<Stack>
-			<Title order={3}>{enemyData.tabletopEnemy.enemyInfo.enemyName}</Title>
+			<Title order={3}>{enemyData.enemyName}</Title>
 		</Stack>
 	)
 }

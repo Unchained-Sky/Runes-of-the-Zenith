@@ -1,57 +1,16 @@
-import { ActionIcon, Avatar, Button, Group, Menu, Modal, NumberInput, Stack, Table, Text, Title, type NumberInputProps } from '@mantine/core'
+import { Button, Group, Modal, NumberInput, SimpleGrid, Stack, Title, type NumberInputProps } from '@mantine/core'
 import { useForm } from '@mantine/form'
-import { useDisclosure } from '@mantine/hooks'
-import { IconPencil, IconTrash, IconX } from '@tabler/icons-react'
 import { useMutation } from '@tanstack/react-query'
-import { getRouteApi } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
-import { Fragment } from 'react'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
 import { mutationError } from '~/utils/mutationError'
 import { useTabletopHeroes } from '../../../-hooks/tabletopData/useTabletopHeroes'
+import CharacterCard from './CharacterCard'
 
 export default function Heroes() {
 	const { data: heroesData } = useTabletopHeroes()
-
-	return (
-		<Stack gap={0}>
-			<Title order={3}>Heroes</Title>
-			<Table>
-				<Table.Thead>
-					<Table.Tr>
-						<Table.Th>Name</Table.Th>
-						<Table.Th>Shield</Table.Th>
-						<Table.Th>Health</Table.Th>
-						<Table.Th>Position</Table.Th>
-						<Table.Th>Edit</Table.Th>
-					</Table.Tr>
-				</Table.Thead>
-				<Table.Tbody>
-					{heroesData.getAllTabletop().map(heroData => {
-						return (
-							<Hero
-								key={heroData.heroId}
-								heroId={heroData.heroId}
-							/>
-						)
-					})}
-				</Table.Tbody>
-			</Table>
-		</Stack>
-	)
-}
-
-type HeroProps = {
-	heroId: number
-}
-
-function Hero({ heroId }: HeroProps) {
-	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useLoaderData()
-	const { heroName, tabletopCharacter } = useTabletopHeroes().data.getFromHeroId(heroId)
-
-	const [editMode, editModeHandlers] = useDisclosure(false)
 
 	const removeHero = useMutation({
 		mutationFn: removeHeroAction,
@@ -60,93 +19,133 @@ function Hero({ heroId }: HeroProps) {
 		}
 	})
 
-	// const getTabletopLifeValue = (value: keyof Tables<'tabletop_heroes'> & (`health_${string}` | `shield_${string}`)) => {
-	// 	return tabletopHero?.[value] ?? 0
-	// }
-
-	// const getTabletopPosition = () => {
-	// if (!tabletopHero) return null
-	// if (
-	// 	tabletopHero.position_q === null
-	// 	|| tabletopHero.position_r === null
-	// 	|| tabletopHero.position_s === null
-	// ) return null
-	// const position = {
-	// 	q: tabletopHero.position_q,
-	// 	r: tabletopHero.position_r,
-	// 	s: tabletopHero.position_s
-	// }
-	// return `${position.q},${position.r},${position.s}`
-	// }
-
-	if (!tabletopCharacter) return null
-
 	return (
-		<Fragment>
-			<HeroEditModal
-				heroId={heroId}
-				opened={editMode}
-				close={editModeHandlers.close}
-			/>
-
-			<Table.Tr>
-				<Table.Td>
-					<Group gap='xs'>
-						<Avatar />
-						<Text size='lg'>{heroName}</Text>
-					</Group>
-				</Table.Td>
-				<Table.Td>
-					<Stack gap={0}>
-						{/* <Text size='sm'>{getTabletopLifeValue('shield_durability')}</Text>
-						<Text size='sm'>{getTabletopLifeValue('shield_current')} / {getTabletopLifeValue('shield_max')}</Text> */}
-					</Stack>
-				</Table.Td>
-				{/* <Table.Td>{getTabletopLifeValue('health_current')} / {getTabletopLifeValue('health_max')}</Table.Td> */}
-				{/* <Table.Td>{getTabletopPosition() ?? 'Unplaced'}</Table.Td> */}
-				<Table.Td>
-					<Group>
-						<ActionIcon variant='subtle' color='gray' onClick={editModeHandlers.toggle}>
-							<IconPencil />
-						</ActionIcon>
-						<Menu>
-							<Menu.Target>
-								<ActionIcon variant='subtle' color='red'>
-									<IconX />
-								</ActionIcon>
-							</Menu.Target>
-							<Menu.Dropdown>
-								<Menu.Label>Are you sure?</Menu.Label>
-								<Menu.Item
-									color='red'
-									leftSection={<IconTrash size={14} />}
-									onClick={() => removeHero.mutate({
-										data: {
-											campaignId,
-											tabletopCharacterId: tabletopCharacter.tabletopCharacterId
-										}
-									})}
-								>
-									Remove Hero
-								</Menu.Item>
-							</Menu.Dropdown>
-						</Menu>
-					</Group>
-				</Table.Td>
-			</Table.Tr>
-		</Fragment>
+		<>
+			<Title order={3}>Heroes</Title>
+			<SimpleGrid cols={3}>
+				{heroesData.getAllTabletop().map(heroData => {
+					return (
+						<CharacterCard
+							key={heroData.heroId}
+							character={{
+								type: 'HERO',
+								tabletopCharacterId: heroData.tabletopCharacter.tabletopCharacterId,
+								characterName: heroData.heroName,
+								stats: heroData.stats,
+								tabletopStats: heroData.tabletopCharacter.tabletopStats
+							}}
+							removeCharacter={() => removeHero.mutate({ data: { tabletopCharacterId: heroData.tabletopCharacter.tabletopCharacterId } })}
+						/>
+					)
+				})}
+			</SimpleGrid>
+		</>
 	)
 }
 
+// type HeroProps = {
+// 	heroId: number
+// }
+
+// function Hero({ heroId }: HeroProps) {
+// 	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useLoaderData()
+// 	const { heroName, tabletopCharacter } = useTabletopHeroes().data.getFromHeroId(heroId)
+
+// 	const [editMode, editModeHandlers] = useDisclosure(false)
+
+// 	const removeHero = useMutation({
+// 		mutationFn: removeHeroAction,
+// 		onError: error => {
+// 			mutationError(error, 'Failed to remove hero')
+// 		}
+// 	})
+
+// 	// const getTabletopLifeValue = (value: keyof Tables<'tabletop_heroes'> & (`health_${string}` | `shield_${string}`)) => {
+// 	// 	return tabletopHero?.[value] ?? 0
+// 	// }
+
+// 	// const getTabletopPosition = () => {
+// 	// if (!tabletopHero) return null
+// 	// if (
+// 	// 	tabletopHero.position_q === null
+// 	// 	|| tabletopHero.position_r === null
+// 	// 	|| tabletopHero.position_s === null
+// 	// ) return null
+// 	// const position = {
+// 	// 	q: tabletopHero.position_q,
+// 	// 	r: tabletopHero.position_r,
+// 	// 	s: tabletopHero.position_s
+// 	// }
+// 	// return `${position.q},${position.r},${position.s}`
+// 	// }
+
+// 	if (!tabletopCharacter) return null
+
+// 	return (
+// 		<Fragment>
+// 			<HeroEditModal
+// 				heroId={heroId}
+// 				opened={editMode}
+// 				close={editModeHandlers.close}
+// 			/>
+
+// 			<Table.Tr>
+// 				<Table.Td>
+// 					<Group gap='xs'>
+// 						<Avatar />
+// 						<Text size='lg'>{heroName}</Text>
+// 					</Group>
+// 				</Table.Td>
+// 				<Table.Td>
+// 					<Stack gap={0}>
+// 						{/* <Text size='sm'>{getTabletopLifeValue('shield_durability')}</Text>
+// 						<Text size='sm'>{getTabletopLifeValue('shield_current')} / {getTabletopLifeValue('shield_max')}</Text> */}
+// 					</Stack>
+// 				</Table.Td>
+// 				{/* <Table.Td>{getTabletopLifeValue('health_current')} / {getTabletopLifeValue('health_max')}</Table.Td> */}
+// 				{/* <Table.Td>{getTabletopPosition() ?? 'Unplaced'}</Table.Td> */}
+// 				<Table.Td>
+// 					<Group>
+// 						<ActionIcon variant='subtle' color='gray' onClick={editModeHandlers.toggle}>
+// 							<IconPencil />
+// 						</ActionIcon>
+// 						<Menu>
+// 							<Menu.Target>
+// 								<ActionIcon variant='subtle' color='red'>
+// 									<IconX />
+// 								</ActionIcon>
+// 							</Menu.Target>
+// 							<Menu.Dropdown>
+// 								<Menu.Label>Are you sure?</Menu.Label>
+// 								<Menu.Item
+// 									color='red'
+// 									leftSection={<IconTrash size={14} />}
+// 									onClick={() => removeHero.mutate({
+// 										data: {
+// 											campaignId,
+// 											tabletopCharacterId: tabletopCharacter.tabletopCharacterId
+// 										}
+// 									})}
+// 								>
+// 									Remove Hero
+// 								</Menu.Item>
+// 							</Menu.Dropdown>
+// 						</Menu>
+// 					</Group>
+// 				</Table.Td>
+// 			</Table.Tr>
+// 		</Fragment>
+// 	)
+// }
+
 const removeHeroSchema = type({
-	tabletopCharacterId: 'number',
-	campaignId: 'number'
+	tabletopCharacterId: 'number'
 })
 
 const removeHeroAction = createServerFn({ method: 'POST' })
 	.validator(removeHeroSchema)
-	.handler(async ({ data: { campaignId, tabletopCharacterId } }) => {
-		await requireGM({ campaignId })
+	.handler(async ({ data: { tabletopCharacterId } }) => {
+		await requireGM({ tabletopCharacterId })
 
 		const serviceClient = getServiceClient()
 

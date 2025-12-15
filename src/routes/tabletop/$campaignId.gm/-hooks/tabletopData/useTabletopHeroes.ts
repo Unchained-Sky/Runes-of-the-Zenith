@@ -19,7 +19,23 @@ const heroLoader = createServerFn({ method: 'GET' })
 			.select(`
 				heroName: hero_name,
 				tabletopHero: tabletop_heroes (
-					tabletopCharacterId: tt_character_id
+					tabletopCharacterId: tt_character_id,
+					tabletopCharacter: tabletop_characters (
+						health,
+						wounds,
+						shield,
+						trauma,
+						movement
+					)
+				),
+				character_info (
+					maxHealth: max_health,
+					maxShield: max_shield,
+					int,
+					str,
+					dex,
+					maxMovement: max_movement,
+					critChance: crit_chance
 				)
 			`)
 			.eq('hero_id', heroId)
@@ -30,9 +46,11 @@ const heroLoader = createServerFn({ method: 'GET' })
 		return {
 			heroId,
 			heroName: data.heroName,
+			stats: data.character_info,
 			tabletopCharacter: data.tabletopHero
 				? {
-					tabletopCharacterId: data.tabletopHero.tabletopCharacterId
+					tabletopCharacterId: data.tabletopHero.tabletopCharacterId,
+					tabletopStats: data.tabletopHero.tabletopCharacter
 				}
 				: null
 		}

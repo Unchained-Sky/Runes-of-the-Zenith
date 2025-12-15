@@ -21,9 +21,23 @@ const enemyLoader = createServerFn({ method: 'GET' })
 				tabletopEnemy: tabletop_enemy (
 					enemyId: enemy_id,
 					enemyInfo: enemy_info (
-						enemyName: enemy_name
+						enemyName: enemy_name,
+						characterInfo: character_info (
+							maxHealth: max_health,
+							maxShield: max_shield,
+							int,
+							str,
+							dex,
+							maxMovement: max_movement,
+							critChance: crit_chance
+						)
 					)
-				)
+				),
+				health,
+				wounds,
+				shield,
+				trauma,
+				movement
 			`)
 			.eq('tt_character_id', tabletopCharacterId)
 			.limit(1)
@@ -36,7 +50,16 @@ const enemyLoader = createServerFn({ method: 'GET' })
 
 		return {
 			tabletopCharacterId,
-			tabletopEnemy
+			enemyId: tabletopEnemy.enemyId,
+			enemyName: tabletopEnemy.enemyInfo.enemyName,
+			stats: tabletopEnemy.enemyInfo.characterInfo,
+			tabletopStats: {
+				health: data.health,
+				wounds: data.wounds,
+				shield: data.shield,
+				trauma: data.trauma,
+				movement: data.movement
+			}
 		}
 	})
 

@@ -37,7 +37,7 @@ export default function CharacterIcon({ tileData }: CharacterIconProps) {
 			case 'HERO':
 				return heroesData.getFromCharacterId(tabletopCharacterId)?.heroName ?? ''
 			case 'ENEMY':
-				return enemiesData[tabletopCharacterId]?.tabletopEnemy.enemyInfo.enemyName ?? ''
+				return enemiesData[tabletopCharacterId]?.enemyName ?? ''
 		}
 	}
 
