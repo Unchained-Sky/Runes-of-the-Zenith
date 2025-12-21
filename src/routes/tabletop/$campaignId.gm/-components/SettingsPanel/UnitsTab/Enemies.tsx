@@ -18,7 +18,8 @@ export default function Enemies() {
 								tabletopCharacterId: enemyData.tabletopCharacterId,
 								characterName: enemyData.enemyName,
 								stats: enemyData.stats,
-								tabletopStats: enemyData.tabletopStats
+								tabletopStats: enemyData.tabletopStats,
+								pos: enemyData.pos
 							}}
 						/>
 					)

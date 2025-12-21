@@ -3,12 +3,16 @@ import { isInRange, useForm } from '@mantine/form'
 import { useDisclosure } from '@mantine/hooks'
 import { IconPencil, IconTrash, IconX } from '@tabler/icons-react'
 import { useMutation } from '@tanstack/react-query'
+import { getRouteApi } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { type Enums } from '~/supabase/databaseTypes'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
+import { type CombatTileCord } from '~/types/gameTypes/combatMap'
 import { mutationError } from '~/utils/mutationError'
+import { type TabletopEnemyData } from '../../../-hooks/tabletopData/useTabletopEnemies'
+import { type TabletopHeroData } from '../../../-hooks/tabletopData/useTabletopHeroes'
 
 type CharacterCardProps = {
 	character: {
@@ -31,12 +35,13 @@ type CharacterCardProps = {
 			trauma: number
 			movement: number
 		}
+		pos: CombatTileCord | null
 	}
 	removeCharacter?: () => void
 }
 
 export default function CharacterCard({ character, removeCharacter }: CharacterCardProps) {
-	const { type, tabletopCharacterId, characterName, stats, tabletopStats } = character
+	const { type, tabletopCharacterId, characterName, stats, tabletopStats, pos } = character
 
 	const [opened, { open, close }] = useDisclosure(false)
 
@@ -47,6 +52,10 @@ export default function CharacterCard({ character, removeCharacter }: CharacterC
 			<Card key={tabletopCharacterId} component={Stack} gap={2} align='center' p='sm' bg='dark.5'>
 				<Avatar name={characterName} color='red' />
 				<Text>{characterName}</Text>
+				<Text>
+					<Text span>Pos: </Text>
+					<Text span fs={pos ? 'normal' : 'italic'}>{pos ? pos.join(',') : 'Unplaced'}</Text>
+				</Text>
 				<Text>Shield: {tabletopStats.shield} [{tabletopStats.trauma}] / {stats.maxShield}</Text>
 				<Text>Health: {tabletopStats.health} [{tabletopStats.wounds}] / {stats.maxHealth}</Text>
 				<Text>
@@ -99,6 +108,10 @@ type EditCharacterModalProps = {
 }
 
 function EditCharacterModal({ character, openedModal, closeModal }: EditCharacterModalProps) {
+	const routeApi = getRouteApi('/tabletop/$campaignId/gm/')
+	const { queryClient } = routeApi.useRouteContext()
+	const { campaignId } = routeApi.useLoaderData()
+
 	const form = useForm({
 		mode: 'uncontrolled',
 		initialValues: {
@@ -120,7 +133,40 @@ function EditCharacterModal({ character, openedModal, closeModal }: EditCharacte
 	const updateCharacter = useMutation({
 		mutationFn: updateCharacterAction,
 		onMutate: ({ data }) => {
-			// TODO optimistic update
+			switch (character.type) {
+				case 'HERO':
+					void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'hero', data.tabletopCharacterId] })
+					queryClient.setQueriesData({ queryKey: [campaignId, 'tabletop', 'hero', data.tabletopCharacterId] }, (oldData: TabletopHeroData) => {
+						return {
+							...oldData,
+							tabletopStats: {
+								...oldData.tabletopStats,
+								health: data.values.currentHealth,
+								wounds: data.values.wounds,
+								shield: data.values.currentShield,
+								trauma: data.values.trauma,
+								movement: data.values.currentMovement
+							}
+						} satisfies TabletopHeroData
+					})
+					break
+				case 'ENEMY':
+					void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'enemy', data.tabletopCharacterId] })
+					queryClient.setQueriesData({ queryKey: [campaignId, 'tabletop', 'enemy', data.tabletopCharacterId] }, (oldData: TabletopEnemyData) => {
+						return {
+							...oldData,
+							tabletopStats: {
+								...oldData.tabletopStats,
+								health: data.values.currentHealth,
+								wounds: data.values.wounds,
+								shield: data.values.currentShield,
+								trauma: data.values.trauma,
+								movement: data.values.currentMovement
+							}
+						} satisfies TabletopEnemyData
+					})
+					break
+			}
 		},
 		onError: error => {
 			mutationError(error, 'Failed to update character')
@@ -130,6 +176,7 @@ function EditCharacterModal({ character, openedModal, closeModal }: EditCharacte
 	const handleSubmit = (values: typeof form.values) => {
 		updateCharacter.mutate({ data: { tabletopCharacterId: character.tabletopCharacterId, values } })
 		closeModal()
+		form.setInitialValues(values)
 	}
 
 	return (

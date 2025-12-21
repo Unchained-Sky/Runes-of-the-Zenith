@@ -31,7 +31,8 @@ export default function Heroes() {
 								tabletopCharacterId: heroData.tabletopCharacterId,
 								characterName: heroData.heroName,
 								stats: heroData.stats,
-								tabletopStats: heroData.tabletopStats
+								tabletopStats: heroData.tabletopStats,
+								pos: heroData.pos
 							}}
 							removeCharacter={() => removeHero.mutate({ data: { tabletopCharacterId: heroData.tabletopCharacterId } })}
 						/>

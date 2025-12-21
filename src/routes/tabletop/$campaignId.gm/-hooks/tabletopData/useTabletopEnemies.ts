@@ -33,6 +33,11 @@ const enemyLoader = createServerFn({ method: 'GET' })
 						)
 					)
 				),
+				tile: tabletop_tiles (
+					q,
+					r,
+					s
+				),
 				health,
 				wounds,
 				shield,
@@ -59,7 +64,8 @@ const enemyLoader = createServerFn({ method: 'GET' })
 				shield: data.shield,
 				trauma: data.trauma,
 				movement: data.movement
-			}
+			},
+			pos: data.tile[0] ? [data.tile[0].q, data.tile[0].r, data.tile[0].s] : null
 		}
 	})
 
@@ -68,7 +74,7 @@ const tabletopEnemyQueryOptions = (campaignId: number, tabletopCharacterId: numb
 	queryFn: () => enemyLoader({ data: { tabletopCharacterId } })
 })
 
-type TabletopEnemyData = NonNullable<Awaited<ReturnType<typeof enemyLoader>>>
+export type TabletopEnemyData = NonNullable<Awaited<ReturnType<typeof enemyLoader>>>
 type TabletopEnemiesData = {
 	[tabletopCharacterId: number]: TabletopEnemyData
 }

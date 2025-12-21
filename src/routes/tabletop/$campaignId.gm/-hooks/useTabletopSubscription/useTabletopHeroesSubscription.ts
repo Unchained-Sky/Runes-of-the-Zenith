@@ -1,7 +1,6 @@
 import { getRouteApi } from '@tanstack/react-router'
 import useMountEffect from '~/hooks/useMountEffect'
 import { type Tables } from '~/supabase/databaseTypes'
-import { type HeroData } from '../tabletopData/useTabletopHeroesOld'
 import { LOG_SUBSCRIPTION_PAYLOADS, type SubscribeHookProps } from './useTabletopSubscription'
 
 type TabletopHeroesTable = Tables<'tabletop_heroes'>
@@ -22,8 +21,8 @@ export default function useTabletopHeroesSubscription({ supabase, campaignId }: 
 
 				switch (payload.eventType) {
 					case 'INSERT': {
-						const { hero_id } = payload.new as TabletopHeroesTable
-						void queryClient.invalidateQueries({ queryKey: [campaignId, 'tabletop', 'hero', hero_id] })
+						const { tt_character_id: tabletopCharacterId } = payload.new as TabletopHeroesTable
+						void queryClient.invalidateQueries({ queryKey: [campaignId, 'tabletop', 'hero', tabletopCharacterId] })
 						void queryClient.invalidateQueries({ queryKey: [campaignId, 'tabletop', 'tiles'] })
 						break
 					}
@@ -52,12 +51,9 @@ export default function useTabletopHeroesSubscription({ supabase, campaignId }: 
 						// break
 					}
 					case 'DELETE': {
-						const { hero_id } = payload.old as TabletopHeroesTable
-						queryClient.setQueriesData({ queryKey: [campaignId, 'tabletop', 'hero', hero_id] }, (oldData: HeroData) => {
-							return {
-								...oldData,
-								tabletopCharacter: null
-							} satisfies HeroData
+						const { tt_character_id: tabletopCharacterId } = payload.old as TabletopHeroesTable
+						queryClient.setQueriesData({ queryKey: [campaignId, 'tabletop', 'hero', tabletopCharacterId] }, () => {
+							return null
 						})
 						break
 					}
