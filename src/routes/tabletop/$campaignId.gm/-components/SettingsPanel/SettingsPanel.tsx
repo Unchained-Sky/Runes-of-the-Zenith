@@ -2,6 +2,7 @@ import { ActionIcon, Drawer, rem, Tabs } from '@mantine/core'
 import { IconMenu2, IconX } from '@tabler/icons-react'
 import { Fragment } from 'react'
 import CharacterTab from './CharacterTab'
+import DebugTag from './DebugTab'
 import MapTab from './MapTab'
 import RoundTab from './RoundTab'
 import UnitsTab from './UnitsTab'
@@ -69,7 +70,10 @@ export default function SettingsPanel() {
 							Round
 						</Tabs.Tab>
 						<Tabs.Tab value='map'>
-							Maps
+							Map
+						</Tabs.Tab>
+						<Tabs.Tab value='debug'>
+							Debug
 						</Tabs.Tab>
 					</Tabs.List>
 
@@ -84,6 +88,9 @@ export default function SettingsPanel() {
 					</Tabs.Panel>
 					<Tabs.Panel value='map'>
 						<MapTab />
+					</Tabs.Panel>
+					<Tabs.Panel value='debug'>
+						<DebugTag />
 					</Tabs.Panel>
 				</Tabs>
 			</Drawer>

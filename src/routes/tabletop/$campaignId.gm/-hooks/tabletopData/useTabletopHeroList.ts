@@ -15,11 +15,21 @@ const heroListLoader = createServerFn({ method: 'GET' })
 
 		const { data, error } = await supabase
 			.from('hero_info')
-			.select('heroId: hero_id')
+			.select(`
+				heroId: hero_id,
+				heroName: hero_name,
+				tabletopHero: tabletop_heroes (
+					tabletopCharacterId: tt_character_id
+				)
+			`)
 			.eq('campaign_id', campaignId)
 		if (error) throw new Error(error.message, { cause: error })
 
-		return data.map(hero => hero.heroId)
+		return data.map(hero => ({
+			heroId: hero.heroId,
+			heroName: hero.heroName,
+			tabletopCharacterId: hero.tabletopHero?.tabletopCharacterId ?? null
+		}))
 	})
 
 export const tabletopHeroListQueryOptions = (campaignId: number) => queryOptions({

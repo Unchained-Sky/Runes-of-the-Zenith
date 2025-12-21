@@ -35,7 +35,7 @@ export default function CharacterIcon({ tileData }: CharacterIconProps) {
 	const getName = () => {
 		switch (characterType) {
 			case 'HERO':
-				return heroesData.getFromCharacterId(tabletopCharacterId)?.heroName ?? ''
+				return heroesData[tabletopCharacterId]?.heroName ?? ''
 			case 'ENEMY':
 				return enemiesData[tabletopCharacterId]?.enemyName ?? ''
 		}

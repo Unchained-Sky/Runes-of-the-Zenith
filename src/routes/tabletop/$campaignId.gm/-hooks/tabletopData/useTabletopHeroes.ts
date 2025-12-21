@@ -1,133 +1,92 @@
-import { queryOptions, useSuspenseQueries } from '@tanstack/react-query'
+import { queryOptions, useQueries } from '@tanstack/react-query'
 import { getRouteApi } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { requireAccount } from '~/supabase/requireAccount'
+import { typedObject } from '~/types/typedObject'
 import { useTabletopHeroList } from './useTabletopHeroList'
 
 const heroLoaderSchema = type({
-	heroId: 'number'
+	tabletopCharacterId: 'number'
 })
 
 const heroLoader = createServerFn({ method: 'GET' })
 	.validator(heroLoaderSchema)
-	.handler(async ({ data: { heroId } }) => {
+	.handler(async ({ data: { tabletopCharacterId } }) => {
 		const { supabase } = await requireAccount({ backlink: '/campaigns' })
 
 		const { data, error } = await supabase
-			.from('hero_info')
+			.from('tabletop_characters')
 			.select(`
-				heroName: hero_name,
 				tabletopHero: tabletop_heroes (
-					tabletopCharacterId: tt_character_id,
-					tabletopCharacter: tabletop_characters (
-						health,
-						wounds,
-						shield,
-						trauma,
-						movement
+					heroId: hero_id,
+					heroInfo: hero_info (
+						heroName: hero_name,
+						characterInfo: character_info (
+							maxHealth: max_health,
+							maxShield: max_shield,
+							int,
+							str,
+							dex,
+							maxMovement: max_movement,
+							critChance: crit_chance
+						)
 					)
 				),
-				character_info (
-					maxHealth: max_health,
-					maxShield: max_shield,
-					int,
-					str,
-					dex,
-					maxMovement: max_movement,
-					critChance: crit_chance
-				)
+				health,
+				wounds,
+				shield,
+				trauma,
+				movement
 			`)
-			.eq('hero_id', heroId)
+			.eq('tt_character_id', tabletopCharacterId)
 			.limit(1)
-			.single()
+			.maybeSingle()
 		if (error) throw new Error(error.message, { cause: error })
+		if (!data) return null
+
+		const tabletopHero = data.tabletopHero[0]
+		if (!tabletopHero) throw new Error('Hero not found')
 
 		return {
-			heroId,
-			heroName: data.heroName,
-			stats: data.character_info,
-			tabletopCharacter: data.tabletopHero
-				? {
-					tabletopCharacterId: data.tabletopHero.tabletopCharacterId,
-					tabletopStats: data.tabletopHero.tabletopCharacter
-				}
-				: null
+			tabletopCharacterId,
+			heroId: tabletopHero.heroId,
+			heroName: tabletopHero.heroInfo.heroName,
+			stats: tabletopHero.heroInfo.characterInfo,
+			tabletopStats: {
+				health: data.health,
+				wounds: data.wounds,
+				shield: data.shield,
+				trauma: data.trauma,
+				movement: data.movement
+			}
 		}
 	})
 
-const tabletopHeroQueryOptions = (campaignId: number, heroId: number) => queryOptions({
-	queryKey: [campaignId, 'tabletop', 'hero', heroId],
-	queryFn: () => heroLoader({ data: { heroId } })
+const tabletopHeroQueryOptions = (campaignId: number, tabletopCharacterId: number) => queryOptions({
+	queryKey: [campaignId, 'tabletop', 'hero', tabletopCharacterId],
+	queryFn: () => heroLoader({ data: { tabletopCharacterId } })
 })
 
-export type HeroData = Awaited<ReturnType<typeof heroLoader>>
-export interface HeroDataTabletop extends HeroData {
-	tabletopCharacter: NonNullable<HeroData['tabletopCharacter']>
-}
-
-function hasTabletopCharacter(heroData: HeroData): heroData is HeroDataTabletop {
-	return !!heroData.tabletopCharacter
-}
-
-class HeroDataMap {
-	#map: Map<`hero-${number}` | `character-${number}`, HeroData>
-	// set of heroIds that don't have tabletop characters
-	#inactive: Set<number>
-	#entries: [`hero-${number}` | `character-${number}`, HeroData][]
-
-	constructor(data: { data: HeroData }[]) {
-		this.#map = new Map()
-		this.#inactive = new Set()
-		data.forEach(({ data }) => this.#set(data.heroId, data.tabletopCharacter?.tabletopCharacterId, data))
-		this.#entries = [...this.#map.entries()]
-	}
-
-	#set(heroId: number, tabletopCharacterId: number | undefined, value: HeroData) {
-		this.#map.set(`hero-${heroId}`, value)
-		if (tabletopCharacterId) {
-			this.#map.set(`character-${tabletopCharacterId}`, value)
-		} else {
-			this.#inactive.add(heroId)
-		}
-	}
-
-	getFromHeroId(heroId: number) {
-		const heroData = this.#map.get(`hero-${heroId}`)
-		if (!heroData) throw new Error(`Hero not found: ${heroId}`)
-		return heroData
-	}
-
-	getFromCharacterId(tabletopCharacterId: number) {
-		const heroData = this.#map.get(`character-${tabletopCharacterId}`)
-		if (heroData && !hasTabletopCharacter(heroData)) throw new Error(`Character not found: ${tabletopCharacterId}`)
-		return heroData
-	}
-
-	getAll() {
-		return this.#entries.flatMap(([key, value]) => key.startsWith('hero-') ? [value] : [])
-	}
-
-	getAllTabletop() {
-		return this.#entries.flatMap(([key, value]) => key.startsWith('character-') && hasTabletopCharacter(value) ? [value] : [])
-	}
-
-	getInactive() {
-		return [...this.#inactive]
-	}
+export type TabletopHeroData = NonNullable<Awaited<ReturnType<typeof heroLoader>>>
+type TabletopHeroesData = {
+	[tabletopCharacterId: number]: TabletopHeroData
 }
 
 export function useTabletopHeroes() {
 	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useLoaderData()
-	const heroIds = useTabletopHeroList().data
-	const queries = useSuspenseQueries({
-		queries: heroIds.map(heroId => tabletopHeroQueryOptions(campaignId, heroId))
-		// combine doesn't work because it doesn't update when you manually set query data
+	const { data: heroList } = useTabletopHeroList()
+	const queries = useQueries({
+		queries: heroList.flatMap(hero => hero.tabletopCharacterId ? tabletopHeroQueryOptions(campaignId, hero.tabletopCharacterId) : [])
 	})
 
+	const dataTuple = queries
+		.map<[number, TabletopHeroesData[number]] | null>(hero => hero.data ? [hero.data.tabletopCharacterId, hero.data] : null)
+		.filter(hero => hero !== null)
+	const combine: TabletopHeroesData = typedObject.fromEntries(dataTuple)
+
 	return {
-		// TODO memoise this somehow
-		data: new HeroDataMap(queries),
+		data: combine,
 		queries
 	}
 }

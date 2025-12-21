@@ -48,14 +48,14 @@ export default function ChangeEncounter() {
 
 	return (
 		<>
-			<Group>
-				<Text>
-					<Text span>Current Encounter: </Text>
-					<Text span fs={currentEncounterName ? 'bold' : 'italic'}>{currentEncounterName ?? 'None'}</Text>
-				</Text>
+			<Title order={3}>Encounter</Title>
 
-				<Button size='compact-md' onClick={() => modalStack.open('encounter-list')}>Change Encounter</Button>
-			</Group>
+			<Text>
+				<Text span fw={700}>Current Encounter: </Text>
+				<Text span fs={currentEncounterName ? 'bold' : 'italic'}>{currentEncounterName ?? 'None'}</Text>
+			</Text>
+
+			<Button onClick={() => modalStack.open('encounter-list')}>Start New Encounter</Button>
 
 			<Modal.Stack>
 				<Modal {...modalStack.register('encounter-list')} title='Change Encounter' onClose={handleCleanupModal}>
@@ -91,8 +91,8 @@ export default function ChangeEncounter() {
 					<Modal {...modalStack.register('confirm')} title='Confirm action' onClose={handleCleanupModal}>
 						<Stack>
 							<Text>Are you sure you want to change the encounter? This will override all current map data</Text>
-							<Group justify='flex-end'>
-								<Button onClick={handleCleanupModal} variant='default'>Cancel</Button>
+							<Group>
+								<Button onClick={handleCleanupModal} variant='default' flex={1}>Cancel</Button>
 								<Button color='red' onClick={handleConfirmSelection}>Confirm</Button>
 							</Group>
 						</Stack>
@@ -160,12 +160,12 @@ const changeEncounterAction = createServerFn({ method: 'POST' })
 		}
 
 		{
-			// TODO - add an option to not clear hero data
 			// delete all tabletop characters
 			const { error } = await serverClient
 				.from('tabletop_characters')
 				.delete()
 				.eq('campaign_id', campaignId)
+				.neq('character_type', 'HERO')
 			if (error) throw new Error(error.message, { cause: error })
 		}
 

@@ -25,7 +25,7 @@ const encounterListLoader = createServerFn({ method: 'GET' })
 		if (!tabletopInfo.data) {
 			const { error } = await supabase
 				.from('tabletop_info')
-				.insert({ campaign_id: campaignId, map_id: -1 }) // TODO remove map_id
+				.insert({ campaign_id: campaignId })
 			if (error) throw new Error(error.message, { cause: error })
 		}
 

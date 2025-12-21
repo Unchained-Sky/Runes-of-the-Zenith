@@ -1,7 +1,7 @@
 import { getRouteApi } from '@tanstack/react-router'
 import useMountEffect from '~/hooks/useMountEffect'
 import { type Tables } from '~/supabase/databaseTypes'
-import { type HeroData } from '../tabletopData/useTabletopHeroes'
+import { type HeroData } from '../tabletopData/useTabletopHeroesOld'
 import { LOG_SUBSCRIPTION_PAYLOADS, type SubscribeHookProps } from './useTabletopSubscription'
 
 type TabletopHeroesTable = Tables<'tabletop_heroes'>

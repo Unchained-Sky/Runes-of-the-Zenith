@@ -1,5 +1,5 @@
 import { Avatar, Button, Group, Menu, Stack, Text, Title } from '@mantine/core'
-import { type HeroDataTabletop, useTabletopHeroes } from '../../../-hooks/tabletopData/useTabletopHeroes'
+import { type TabletopHeroData, useTabletopHeroes } from '../../../-hooks/tabletopData/useTabletopHeroes'
 import { useTabletopHeroRounds } from '../../../-hooks/tabletopData/useTabletopHeroRounds'
 import { useAssignNextHeroTurn } from '../../../-utils/assignNextHeroTurn'
 
@@ -14,7 +14,7 @@ export default function TurnOrder() {
 		<Stack align='flex-start'>
 			<Title order={3}>Turn Order</Title>
 			{usedTurns.map(turn => {
-				const heroData = heroesData.getFromCharacterId(turn.tabletopCharacterId)
+				const heroData = heroesData[turn.tabletopCharacterId]
 				if (!heroData) throw new Error(`Hero not found: ${turn.tabletopCharacterId}`)
 				return <UsedTurn key={turn.order} turnType={turn.turnType} heroData={heroData} />
 			})}
@@ -30,7 +30,7 @@ export default function TurnOrder() {
 
 type UsedTurnProps = {
 	turnType: 'PRIMARY' | 'SECONDARY'
-	heroData: HeroDataTabletop
+	heroData: TabletopHeroData
 }
 
 function UsedTurn({ turnType, heroData }: UsedTurnProps) {
@@ -53,8 +53,6 @@ function UnusedTurn() {
 
 function AssignNextTurn() {
 	const { data: heroesData } = useTabletopHeroes()
-	const allHeroes = heroesData.getAllTabletop()
-
 	const { data: heroRounds } = useTabletopHeroRounds()
 
 	const assignNextHeroTurn = useAssignNextHeroTurn()
@@ -66,8 +64,8 @@ function AssignNextTurn() {
 			</Menu.Target>
 
 			<Menu.Dropdown>
-				{allHeroes.map(heroData => {
-					const rounds = heroRounds.filter(heroRound => heroRound.tabletopCharacterId === heroData.tabletopCharacter.tabletopCharacterId)
+				{Object.values(heroesData).map(heroData => {
+					const rounds = heroRounds.filter(heroRound => heroRound.tabletopCharacterId === heroData.tabletopCharacterId)
 					const primary = rounds.find(round => round.turnType === 'PRIMARY')?.used
 					const secondary = rounds.find(round => round.turnType === 'SECONDARY')?.used
 					return (
@@ -80,7 +78,7 @@ function AssignNextTurn() {
 								<Menu.Item
 									disabled={primary}
 									onClick={() => {
-										assignNextHeroTurn.mutate({ data: { tabletopCharacterId: heroData.tabletopCharacter.tabletopCharacterId, turnType: 'PRIMARY' } })
+										assignNextHeroTurn.mutate({ data: { tabletopCharacterId: heroData.tabletopCharacterId, turnType: 'PRIMARY' } })
 									}}
 								>
 									Primary
@@ -88,7 +86,7 @@ function AssignNextTurn() {
 								<Menu.Item
 									disabled={secondary}
 									onClick={() => {
-										assignNextHeroTurn.mutate({ data: { tabletopCharacterId: heroData.tabletopCharacter.tabletopCharacterId, turnType: 'SECONDARY' } })
+										assignNextHeroTurn.mutate({ data: { tabletopCharacterId: heroData.tabletopCharacterId, turnType: 'SECONDARY' } })
 									}}
 								>
 									Secondary

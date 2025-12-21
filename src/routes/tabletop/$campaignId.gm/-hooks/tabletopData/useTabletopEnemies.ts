@@ -68,8 +68,9 @@ const tabletopEnemyQueryOptions = (campaignId: number, tabletopCharacterId: numb
 	queryFn: () => enemyLoader({ data: { tabletopCharacterId } })
 })
 
-type EnemiesData = {
-	[tabletopCharacterId: number]: NonNullable<Awaited<ReturnType<typeof enemyLoader>>>
+type TabletopEnemyData = NonNullable<Awaited<ReturnType<typeof enemyLoader>>>
+type TabletopEnemiesData = {
+	[tabletopCharacterId: number]: TabletopEnemyData
 }
 
 export function useTabletopEnemies() {
@@ -80,9 +81,9 @@ export function useTabletopEnemies() {
 	})
 
 	const dataTuple = queries
-		.map<[number, EnemiesData[number]] | null>(enemy => enemy.data ? [enemy.data.tabletopCharacterId, enemy.data] : null)
+		.map<[number, TabletopEnemiesData[number]] | null>(enemy => enemy.data ? [enemy.data.tabletopCharacterId, enemy.data] : null)
 		.filter(enemy => enemy !== null)
-	const combine: EnemiesData = typedObject.fromEntries(dataTuple)
+	const combine: TabletopEnemiesData = typedObject.fromEntries(dataTuple)
 
 	return {
 		data: combine,

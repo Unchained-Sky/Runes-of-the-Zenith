@@ -10,7 +10,7 @@ import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
 import { type CombatTileCord } from '~/types/gameTypes/combatMap'
 import { mutationError } from '~/utils/mutationError'
-import { useTabletopHeroes } from '../-hooks/tabletopData/useTabletopHeroes'
+import { useTabletopHeroList } from '../-hooks/tabletopData/useTabletopHeroList'
 import { useTabletopTiles } from '../-hooks/tabletopData/useTabletopTiles'
 
 type HexContextMenuProps = {
@@ -40,8 +40,8 @@ type HeroesProps = {
 function Heroes({ cord }: HeroesProps) {
 	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useLoaderData()
 
-	const { data: heroesData } = useTabletopHeroes()
-	const inactiveHeroes = heroesData.getInactive()
+	const { data: heroList } = useTabletopHeroList()
+	const inactiveHeroes = heroList.filter(hero => !hero.tabletopCharacterId)
 
 	const addHero = useMutation({
 		mutationFn: addHeroAction,
@@ -60,8 +60,7 @@ function Heroes({ cord }: HeroesProps) {
 			</Menu.Sub.Target>
 
 			<Menu.Sub.Dropdown>
-				{inactiveHeroes.map(heroId => {
-					const heroData = heroesData.getFromHeroId(heroId)
+				{inactiveHeroes.map(({ heroId, heroName }) => {
 					return (
 						<Menu.Item
 							key={heroId}
@@ -73,7 +72,7 @@ function Heroes({ cord }: HeroesProps) {
 								}
 							})}
 						>
-							{heroData.heroName}
+							{heroName}
 						</Menu.Item>
 					)
 				})}

@@ -15,7 +15,7 @@ export default function CharacterTab() {
 function Hero() {
 	const [selectedCharacterId] = useSettingsPanelStore(state => state.selectedCharacter)
 	const { data: heroesData } = useTabletopHeroes()
-	const heroData = heroesData.getFromCharacterId(selectedCharacterId)
+	const heroData = heroesData[selectedCharacterId]
 	if (!heroData) return null
 
 	return (

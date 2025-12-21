@@ -22,18 +22,18 @@ export default function Heroes() {
 		<>
 			<Title order={3}>Heroes</Title>
 			<SimpleGrid cols={3}>
-				{heroesData.getAllTabletop().map(heroData => {
+				{Object.values(heroesData).map(heroData => {
 					return (
 						<CharacterCard
 							key={heroData.heroId}
 							character={{
 								type: 'HERO',
-								tabletopCharacterId: heroData.tabletopCharacter.tabletopCharacterId,
+								tabletopCharacterId: heroData.tabletopCharacterId,
 								characterName: heroData.heroName,
 								stats: heroData.stats,
-								tabletopStats: heroData.tabletopCharacter.tabletopStats
+								tabletopStats: heroData.tabletopStats
 							}}
-							removeCharacter={() => removeHero.mutate({ data: { tabletopCharacterId: heroData.tabletopCharacter.tabletopCharacterId } })}
+							removeCharacter={() => removeHero.mutate({ data: { tabletopCharacterId: heroData.tabletopCharacterId } })}
 						/>
 					)
 				})}
