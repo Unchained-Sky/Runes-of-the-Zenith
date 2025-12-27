@@ -32,6 +32,8 @@ const heroListLoader = createServerFn({ method: 'GET' })
 		}))
 	})
 
+export type TabletopHeroesList = Awaited<ReturnType<typeof heroListLoader>>
+
 export const tabletopHeroListQueryOptions = (campaignId: number) => queryOptions({
 	queryKey: [campaignId, 'tabletop', 'hero-list'],
 	queryFn: () => heroListLoader({ data: { campaignId } }),

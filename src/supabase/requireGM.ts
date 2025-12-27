@@ -5,6 +5,8 @@ type RequireGMProps = ({
 	campaignId: number
 } | {
 	tabletopCharacterId: number
+} | {
+	heroId: number
 }) & {
 	backlink?: string
 }
@@ -14,6 +16,7 @@ export const requireGM = serverOnly(async ({ backlink, ...props }: RequireGMProp
 
 	const campaignId = 'campaignId' in props ? props.campaignId : null
 	const tabletopCharacterId = 'tabletopCharacterId' in props ? props.tabletopCharacterId : null
+	const heroId = 'heroId' in props ? props.heroId : null
 
 	if (campaignId) {
 		const { error } = await supabase
@@ -42,6 +45,24 @@ export const requireGM = serverOnly(async ({ backlink, ...props }: RequireGMProp
 			.single()
 		if (error) throw new Error(error.message, { cause: error })
 		if (data.campaign_info.gmUserId !== user.id) throw new Error('You are not the GM of this campaign')
+
+		return { supabase, user, campaignId: data.campaignId }
+	}
+
+	if (heroId) {
+		const { data, error } = await supabase
+			.from('hero_info')
+			.select(`
+				campaignId: campaign_id,
+				campaign_info (
+					gmUserId: user_id
+				)
+			`)
+			.eq('hero_id', heroId)
+			.limit(1)
+			.single()
+		if (error) throw new Error(error.message, { cause: error })
+		if (!data.campaignId || data.campaign_info?.gmUserId !== user.id) throw new Error('You are not the GM of this campaign')
 
 		return { supabase, user, campaignId: data.campaignId }
 	}

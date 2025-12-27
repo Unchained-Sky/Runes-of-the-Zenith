@@ -10,6 +10,7 @@ import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
 import { type CombatTileCord } from '~/types/gameTypes/combatMap'
 import { mutationError } from '~/utils/mutationError'
+import { type TabletopHeroData, useTabletopHeroes } from '../-hooks/tabletopData/useTabletopHeroes'
 import { useTabletopHeroList } from '../-hooks/tabletopData/useTabletopHeroList'
 import { useTabletopTiles } from '../-hooks/tabletopData/useTabletopTiles'
 
@@ -38,13 +39,34 @@ type HeroesProps = {
 }
 
 function Heroes({ cord }: HeroesProps) {
-	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useLoaderData()
+	const routeApi = getRouteApi('/tabletop/$campaignId/gm/')
+	const { queryClient } = routeApi.useRouteContext()
+	const { campaignId } = routeApi.useLoaderData()
 
 	const { data: heroList } = useTabletopHeroList()
 	const inactiveHeroes = heroList.filter(hero => !hero.tabletopCharacterId)
 
+	const { data: heroesData } = useTabletopHeroes()
+	const unplacedHeroes = Object.values(heroesData).flatMap(hero => hero.pos ? [] : { heroId: hero.heroId, heroName: hero.heroName })
+
+	const addableHeroes = [...inactiveHeroes, ...unplacedHeroes]
+
 	const addHero = useMutation({
 		mutationFn: addHeroAction,
+		onMutate: ({ data }) => {
+			const { heroId, cord } = data
+
+			const heroData = Object.values(heroesData).find(hero => hero.heroId === heroId)
+			if (heroData) {
+				void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'hero', heroData.tabletopCharacterId] })
+				queryClient.setQueriesData({ queryKey: [campaignId, 'tabletop', 'hero', heroData.tabletopCharacterId] }, (oldData: TabletopHeroData) => {
+					return {
+						...oldData,
+						pos: cord
+					} satisfies TabletopHeroData
+				})
+			}
+		},
 		onError: error => {
 			mutationError(error, 'Failed to add hero')
 		}
@@ -56,18 +78,17 @@ function Heroes({ cord }: HeroesProps) {
 	return (
 		<Menu.Sub>
 			<Menu.Sub.Target>
-				<Menu.Sub.Item disabled={!inactiveHeroes.length || !!tile?.characterType}>Add Hero</Menu.Sub.Item>
+				<Menu.Sub.Item disabled={!addableHeroes.length || !!tile?.characterType}>Add Hero</Menu.Sub.Item>
 			</Menu.Sub.Target>
 
 			<Menu.Sub.Dropdown>
-				{inactiveHeroes.map(({ heroId, heroName }) => {
+				{addableHeroes.map(({ heroId, heroName }) => {
 					return (
 						<Menu.Item
 							key={heroId}
 							onClick={() => addHero.mutate({
 								data: {
 									heroId,
-									campaignId,
 									cord
 								}
 							})}
@@ -83,14 +104,13 @@ function Heroes({ cord }: HeroesProps) {
 
 const addHeroSchema = type({
 	heroId: 'number',
-	campaignId: 'number',
 	cord: ['number', 'number', 'number']
 })
 
 const addHeroAction = createServerFn({ method: 'POST' })
 	.validator(addHeroSchema)
-	.handler(async ({ data: { heroId, campaignId, cord: [q, r, s] } }) => {
-		const { supabase } = await requireGM({ campaignId })
+	.handler(async ({ data: { heroId, cord: [q, r, s] } }) => {
+		const { supabase, campaignId } = await requireGM({ heroId })
 
 		const serviceClient = getServiceClient()
 
@@ -108,7 +128,7 @@ const addHeroAction = createServerFn({ method: 'POST' })
 			if (data?.characterId) throw new Error('Tile already has a character')
 		}
 
-		const getCharacterId = async () => {
+		const getTabletopCharacterId = async () => {
 			const { data: characterData, error: characterError } = await supabase
 				.from('tabletop_heroes')
 				.select(`
@@ -153,14 +173,14 @@ const addHeroAction = createServerFn({ method: 'POST' })
 			return data.characterId
 		}
 
-		const characterId = await getCharacterId()
+		const tabletopCharacterId = await getTabletopCharacterId()
 
 		{
 			// Check if the hero is already on the map
 			const { count } = await supabase
 				.from('tabletop_tiles')
 				.select('', { count: 'exact' })
-				.eq('tt_character_id', characterId)
+				.eq('tt_character_id', tabletopCharacterId)
 			if (count) throw new Error('Character already has a tile')
 		}
 
@@ -173,7 +193,7 @@ const addHeroAction = createServerFn({ method: 'POST' })
 					q,
 					r,
 					s,
-					tt_character_id: characterId
+					tt_character_id: tabletopCharacterId
 				} satisfies TablesInsert<'tabletop_tiles'>)
 			if (error) throw new Error(error.message, { cause: error })
 		}
