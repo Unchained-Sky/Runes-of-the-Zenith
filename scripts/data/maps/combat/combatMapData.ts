@@ -1,4 +1,4 @@
-import { type Compendium } from '~/scripts/compendiumTypes'
+import { type Compendium } from '~/scripts/data/compendiumTypes'
 import { type CombatMap } from '~/types/gameTypes/combatMap'
 import rocks from './base/rocks'
 import woods from './base/woods'

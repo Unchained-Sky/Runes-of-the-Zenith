@@ -1,4 +1,4 @@
-import { createCompendiumHash } from '~/scripts/compendiumTypes'
+import { createCompendiumHash } from '~/scripts/data/compendiumTypes'
 import zombeast from '../../enemies/base/zombeast'
 import zombrero from '../../enemies/base/zombrero'
 import rocks from '../../maps/combat/base/rocks'

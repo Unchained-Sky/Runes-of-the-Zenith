@@ -1,8 +1,8 @@
 import { type TablesInsert } from '~/supabase/databaseTypes'
 import { getServiceClient } from '~/supabase/getServiceClient'
-import { adminUUID } from '../src/supabase/adminAccount'
-import { createCompendiumHash } from './compendiumTypes'
-import combatMaps, { type CompendiumCombatMap } from './data/maps/combat/combatMapData'
+import { adminUUID } from '../../src/supabase/adminAccount'
+import { createCompendiumHash } from '../data/compendiumTypes'
+import combatMaps, { type CompendiumCombatMap } from '../data/maps/combat/combatMapData'
 
 const supabase = getServiceClient()
 

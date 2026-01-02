@@ -1,4 +1,4 @@
-import { type Compendium } from '~/scripts/compendiumTypes'
+import { type Compendium } from '~/scripts/data/compendiumTypes'
 import { type Enemy } from '~/types/gameTypes/enemy'
 import marauder from './base/marauder'
 import zombeast from './base/zombeast'

@@ -1,4 +1,4 @@
-import { createCompendiumHash } from '~/scripts/compendiumTypes'
+import { createCompendiumHash } from '~/scripts/data/compendiumTypes'
 import marauder from '../../enemies/base/marauder'
 import woods from '../../maps/combat/base/woods'
 import { type CompendiumEncounter } from '../encounterData'

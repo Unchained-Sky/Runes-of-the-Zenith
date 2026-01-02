@@ -1,8 +1,8 @@
 import { adminUUID } from '~/supabase/adminAccount'
 import { type TablesInsert } from '~/supabase/databaseTypes'
 import { getServiceClient } from '~/supabase/getServiceClient'
-import { createCompendiumHash } from './compendiumTypes'
-import encounters, { type CompendiumEncounter } from './data/encounters/encounterData'
+import { createCompendiumHash } from '../data/compendiumTypes'
+import encounters, { type CompendiumEncounter } from '../data/encounters/encounterData'
 
 const supabase = getServiceClient()
 

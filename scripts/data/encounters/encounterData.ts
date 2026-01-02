@@ -1,4 +1,4 @@
-import { type Compendium, type CompendiumHash } from '~/scripts/compendiumTypes'
+import { type Compendium, type CompendiumHash } from '~/scripts/data/compendiumTypes'
 import first from './base/first'
 import second from './base/second'
 

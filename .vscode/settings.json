@@ -6,7 +6,10 @@
 		"Pipeable",
 		"Revalidator",
 		"rotz",
-		"runetablet"
+		"runetablet",
+		"Subarchetype",
+		"subarchetypes",
+		"Tribrid"
 	],
 	"cssVariables.lookupFiles": [
 		"**/*.css",

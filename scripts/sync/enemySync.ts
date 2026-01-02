@@ -1,7 +1,7 @@
 import { adminUUID } from '~/supabase/adminAccount'
 import { getServiceClient } from '~/supabase/getServiceClient'
-import { createCompendiumHash } from './compendiumTypes'
-import enemyData, { type CompendiumEnemy } from './data/enemies/enemyData'
+import { createCompendiumHash } from '../data/compendiumTypes'
+import enemyData, { type CompendiumEnemy } from '../data/enemies/enemyData'
 
 const supabase = getServiceClient()
 
