@@ -1,3 +1,4 @@
+import { type RuneExtraData } from '~/routes/tabletop/$campaignId.gm/-hooks/tabletopData/useTabletopHeroes'
 import { type Archetype, type DamageType, type Subarchetype } from '../DamageType'
 import astral from './intelligence/arcane/astral'
 
@@ -17,7 +18,7 @@ type RuneSlotDurability = {
 export type RuneDataInternal = {
 	name: string
 	description: string
-	data: object
+	data: Omit<RuneExtraData, 'description'>
 } & RuneSlotDurability
 
 export type RuneData<T extends DamageType = DamageType> = T extends DamageType ? {

@@ -12,12 +12,11 @@ export type Slice<
 	Middleware extends [StoreMutatorIdentifier, unknown][] = [DevTools, Persist]
 > = StateCreator<Store, Middleware, [], CurrentSlice>
 
-export const createActionName
-	= <T extends object>(storeName: string) =>
-		(actionName: keyof T | `${keyof T & string}/${string}`): [false, string] => [
-			false,
-			`${storeName}/${actionName.toString()}`
-		]
+export const createActionName = <T extends object>(storeName: string) =>
+	(actionName: keyof T | `${keyof T & string}/${string}`): [false, string] => [
+		false,
+		`${storeName}/${actionName.toString()}`
+	]
 
-const projectName = 'project-no-dice'
+const projectName = 'rotz'
 export const persistStoreName = (storeName: string) => `${projectName}-${storeName}`

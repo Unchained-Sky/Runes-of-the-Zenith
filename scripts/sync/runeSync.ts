@@ -21,6 +21,7 @@ const supabase = getServiceClient()
 				rune_name: rune.name,
 				slot: rune.slot,
 				durability: rune.durability,
+				// TODO remove damage_type and archetype and move them into a separate table
 				damage_type: rune.damageType,
 				archetype: rune.archetype,
 				subarchetype: rune.subarchetype,

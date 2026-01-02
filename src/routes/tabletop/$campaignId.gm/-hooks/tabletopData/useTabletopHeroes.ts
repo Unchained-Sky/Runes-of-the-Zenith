@@ -2,6 +2,7 @@ import { queryOptions, useQueries } from '@tanstack/react-query'
 import { getRouteApi } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
+import { type Enums } from '~/supabase/databaseTypes'
 import { requireAccount } from '~/supabase/requireAccount'
 import { typedObject } from '~/types/typedObject'
 import { useTabletopHeroList } from './useTabletopHeroList'
@@ -30,6 +31,17 @@ const heroLoader = createServerFn({ method: 'GET' })
 							dex,
 							maxMovement: max_movement,
 							critChance: crit_chance
+						),
+						heroRune: hero_rune (
+							runeInfo: rune_info (
+								name: rune_name,
+								slot,
+								durability,
+								damageType: damage_type,
+								archetype,
+								subarchetype,
+								data
+							)
 						)
 					)
 				),
@@ -53,6 +65,22 @@ const heroLoader = createServerFn({ method: 'GET' })
 		const tabletopHero = data.tabletopHero[0]
 		if (!tabletopHero) throw new Error('Hero not found')
 
+		const runes = tabletopHero.heroInfo.heroRune.reduce<Record<InternalTabletopHeroRuneData['slot'], InternalTabletopHeroRuneData[]>>((acc, curr) => {
+			const runeData = curr.runeInfo
+			runeData.data = JSON.stringify(runeData.data)
+			return {
+				...acc,
+				[runeData.slot]: [
+					...acc[runeData.slot],
+					runeData
+				]
+			}
+		}, {
+			PRIMARY: [],
+			SECONDARY: [],
+			PASSIVE: []
+		})
+
 		return {
 			tabletopCharacterId,
 			heroId: tabletopHero.heroId,
@@ -65,7 +93,8 @@ const heroLoader = createServerFn({ method: 'GET' })
 				trauma: data.trauma,
 				movement: data.movement
 			},
-			pos: data.tile[0] ? [data.tile[0].q, data.tile[0].r, data.tile[0].s] : null
+			pos: data.tile[0] ? [data.tile[0].q, data.tile[0].r, data.tile[0].s] : null,
+			runes
 		}
 	})
 
@@ -74,9 +103,46 @@ const tabletopHeroQueryOptions = (campaignId: number, tabletopCharacterId: numbe
 	queryFn: () => heroLoader({ data: { tabletopCharacterId } })
 })
 
-export type TabletopHeroData = NonNullable<Awaited<ReturnType<typeof heroLoader>>>
+type InternalTabletopHeroData = NonNullable<Awaited<ReturnType<typeof heroLoader>>>
+export type TabletopHeroData = Omit<InternalTabletopHeroData, 'runes'> & {
+	runes: {
+		PRIMARY: TabletopHeroRuneData[]
+		SECONDARY: TabletopHeroRuneData[]
+		PASSIVE: TabletopHeroRuneData[]
+	}
+}
 type TabletopHeroesData = {
 	[tabletopCharacterId: number]: TabletopHeroData
+}
+
+type InternalTabletopHeroRuneData = Omit<TabletopHeroRuneData, 'data'> & {
+	data: string
+}
+export type TabletopHeroRuneData = {
+	name: string
+	slot: Enums<'rune_slot'>
+	durability: Enums<'rune_durability'> | null
+	damageType: Enums<'damage_type'>
+	archetype: string
+	subarchetype: string
+	data: RuneExtraData
+}
+
+const runeExtraDataSchema = type({
+	description: 'string'
+})
+export type RuneExtraData = typeof runeExtraDataSchema.infer
+const runeExtraDataFormatter = (rune: InternalTabletopHeroRuneData) => {
+	const json = JSON.parse(rune.data)
+	const out = runeExtraDataSchema(json)
+	if (out instanceof type.errors) {
+		throw console.error(out.summary)
+	} else {
+		return {
+			...rune,
+			data: out
+		}
+	}
 }
 
 export function useTabletopHeroes() {
@@ -87,7 +153,20 @@ export function useTabletopHeroes() {
 	})
 
 	const dataTuple = queries
-		.map<[number, TabletopHeroesData[number]] | null>(hero => hero.data ? [hero.data.tabletopCharacterId, hero.data] : null)
+		.map<[number, TabletopHeroData] | null>(hero => {
+			if (!hero.data) return null
+
+			const runeExtraData = {
+				PRIMARY: hero.data.runes.PRIMARY.map(runeExtraDataFormatter),
+				SECONDARY: hero.data.runes.SECONDARY.map(runeExtraDataFormatter),
+				PASSIVE: hero.data.runes.PASSIVE.map(runeExtraDataFormatter)
+			}
+
+			return [hero.data.tabletopCharacterId, {
+				...hero.data,
+				runes: runeExtraData
+			}]
+		})
 		.filter(hero => hero !== null)
 	const combine: TabletopHeroesData = typedObject.fromEntries(dataTuple)
 
