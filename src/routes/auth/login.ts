@@ -2,7 +2,6 @@ import { createFileRoute, redirect } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { getSupabaseServerClient } from '~/supabase/getSupabaseServerClient'
-import { type FormResponse } from '~/types/formResponse'
 
 const authLoginSearchSchema = type({
 	'backlink?': 'string'
@@ -38,12 +37,7 @@ const serverLoader = createServerFn({ method: 'POST' })
 			}
 		})
 
-		if (error) {
-			return {
-				error: true,
-				message: error.message
-			} satisfies FormResponse
-		}
+		if (error) throw new Error(error.message, { cause: error })
 
 		throw redirect({ href: data.url })
 	})

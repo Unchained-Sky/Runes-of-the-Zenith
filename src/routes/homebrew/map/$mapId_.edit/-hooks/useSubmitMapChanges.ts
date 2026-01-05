@@ -3,9 +3,17 @@ import { createServerFn, useServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireAccount } from '~/supabase/requireAccount'
-import { type FormResponse } from '~/types/formResponse'
 import { typedObject } from '~/types/typedObject'
 import { useMapEditStore } from './useMapEditStore'
+
+type FormResponse<T = unknown> = {
+	error: true
+	message: string
+} | {
+	error: false
+	message: string
+	data?: T
+}
 
 const submitMapChangesSchema = type({
 	'mapId': 'string.digits',
@@ -78,6 +86,7 @@ const submitMapChanges = createServerFn({ method: 'POST' })
 export const useSubmitMapChanges = () => {
 	const { mapId } = getRouteApi('/homebrew/map/$mapId_/edit/').useParams()
 
+	// TODO change to useMutation
 	const postSubmit = useServerFn(submitMapChanges)
 
 	return async () => {
