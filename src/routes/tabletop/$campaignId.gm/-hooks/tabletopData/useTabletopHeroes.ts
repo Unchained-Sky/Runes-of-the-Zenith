@@ -62,8 +62,23 @@ const heroLoader = createServerFn({ method: 'GET' })
 		if (error) throw new Error(error.message, { cause: error })
 		if (!data) return null
 
+		const getAvatar = async (heroId: number) => {
+			const { data } = await supabase
+				.storage
+				.from('hero_avatar')
+				.exists(`${heroId}.png`)
+
+			const { data: { publicUrl: avatarUrl } } = supabase
+				.storage
+				.from('hero_avatar')
+				.getPublicUrl(`${data ? heroId : 'default'}.png`)
+			return avatarUrl
+		}
+
 		const tabletopHero = data.tabletopHero[0]
 		if (!tabletopHero) throw new Error('Hero not found')
+
+		const avatarUrl = await getAvatar(tabletopHero.heroId)
 
 		const runes = tabletopHero.heroInfo.heroRune.reduce<Record<InternalTabletopHeroRuneData['slot'], InternalTabletopHeroRuneData[]>>((acc, curr) => {
 			const runeData = curr.runeInfo
@@ -94,7 +109,8 @@ const heroLoader = createServerFn({ method: 'GET' })
 				movement: data.movement
 			},
 			pos: data.tile[0] ? [data.tile[0].q, data.tile[0].r, data.tile[0].s] : null,
-			runes
+			runes,
+			avatarUrl
 		}
 	})
 

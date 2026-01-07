@@ -1,4 +1,4 @@
-import { ActionIcon, Card, Group, Stack, Text, Title, Tooltip } from '@mantine/core'
+import { ActionIcon, Avatar, Card, Group, Stack, Text, Title, Tooltip } from '@mantine/core'
 import { IconFlame } from '@tabler/icons-react'
 import { type Enums } from '~/supabase/databaseTypes'
 import { titleCase, type TitleCase } from '~/utils/stringCase'
@@ -13,7 +13,10 @@ export default function Hero() {
 
 	return (
 		<Stack>
-			<Title order={3}>{heroData.heroName}</Title>
+			<Group>
+				<Avatar src={heroData.avatarUrl} name={heroData.heroName} color='green' />
+				<Title order={3}>{heroData.heroName}</Title>
+			</Group>
 
 			<Stack>
 				<RuneSlot slot='Primary' runes={heroData.runes.PRIMARY} />

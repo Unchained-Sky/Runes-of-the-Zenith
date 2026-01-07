@@ -41,6 +41,15 @@ export default function CharacterIcon({ tileData }: CharacterIconProps) {
 		}
 	}
 
+	const getAvatar = () => {
+		switch (characterType) {
+			case 'HERO':
+				return heroesData[tabletopCharacterId]?.avatarUrl
+			case 'ENEMY':
+				return undefined
+		}
+	}
+
 	const mouseEvents = useHoldButton({
 		clickCallback: () => {
 			if (isSelected) {
@@ -55,8 +64,9 @@ export default function CharacterIcon({ tileData }: CharacterIconProps) {
 		<Avatar
 			ref={ref}
 			name={getName()}
+			src={getAvatar()}
 			color={characterType === 'HERO' ? 'green' : 'red'}
-			size='lg'
+			size='xl'
 			pos='absolute'
 			left='50%'
 			top='50%'

@@ -36,12 +36,13 @@ type CharacterCardProps = {
 			movement: number
 		}
 		pos: CombatTileCord | null
+		avatarUrl?: string
 	}
 	removeCharacter?: () => void
 }
 
 export default function CharacterCard({ character, removeCharacter }: CharacterCardProps) {
-	const { type, tabletopCharacterId, characterName, stats, tabletopStats, pos } = character
+	const { type, tabletopCharacterId, characterName, stats, tabletopStats, pos, avatarUrl } = character
 
 	const [opened, { open, close }] = useDisclosure(false)
 
@@ -50,8 +51,8 @@ export default function CharacterCard({ character, removeCharacter }: CharacterC
 			<EditCharacterModal character={character} openedModal={opened} closeModal={close} />
 
 			<Card key={tabletopCharacterId} component={Stack} gap={2} align='center' p='sm' bg='dark.5'>
-				<Avatar name={characterName} color='red' />
-				<Text>{characterName}</Text>
+				<Avatar src={avatarUrl} name={characterName} color={type === 'HERO' ? 'green' : 'red'} />
+				<Text fw={700}>{characterName}</Text>
 				<Text>
 					<Text span>Pos: </Text>
 					<Text span fs={pos ? 'normal' : 'italic'}>{pos ? pos.join(',') : 'Unplaced'}</Text>
