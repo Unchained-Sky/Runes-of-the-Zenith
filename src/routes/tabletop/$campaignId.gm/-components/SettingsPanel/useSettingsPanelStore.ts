@@ -9,7 +9,7 @@ type SettingsPanelState = {
 	selectedCharacter: [tabletopCharacterId: number, characterType: Enums<'character_type'>]
 }
 
-const useSettingsPanelState: SettingsPanelState = {
+const settingsPanelState: SettingsPanelState = {
 	lastActiveTab: 'units',
 	activeTab: null,
 	/** TabletopCharacterId */
@@ -55,7 +55,7 @@ type SettingsPanelStore = SettingsPanelState & SettingsPanelActions
 export const useSettingsPanelStore = create<SettingsPanelStore>()(
 	devtools(
 		(...a) => ({
-			...useSettingsPanelState,
+			...settingsPanelState,
 			...createSettingsPanelActions(...a)
 		}),
 		{ name: 'Settings Panel Store' }

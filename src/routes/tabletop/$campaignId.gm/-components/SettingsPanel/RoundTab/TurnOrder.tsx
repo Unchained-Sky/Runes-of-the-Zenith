@@ -36,7 +36,7 @@ type UsedTurnProps = {
 function UsedTurn({ turnType, heroData }: UsedTurnProps) {
 	return (
 		<Group>
-			<Avatar name={heroData.heroName} color='green' />
+			<Avatar src={heroData.avatarUrl} name={heroData.heroName} color='green' />
 			<Text>{heroData.heroName} [{turnType}]</Text>
 		</Group>
 	)

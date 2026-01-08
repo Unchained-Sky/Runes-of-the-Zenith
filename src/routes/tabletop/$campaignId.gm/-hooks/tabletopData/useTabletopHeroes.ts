@@ -1,4 +1,4 @@
-import { queryOptions, useQueries } from '@tanstack/react-query'
+import { queryOptions, useSuspenseQueries } from '@tanstack/react-query'
 import { getRouteApi } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
@@ -164,7 +164,7 @@ const runeExtraDataFormatter = (rune: InternalTabletopHeroRuneData) => {
 export function useTabletopHeroes() {
 	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useLoaderData()
 	const { data: heroList } = useTabletopHeroList()
-	const queries = useQueries({
+	const queries = useSuspenseQueries({
 		queries: heroList.flatMap(hero => hero.tabletopCharacterId ? tabletopHeroQueryOptions(campaignId, hero.tabletopCharacterId) : [])
 	})
 

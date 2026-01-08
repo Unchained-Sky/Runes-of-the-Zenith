@@ -10,10 +10,13 @@ import { requireGM } from '~/supabase/requireGM'
 import { mutationError } from '~/utils/mutationError'
 import { useTabletopCurrentEncounter } from '../../../-hooks/tabletopData/useTabletopCurrentEncounter'
 import { useTabletopEncounterList } from '../../../-hooks/tabletopData/useTabletopEncounterList'
+import { startRoundAction, startRoundQuerySync } from '../../../-utils/startRound'
 import { useSettingsPanelStore } from '../useSettingsPanelStore'
 
 export default function ChangeEncounter() {
-	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useParams()
+	const routeApi = getRouteApi('/tabletop/$campaignId/gm/')
+	const { queryClient } = routeApi.useRouteContext()
+	const { campaignId } = routeApi.useLoaderData()
 
 	const { data: currentEncounterName } = useTabletopCurrentEncounter()
 	const { data: encounterData } = useTabletopEncounterList()
@@ -34,6 +37,9 @@ export default function ChangeEncounter() {
 
 	const changeEncounter = useMutation({
 		mutationFn: changeEncounterAction,
+		onMutate: () => {
+			startRoundQuerySync({ queryClient, campaignId })
+		},
 		onError: error => {
 			mutationError(error, 'Failed to change the encounter')
 		}
@@ -43,7 +49,7 @@ export default function ChangeEncounter() {
 		if (!selectedEncounter) return
 		useSettingsPanelStore.getState().deselectCharacter()
 		handleCleanupModal()
-		changeEncounter.mutate({ data: { campaignId: +campaignId, encounterId: selectedEncounter } })
+		changeEncounter.mutate({ data: { campaignId: campaignId, encounterId: selectedEncounter } })
 	}
 
 	return (
@@ -248,4 +254,6 @@ const changeEncounterAction = createServerFn({ method: 'POST' })
 				)
 			if (tilesError) throw new Error(tilesError.message, { cause: tilesError })
 		}
+
+		await startRoundAction({ data: { campaignId } })
 	})

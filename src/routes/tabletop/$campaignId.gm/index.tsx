@@ -3,6 +3,7 @@ import { safeParseInt } from '~/utils/safeParseInt'
 import CombatGridTabletopGM from './-components/CombatGridTabletopGM'
 import DragDrop from './-components/DragDrop'
 import SettingsPanel from './-components/SettingsPanel'
+import Windows from './-components/Windows'
 import { tabletopCurrentEncounterQueryOptions } from './-hooks/tabletopData/useTabletopCurrentEncounter'
 import { tabletopEncounterListQueryOptions } from './-hooks/tabletopData/useTabletopEncounterList'
 import { tabletopEnemyListQueryOptions } from './-hooks/tabletopData/useTabletopEnemyList'
@@ -62,8 +63,8 @@ function RouteComponent() {
 	return (
 		<DragDrop>
 			<CombatGridTabletopGM />
-
 			<SettingsPanel />
+			<Windows />
 		</DragDrop>
 	)
 }

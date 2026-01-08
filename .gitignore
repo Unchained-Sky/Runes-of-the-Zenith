@@ -12,6 +12,7 @@ count.txt
 todos.json
 .eslintcache
 worker-configuration.d.ts
+.vscode/settings.json
 
 # Supabase Types
 src/supabase/databaseTypes.d.ts

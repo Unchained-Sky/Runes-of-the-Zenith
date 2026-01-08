@@ -7,6 +7,7 @@ import MapTab from './MapTab'
 import RoundTab from './RoundTab'
 import UnitsTab from './UnitsTab'
 import { useSettingsPanelStore } from './useSettingsPanelStore'
+import WindowTab from './WindowTab'
 
 export default function SettingsPanel() {
 	const {
@@ -72,6 +73,9 @@ export default function SettingsPanel() {
 						<Tabs.Tab value='map'>
 							Map
 						</Tabs.Tab>
+						<Tabs.Tab value='window'>
+							Windows
+						</Tabs.Tab>
 						<Tabs.Tab value='debug'>
 							Debug
 						</Tabs.Tab>
@@ -88,6 +92,9 @@ export default function SettingsPanel() {
 					</Tabs.Panel>
 					<Tabs.Panel value='map'>
 						<MapTab />
+					</Tabs.Panel>
+					<Tabs.Panel value='window'>
+						<WindowTab />
 					</Tabs.Panel>
 					<Tabs.Panel value='debug'>
 						<DebugTag />

@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query'
+import { type QueryClient, useMutation } from '@tanstack/react-query'
 import { getRouteApi } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
@@ -16,19 +16,28 @@ export function useStartRound() {
 	return useMutation({
 		mutationFn: () => startRoundAction({ data: { campaignId } }),
 		onMutate: () => {
-			void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'hero-rounds'] })
-			queryClient.setQueryData([campaignId, 'tabletop', 'hero-rounds'], (oldData: HeroTurn[]) => {
-				return oldData.map<HeroTurn>(turn => ({
-					used: false,
-					order: null,
-					tabletopCharacterId: turn.tabletopCharacterId,
-					turnType: turn.turnType
-				}))
-			})
+			startRoundQuerySync({ queryClient, campaignId })
 		},
 		onError: error => {
 			mutationError(error, 'Failed to start round')
 		}
+	})
+}
+
+type StartRoundQuerySyncProps = {
+	queryClient: QueryClient
+	campaignId: number
+}
+
+export const startRoundQuerySync = ({ queryClient, campaignId }: StartRoundQuerySyncProps) => {
+	void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'hero-rounds'] })
+	queryClient.setQueryData([campaignId, 'tabletop', 'hero-rounds'], (oldData: HeroTurn[]) => {
+		return oldData.map<HeroTurn>(turn => ({
+			used: false,
+			order: null,
+			tabletopCharacterId: turn.tabletopCharacterId,
+			turnType: turn.turnType
+		}))
 	})
 }
 

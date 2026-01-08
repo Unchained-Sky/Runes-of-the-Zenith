@@ -1,8 +1,11 @@
-import { Avatar, createTheme, type MantineColorScheme, MantineProvider } from '@mantine/core'
 import '@mantine/core/styles.css'
+
+import '@gfazioli/mantine-window/styles.css'
 import '@mantine/dropzone/styles.css'
-import { Notifications } from '@mantine/notifications'
 import '@mantine/notifications/styles.css'
+
+import { Avatar, createTheme, type MantineColorScheme, MantineProvider } from '@mantine/core'
+import { Notifications } from '@mantine/notifications'
 import { type ReactNode } from 'react'
 
 const defaultColorScheme: MantineColorScheme = 'dark'
