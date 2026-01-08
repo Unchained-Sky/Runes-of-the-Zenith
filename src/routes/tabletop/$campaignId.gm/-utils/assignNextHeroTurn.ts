@@ -7,6 +7,7 @@ import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
 import { mutationError } from '~/utils/mutationError'
 import { type HeroTurn } from '../-hooks/tabletopData/useTabletopHeroRounds'
+import { type TabletopHeroData } from '../-hooks/tabletopData/useTabletopHeroes'
 
 const findNextOrder = (array: { order: number | null }[]) => Math.max(0, ...array.flatMap(({ order }) => order ? [order] : [])) + 1
 
@@ -18,15 +19,33 @@ export function useAssignNextHeroTurn() {
 	return useMutation({
 		mutationFn: assignNextHeroTurnAction,
 		onMutate: ({ data }) => {
+			let nextTurn: number = 0
+
 			void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'hero-rounds'] })
 			queryClient.setQueryData([campaignId, 'tabletop', 'hero-rounds'], (oldData: HeroTurn[]) => {
 				const oldDataCopy = structuredClone(oldData)
 				const turn = oldDataCopy.findIndex(turn => turn.tabletopCharacterId === data.tabletopCharacterId && turn.turnType === data.turnType)
 				if (turn === -1 || !oldDataCopy[turn]) throw new Error('Turn not found')
-				const nextTurn = findNextOrder(oldDataCopy)
+				nextTurn = findNextOrder(oldDataCopy)
 				oldDataCopy[turn].used = true
 				oldDataCopy[turn].order = nextTurn
 				return oldDataCopy.sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+			})
+
+			void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'hero', data.tabletopCharacterId] })
+			queryClient.setQueriesData({ queryKey: [campaignId, 'tabletop', 'hero', data.tabletopCharacterId] }, (oldData: TabletopHeroData) => {
+				const { turn } = oldData
+				if (!turn) throw new Error('Turn not found')
+				return {
+					...oldData,
+					turn: {
+						...turn,
+						[data.turnType]: {
+							...turn[data.turnType],
+							used: true
+						}
+					}
+				} satisfies TabletopHeroData
 			})
 		},
 		onError: error => {

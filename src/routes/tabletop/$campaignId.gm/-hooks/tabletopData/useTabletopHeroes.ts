@@ -54,7 +54,12 @@ const heroLoader = createServerFn({ method: 'GET' })
 				wounds,
 				shield,
 				trauma,
-				movement
+				movement,
+				turn: tabletop_hero_turn (
+					turnType: turn_type,
+					used,
+					order
+				)
 			`)
 			.eq('tt_character_id', tabletopCharacterId)
 			.limit(1)
@@ -62,23 +67,8 @@ const heroLoader = createServerFn({ method: 'GET' })
 		if (error) throw new Error(error.message, { cause: error })
 		if (!data) return null
 
-		const getAvatar = async (heroId: number) => {
-			const { data } = await supabase
-				.storage
-				.from('hero_avatar')
-				.exists(`${heroId}.png`)
-
-			const { data: { publicUrl: avatarUrl } } = supabase
-				.storage
-				.from('hero_avatar')
-				.getPublicUrl(`${data ? heroId : 'default'}.png`)
-			return avatarUrl
-		}
-
 		const tabletopHero = data.tabletopHero[0]
 		if (!tabletopHero) throw new Error('Hero not found')
-
-		const avatarUrl = await getAvatar(tabletopHero.heroId)
 
 		const runes = tabletopHero.heroInfo.heroRune.reduce<Record<InternalTabletopHeroRuneData['slot'], InternalTabletopHeroRuneData[]>>((acc, curr) => {
 			const runeData = curr.runeInfo
@@ -96,6 +86,30 @@ const heroLoader = createServerFn({ method: 'GET' })
 			PASSIVE: []
 		})
 
+		const getAvatar = async (heroId: number) => {
+			const { data } = await supabase
+				.storage
+				.from('hero_avatar')
+				.exists(`${heroId}.png`)
+
+			const { data: { publicUrl: avatarUrl } } = supabase
+				.storage
+				.from('hero_avatar')
+				.getPublicUrl(`${data ? heroId : 'default'}.png`)
+			return avatarUrl
+		}
+		const avatarUrl = await getAvatar(tabletopHero.heroId)
+
+		const isPrimaryTurn = (turn: Turn): turn is Turn & { turnType: 'PRIMARY' } => {
+			return turn.turnType === 'PRIMARY'
+		}
+		const isSecondaryTurn = (turn: Turn): turn is Turn & { turnType: 'SECONDARY' } => {
+			return turn.turnType === 'SECONDARY'
+		}
+		const primaryTurn = data.turn.find(isPrimaryTurn)
+		const secondaryTurn = data.turn.find(isSecondaryTurn)
+		const turn = primaryTurn && secondaryTurn ? { PRIMARY: primaryTurn, SECONDARY: secondaryTurn } : null
+
 		return {
 			tabletopCharacterId,
 			heroId: tabletopHero.heroId,
@@ -110,7 +124,8 @@ const heroLoader = createServerFn({ method: 'GET' })
 			},
 			pos: data.tile[0] ? [data.tile[0].q, data.tile[0].r, data.tile[0].s] : null,
 			runes,
-			avatarUrl
+			avatarUrl,
+			turn
 		}
 	})
 
@@ -159,6 +174,12 @@ const runeExtraDataFormatter = (rune: InternalTabletopHeroRuneData) => {
 			data: out
 		}
 	}
+}
+
+type Turn = {
+	turnType: Enums<'turn_type'>
+	used: boolean
+	order: number | null
 }
 
 export function useTabletopHeroes() {

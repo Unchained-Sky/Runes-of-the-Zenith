@@ -7,6 +7,7 @@ import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
 import { mutationError } from '~/utils/mutationError'
 import { type HeroTurn } from '../-hooks/tabletopData/useTabletopHeroRounds'
+import { type TabletopHeroData } from '../-hooks/tabletopData/useTabletopHeroes'
 
 export function useStartRound() {
 	const routeApi = getRouteApi('/tabletop/$campaignId/gm/')
@@ -38,6 +39,25 @@ export const startRoundQuerySync = ({ queryClient, campaignId }: StartRoundQuery
 			tabletopCharacterId: turn.tabletopCharacterId,
 			turnType: turn.turnType
 		}))
+	})
+
+	void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'hero'] })
+	queryClient.setQueriesData({ queryKey: [campaignId, 'tabletop', 'hero'] }, (oldData: TabletopHeroData) => {
+		return {
+			...oldData,
+			turn: {
+				PRIMARY: {
+					turnType: 'PRIMARY',
+					used: false,
+					order: null
+				},
+				SECONDARY: {
+					turnType: 'SECONDARY',
+					used: false,
+					order: null
+				}
+			}
+		} satisfies TabletopHeroData
 	})
 }
 
