@@ -16,6 +16,7 @@ const heroLoader = createServerFn({ method: 'GET' })
 	.handler(async ({ data: { tabletopCharacterId } }) => {
 		const { supabase } = await requireAccount({ backlink: '/campaigns' })
 
+		// TODO move runeInfo into a separate loader
 		const { data, error } = await supabase
 			.from('tabletop_characters')
 			.select(`
@@ -59,6 +60,10 @@ const heroLoader = createServerFn({ method: 'GET' })
 					turnType: turn_type,
 					used,
 					order
+				),
+				token: tabletop_character_token (
+					name: token_name,
+					amount
 				)
 			`)
 			.eq('tt_character_id', tabletopCharacterId)
@@ -125,7 +130,8 @@ const heroLoader = createServerFn({ method: 'GET' })
 			pos: data.tile[0] ? [data.tile[0].q, data.tile[0].r, data.tile[0].s] : null,
 			runes,
 			avatarUrl,
-			turn
+			turn,
+			tokens: data.token
 		}
 	})
 

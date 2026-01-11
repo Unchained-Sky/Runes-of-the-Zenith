@@ -1,4 +1,5 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
+import { useTokenQuery } from '~/hooks/data/useTokenQuery'
 import { safeParseInt } from '~/utils/safeParseInt'
 import CombatGridTabletopGM from './-components/CombatGridTabletopGM'
 import DragDrop from './-components/DragDrop'
@@ -59,6 +60,8 @@ export const Route = createFileRoute('/tabletop/$campaignId/gm/')({
 
 function RouteComponent() {
 	useTabletopGMSubscription()
+
+	useTokenQuery()
 
 	return (
 		<DragDrop>

@@ -1,9 +1,10 @@
-import { ActionIcon, Avatar, Card, Code, Collapse, Group, Stack, Text, Title, Tooltip } from '@mantine/core'
+import { ActionIcon, Avatar, Box, Card, Code, Collapse, Group, Image, Pill, Stack, Text, ThemeIcon, Title, Tooltip } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { IconChevronDown, IconFlame, type ReactNode } from '@tabler/icons-react'
+import { useTokenQuery } from '~/hooks/data/useTokenQuery'
 import { type Enums } from '~/supabase/databaseTypes'
 import { titleCase } from '~/utils/stringCase'
-import { type TabletopHeroRuneData, useTabletopHeroes } from '../../../-hooks/tabletopData/useTabletopHeroes'
+import { type TabletopHeroData, type TabletopHeroRuneData, useTabletopHeroes } from '../../../-hooks/tabletopData/useTabletopHeroes'
 import { useAssignNextHeroTurn } from '../../../-utils/assignNextHeroTurn'
 import { useSettingsPanelStore } from '../useSettingsPanelStore'
 
@@ -22,6 +23,8 @@ export default function Hero() {
 				<Avatar src={heroData.avatarUrl} name={heroData.heroName} color='green' />
 				<Title order={3}>{heroData.heroName}</Title>
 			</Group>
+
+			<Tokens tokens={heroData.tokens} />
 
 			<Stack>
 				<Slot slot='PRIMARY'>
@@ -137,7 +140,7 @@ function Action({ tooltipText, usedTurn, slot, onAction, inlineDescription, expa
 		<Stack>
 			<Group justify='space-between'>
 				<Group>
-					<Tooltip label={tooltipText} color='gray'>
+					<Tooltip label={tooltipText}>
 						<ActionIcon variant='subtle' disabled={usedTurn} onClick={handleClick}>
 							<IconFlame />
 						</ActionIcon>
@@ -200,5 +203,61 @@ function Rune({ runeData, usedTurn }: RuneProps) {
 				</Stack>
 			)}
 		/>
+	)
+}
+
+type TokenProps = {
+	tokens: TabletopHeroData['tokens']
+}
+
+function Tokens({ tokens }: TokenProps) {
+	const tokensData = useTokenQuery()
+
+	const getTokenColour = (alignment: Enums<'token_alignment'>) => {
+		switch (alignment) {
+			case 'POSITIVE':
+				return 'green'
+			case 'NEUTRAL':
+				return 'yellow'
+			case 'NEGATIVE':
+				return 'red'
+		}
+	}
+
+	return (
+		<Card component={Stack} bg='dark.5'>
+			<Title order={4}>Tokens</Title>
+			<Group>
+				{tokens.map(token => {
+					const tokenData = tokensData[token.name]
+					if (!tokenData) throw new Error(`Token ${token.name} not found`)
+
+					return (
+						<Tooltip
+							key={token.name}
+							label={(
+								<Box>
+									<Text fw='bold'>{token.name}</Text>
+									<Text>{tokenData.extraData.description}</Text>
+								</Box>
+							)}
+						>
+							<Box pos='relative' id={`token-${token.name}`}>
+								<ThemeIcon
+									variant='light'
+									color={getTokenColour(tokenData.alignment)}
+									size='xl'
+								>
+									<Image src={`/tokenIcon/${tokenData.extraData.image}`} />
+								</ThemeIcon>
+								<Pill pos='absolute' bottom={0} right={-4}>{token.amount}</Pill>
+							</Box>
+						</Tooltip>
+					)
+				})}
+
+				{tokens.length === 0 && <Text fs='italic'>None</Text>}
+			</Group>
+		</Card>
 	)
 }

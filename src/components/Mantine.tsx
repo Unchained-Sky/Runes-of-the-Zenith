@@ -4,7 +4,7 @@ import '@gfazioli/mantine-window/styles.css'
 import '@mantine/dropzone/styles.css'
 import '@mantine/notifications/styles.css'
 
-import { Avatar, createTheme, type MantineColorScheme, MantineProvider } from '@mantine/core'
+import { Avatar, createTheme, type MantineColorScheme, MantineProvider, Tooltip } from '@mantine/core'
 import { Notifications } from '@mantine/notifications'
 import { type ReactNode } from 'react'
 
@@ -18,6 +18,11 @@ const theme = createTheme({
 				imageProps: {
 					draggable: false
 				}
+			}
+		}),
+		Tooltip: Tooltip.extend({
+			defaultProps: {
+				color: 'gray'
 			}
 		})
 	}

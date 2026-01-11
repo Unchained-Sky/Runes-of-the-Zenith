@@ -1,4 +1,4 @@
-import { ActionIcon, Drawer, rem, Tabs } from '@mantine/core'
+import { ActionIcon, Drawer, rem, ScrollArea, Tabs } from '@mantine/core'
 import { IconMenu2, IconX } from '@tabler/icons-react'
 import { Fragment } from 'react'
 import CharacterTab from './CharacterTab'
@@ -81,24 +81,31 @@ export default function SettingsPanel() {
 						</Tabs.Tab>
 					</Tabs.List>
 
-					<Tabs.Panel value='character'>
-						<CharacterTab />
-					</Tabs.Panel>
-					<Tabs.Panel value='units'>
-						<UnitsTab />
-					</Tabs.Panel>
-					<Tabs.Panel value='round'>
-						<RoundTab />
-					</Tabs.Panel>
-					<Tabs.Panel value='map'>
-						<MapTab />
-					</Tabs.Panel>
-					<Tabs.Panel value='window'>
-						<WindowTab />
-					</Tabs.Panel>
-					<Tabs.Panel value='debug'>
-						<DebugTag />
-					</Tabs.Panel>
+					{/*
+						60px = draw header
+						36px = tab list
+						16px = top padding panels
+					*/}
+					<ScrollArea h='calc(100vh - 60px - 36px - 16px)'>
+						<Tabs.Panel value='character'>
+							<CharacterTab />
+						</Tabs.Panel>
+						<Tabs.Panel value='units'>
+							<UnitsTab />
+						</Tabs.Panel>
+						<Tabs.Panel value='round'>
+							<RoundTab />
+						</Tabs.Panel>
+						<Tabs.Panel value='map'>
+							<MapTab />
+						</Tabs.Panel>
+						<Tabs.Panel value='window'>
+							<WindowTab />
+						</Tabs.Panel>
+						<Tabs.Panel value='debug'>
+							<DebugTag />
+						</Tabs.Panel>
+					</ScrollArea>
 				</Tabs>
 			</Drawer>
 		</Fragment>
