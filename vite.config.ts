@@ -1,4 +1,4 @@
-import eslintPlugin from '@nabla/vite-plugin-eslint'
+import { cloudflare } from '@cloudflare/vite-plugin'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import viteReact from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
@@ -9,12 +9,9 @@ const config = defineConfig({
 		viteTsConfigPaths({
 			projects: ['./tsconfig.json']
 		}),
-		tanstackStart({
-			customViteReactPlugin: true,
-			target: 'cloudflare-module'
-		}),
-		viteReact(),
-		eslintPlugin()
+		tanstackStart(),
+		cloudflare({ viteEnvironment: { name: 'ssr' } }),
+		viteReact()
 	]
 })
 

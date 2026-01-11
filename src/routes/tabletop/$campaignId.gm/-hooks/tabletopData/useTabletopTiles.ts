@@ -10,7 +10,7 @@ const tilesLoaderSchema = type({
 })
 
 const tilesLoader = createServerFn({ method: 'GET' })
-	.validator(tilesLoaderSchema)
+	.inputValidator(tilesLoaderSchema)
 	.handler(async ({ data: { campaignId } }) => {
 		const { supabase } = await requireAccount({ backlink: '/campaigns' })
 

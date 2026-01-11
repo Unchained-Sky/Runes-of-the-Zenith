@@ -10,7 +10,7 @@ const encounterListLoaderSchema = type({
 })
 
 const encounterListLoader = createServerFn({ method: 'GET' })
-	.validator(encounterListLoaderSchema)
+	.inputValidator(encounterListLoaderSchema)
 	.handler(async ({ data: { campaignId } }) => {
 		const { supabase, user } = await requireAccount({ backlink: '/campaigns' })
 

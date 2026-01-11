@@ -77,7 +77,7 @@ const removeHeroSchema = type({
 })
 
 const removeHeroAction = createServerFn({ method: 'POST' })
-	.validator(removeHeroSchema)
+	.inputValidator(removeHeroSchema)
 	.handler(async ({ data: { tabletopCharacterId } }) => {
 		await requireGM({ tabletopCharacterId })
 

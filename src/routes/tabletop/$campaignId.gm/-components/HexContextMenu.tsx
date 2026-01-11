@@ -108,7 +108,7 @@ const addHeroSchema = type({
 })
 
 const addHeroAction = createServerFn({ method: 'POST' })
-	.validator(addHeroSchema)
+	.inputValidator(addHeroSchema)
 	.handler(async ({ data: { heroId, cord: [q, r, s] } }) => {
 		const { supabase, campaignId } = await requireGM({ heroId })
 

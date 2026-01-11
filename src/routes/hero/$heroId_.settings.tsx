@@ -26,7 +26,7 @@ const serverLoaderSchema = type({
 })
 
 const serverLoader = createServerFn({ method: 'GET' })
-	.validator(serverLoaderSchema)
+	.inputValidator(serverLoaderSchema)
 	.handler(async ({ data: { heroId } }) => {
 		const { supabase } = await requireAccount({ backlink: '/hero' })
 
@@ -156,7 +156,7 @@ const heroSettingsSchema = type({
 })
 
 const heroSettingsAction = createServerFn({ method: 'POST' })
-	.validator(heroSettingsSchema)
+	.inputValidator(heroSettingsSchema)
 	.handler(async ({ data: { heroId, campaignId, heroPrivacy } }) => {
 		// TODO check if the hero is in an active tabletop
 
@@ -285,7 +285,7 @@ function HeroAvatar() {
 }
 
 const heroAvatarAction = createServerFn({ method: 'POST' })
-	.validator((formData: FormData) => {
+	.inputValidator((formData: FormData) => {
 		const avatar = formData.get('avatar')
 		if (!avatar || !(avatar instanceof File)) {
 			throw new Error('No file uploaded')

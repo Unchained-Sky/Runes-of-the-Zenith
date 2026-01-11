@@ -17,7 +17,7 @@ const serverLoaderSchema = type({
 })
 
 const serverLoader = createServerFn({ method: 'GET' })
-	.validator(serverLoaderSchema)
+	.inputValidator(serverLoaderSchema)
 	.handler(async ({ data: { source, name } }) => {
 		const supabase = getSupabaseServerClient()
 

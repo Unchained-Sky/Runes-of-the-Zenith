@@ -56,7 +56,7 @@ const clearEncounterSchema = type({
 })
 
 const clearEncounterAction = createServerFn({ method: 'POST' })
-	.validator(clearEncounterSchema)
+	.inputValidator(clearEncounterSchema)
 	.handler(async ({ data: { campaignId } }) => {
 		const { supabase } = await requireGM({ campaignId })
 

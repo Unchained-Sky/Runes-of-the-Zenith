@@ -22,6 +22,7 @@
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": false,
     "noEmit": true,
+    "forceConsistentCasingInFileNames": true,
     /* Linting */
     "skipLibCheck": true,
     "strict": true,

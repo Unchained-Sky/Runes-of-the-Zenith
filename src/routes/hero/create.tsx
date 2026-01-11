@@ -66,7 +66,7 @@ const createHeroSchema = type({
 })
 
 const createHeroAction = createServerFn({ method: 'POST' })
-	.validator(createHeroSchema)
+	.inputValidator(createHeroSchema)
 	.handler(async ({ data: { heroName } }) => {
 		const { supabase } = await requireAccount()
 

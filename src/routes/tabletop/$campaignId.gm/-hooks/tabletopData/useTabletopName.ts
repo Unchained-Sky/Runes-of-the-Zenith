@@ -9,7 +9,7 @@ const nameLoaderSchema = type({
 })
 
 const nameLoader = createServerFn({ method: 'GET' })
-	.validator(nameLoaderSchema)
+	.inputValidator(nameLoaderSchema)
 	.handler(async ({ data: { campaignId } }) => {
 		const { supabase } = await requireAccount({ backlink: '/campaigns' })
 

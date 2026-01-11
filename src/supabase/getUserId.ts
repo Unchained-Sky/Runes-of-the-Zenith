@@ -1,5 +1,5 @@
 import { type SupabaseClient } from '@supabase/supabase-js'
-import { serverOnly } from '@tanstack/react-start'
+import { createServerOnlyFn } from '@tanstack/react-start'
 import { getSupabaseServerClient } from './getSupabaseServerClient'
 
 type GetUserIdReturn = {
@@ -7,7 +7,7 @@ type GetUserIdReturn = {
 	supabase: SupabaseClient
 }
 
-export const getUserId = serverOnly(async (supabase?: SupabaseClient) => {
+export const getUserId = createServerOnlyFn(async (supabase?: SupabaseClient) => {
 	if (!supabase) supabase = getSupabaseServerClient()
 
 	const { data: sessionData } = await supabase.auth.getSession()

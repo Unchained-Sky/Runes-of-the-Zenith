@@ -9,7 +9,7 @@ const currentEncounterLoaderSchema = type({
 })
 
 const currentEncounterLoader = createServerFn({ method: 'GET' })
-	.validator(currentEncounterLoaderSchema)
+	.inputValidator(currentEncounterLoaderSchema)
 	.handler(async ({ data: { campaignId } }) => {
 		const { supabase } = await requireAccount({ backlink: '/campaigns' })
 

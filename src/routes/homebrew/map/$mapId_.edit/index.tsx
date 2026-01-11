@@ -25,7 +25,7 @@ const serverLoaderSchema = type({
 })
 
 const serverLoader = createServerFn({ method: 'GET' })
-	.validator(serverLoaderSchema)
+	.inputValidator(serverLoaderSchema)
 	.handler(async ({ data: { mapId } }) => {
 		const { supabase } = await requireAccount({ backlink: '/homebrew/map' })
 

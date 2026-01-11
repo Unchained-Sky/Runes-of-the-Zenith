@@ -29,7 +29,7 @@ const submitMapChangesSchema = type({
 })
 
 const submitMapChanges = createServerFn({ method: 'POST' })
-	.validator(submitMapChangesSchema)
+	.inputValidator(submitMapChangesSchema)
 	.handler(async ({ data }) => {
 		const mapId = parseInt(data.mapId)
 

@@ -22,7 +22,7 @@ const serverLoaderSchema = type({
 })
 
 const serverLoader = createServerFn({ method: 'GET' })
-	.validator(serverLoaderSchema)
+	.inputValidator(serverLoaderSchema)
 	.handler(async ({ data: { inviteId } }) => {
 		const { supabase } = await requireAccount()
 
@@ -79,7 +79,7 @@ const joinCampaignSchema = type({
 })
 
 const joinCampaignAction = createServerFn({ method: 'POST' })
-	.validator(joinCampaignSchema)
+	.inputValidator(joinCampaignSchema)
 	.handler(async ({ data: { inviteId } }) => {
 		const { supabase, user } = await requireAccount()
 

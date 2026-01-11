@@ -9,7 +9,7 @@ const heroRoundsSchema = type({
 })
 
 const heroRoundsLoader = createServerFn({ method: 'GET' })
-	.validator(heroRoundsSchema)
+	.inputValidator(heroRoundsSchema)
 	.handler(async ({ data: { campaignId } }) => {
 		const { supabase } = await requireGM({ campaignId })
 

@@ -16,7 +16,7 @@ export const Route = createFileRoute('/auth/callback')({
 })
 
 const serverLoader = createServerFn({ method: 'GET' })
-	.validator(authCallbackSearchSchema)
+	.inputValidator(authCallbackSearchSchema)
 	.handler(async ({ data }) => {
 		const supabase = getSupabaseServerClient()
 		const { error } = await supabase.auth.exchangeCodeForSession(data.code)

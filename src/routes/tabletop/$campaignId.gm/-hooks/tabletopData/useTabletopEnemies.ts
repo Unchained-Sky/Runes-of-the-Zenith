@@ -11,7 +11,7 @@ const enemyLoaderSchema = type({
 })
 
 const enemyLoader = createServerFn({ method: 'GET' })
-	.validator(enemyLoaderSchema)
+	.inputValidator(enemyLoaderSchema)
 	.handler(async ({ data: { tabletopCharacterId } }) => {
 		const { supabase } = await requireAccount({ backlink: '/campaigns' })
 

@@ -1,8 +1,8 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
+import { staticFunctionMiddleware } from '@tanstack/start-static-server-functions'
 import { type Token } from '~/scripts/data/tokens/tokens'
 import { getSupabaseServerClient } from '~/supabase/getSupabaseServerClient'
-// import { staticFunctionMiddleware } from '@tanstack/start-static-server-functions'
 
 export const useTokenQuery = () => {
 	return useSuspenseQuery({
@@ -13,8 +13,7 @@ export const useTokenQuery = () => {
 }
 
 const tokenQueryAction = createServerFn({ method: 'GET' })
-	// TODO update tanstack start to use this middleware
-	// .middleware([staticFunctionMiddleware])
+	.middleware([staticFunctionMiddleware])
 	.handler(async () => {
 		const supabase = getSupabaseServerClient()
 

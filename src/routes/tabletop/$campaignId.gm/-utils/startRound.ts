@@ -66,7 +66,7 @@ const startRoundSchema = type({
 })
 
 export const startRoundAction = createServerFn({ method: 'POST' })
-	.validator(startRoundSchema)
+	.inputValidator(startRoundSchema)
 	.handler(async ({ data: { campaignId } }) => {
 		const { supabase } = await requireGM({ campaignId })
 

@@ -17,7 +17,7 @@ const serverLoaderSchema = type({
 })
 
 const serverLoader = createServerFn({ method: 'GET' })
-	.validator(serverLoaderSchema)
+	.inputValidator(serverLoaderSchema)
 	.handler(async ({ data: { campaignId } }) => {
 		const { supabase } = await requireAccount({ backlink: '/tabletop/$id/player' })
 

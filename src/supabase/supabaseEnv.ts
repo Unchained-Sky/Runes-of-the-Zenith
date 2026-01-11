@@ -1,4 +1,4 @@
-import { createServerFn, serverOnly } from '@tanstack/react-start'
+import { createServerFn, createServerOnlyFn } from '@tanstack/react-start'
 
 type SupabaseEnv = {
 	SUPABASE_URL: string
@@ -6,7 +6,7 @@ type SupabaseEnv = {
 	SUPABASE_SERVICE_ROLE: string
 }
 
-export const getSupabaseServerEnv = serverOnly((override: Partial<SupabaseEnv> = {}) => {
+export const getSupabaseServerEnv = createServerOnlyFn((override: Partial<SupabaseEnv> = {}) => {
 	if (!process.env.SUPABASE_URL) {
 		throw new Error('SUPABASE_URL env is missing')
 	}

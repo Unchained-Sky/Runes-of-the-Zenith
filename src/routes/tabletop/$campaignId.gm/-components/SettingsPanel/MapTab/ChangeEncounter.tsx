@@ -132,7 +132,7 @@ const changeEncounterSchema = type({
 })
 
 const changeEncounterAction = createServerFn({ method: 'POST' })
-	.validator(changeEncounterSchema)
+	.inputValidator(changeEncounterSchema)
 	.handler(async ({ data: { campaignId, encounterId } }) => {
 		const { supabase } = await requireGM({ campaignId })
 

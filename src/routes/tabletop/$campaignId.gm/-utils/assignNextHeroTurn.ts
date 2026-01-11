@@ -60,7 +60,7 @@ const assignNextHeroTurnSchema = type({
 })
 
 export const assignNextHeroTurnAction = createServerFn({ method: 'POST' })
-	.validator(assignNextHeroTurnSchema)
+	.inputValidator(assignNextHeroTurnSchema)
 	.handler(async ({ data: { tabletopCharacterId, turnType } }) => {
 		const { supabase, campaignId } = await requireGM({ tabletopCharacterId })
 

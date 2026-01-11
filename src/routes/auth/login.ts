@@ -27,7 +27,7 @@ export const Route = createFileRoute('/auth/login')({
 })
 
 const serverLoader = createServerFn({ method: 'POST' })
-	.validator(authLoginSearchSchema)
+	.inputValidator(authLoginSearchSchema)
 	.handler(async ({ data: { backlink } }) => {
 		const supabase = getSupabaseServerClient()
 		const { data, error } = await supabase.auth.signInWithOAuth({

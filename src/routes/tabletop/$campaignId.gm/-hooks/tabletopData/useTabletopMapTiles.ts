@@ -10,7 +10,7 @@ const mapTilesLoaderSchema = type({
 })
 
 const mapTilesLoader = createServerFn({ method: 'GET' })
-	.validator(mapTilesLoaderSchema)
+	.inputValidator(mapTilesLoaderSchema)
 	.handler(async ({ data: { campaignId } }) => {
 		const { supabase } = await requireAccount({ backlink: '/campaigns' })
 

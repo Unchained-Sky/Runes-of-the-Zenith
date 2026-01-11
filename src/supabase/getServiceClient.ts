@@ -1,9 +1,9 @@
 import { createClient } from '@supabase/supabase-js'
-import { serverOnly } from '@tanstack/react-start'
+import { createServerOnlyFn } from '@tanstack/react-start'
 import { type Database } from './databaseTypes'
 import { getSupabaseServerEnv } from './supabaseEnv'
 
-export const getServiceClient = serverOnly(() => {
+export const getServiceClient = createServerOnlyFn(() => {
 	const { SUPABASE_URL, SUPABASE_SERVICE_ROLE } = getSupabaseServerEnv()
 
 	return createClient<Database>(SUPABASE_URL, SUPABASE_SERVICE_ROLE, {

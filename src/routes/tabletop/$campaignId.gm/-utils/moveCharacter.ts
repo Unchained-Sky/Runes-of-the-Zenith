@@ -46,7 +46,7 @@ const moveCharacterActionSchema = type({
 })
 
 export const moveCharacterAction = createServerFn({ method: 'POST' })
-	.validator(moveCharacterActionSchema)
+	.inputValidator(moveCharacterActionSchema)
 	.handler(async ({ data: { cord: [q, r, s], tabletopCharacterId } }) => {
 		const { supabase, campaignId } = await requireGM({ tabletopCharacterId })
 

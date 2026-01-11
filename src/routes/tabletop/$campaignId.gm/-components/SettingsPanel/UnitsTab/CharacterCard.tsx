@@ -251,7 +251,7 @@ const updateCharacterSchema = type({
 })
 
 const updateCharacterAction = createServerFn({ method: 'POST' })
-	.validator(updateCharacterSchema)
+	.inputValidator(updateCharacterSchema)
 	.handler(async ({ data: { tabletopCharacterId, values } }) => {
 		await requireGM({ tabletopCharacterId })
 

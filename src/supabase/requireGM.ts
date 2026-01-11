@@ -1,4 +1,4 @@
-import { serverOnly } from '@tanstack/react-start'
+import { createServerOnlyFn } from '@tanstack/react-start'
 import { requireAccount } from './requireAccount'
 
 type RequireGMProps = ({
@@ -11,7 +11,7 @@ type RequireGMProps = ({
 	backlink?: string
 }
 
-export const requireGM = serverOnly(async ({ backlink, ...props }: RequireGMProps) => {
+export const requireGM = createServerOnlyFn(async ({ backlink, ...props }: RequireGMProps) => {
 	const { supabase, user } = await requireAccount({ backlink: backlink ?? '/' })
 
 	const campaignId = 'campaignId' in props ? props.campaignId : null

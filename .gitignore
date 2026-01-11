@@ -13,6 +13,7 @@ todos.json
 .eslintcache
 worker-configuration.d.ts
 .vscode/settings.json
+.wrangler
 
 # Supabase Types
 src/supabase/databaseTypes.d.ts

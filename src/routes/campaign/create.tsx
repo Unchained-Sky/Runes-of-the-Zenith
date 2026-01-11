@@ -70,7 +70,7 @@ const createCampaignSchema = type({
 })
 
 const createCampaignAction = createServerFn({ method: 'POST' })
-	.validator(createCampaignSchema)
+	.inputValidator(createCampaignSchema)
 	.handler(async ({ data: { campaignName } }) => {
 		const { supabase } = await requireAccount()
 

@@ -12,7 +12,7 @@ const heroLoaderSchema = type({
 })
 
 const heroLoader = createServerFn({ method: 'GET' })
-	.validator(heroLoaderSchema)
+	.inputValidator(heroLoaderSchema)
 	.handler(async ({ data: { tabletopCharacterId } }) => {
 		const { supabase } = await requireAccount({ backlink: '/campaigns' })
 
