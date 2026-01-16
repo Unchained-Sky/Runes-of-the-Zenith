@@ -1,4 +1,5 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
+import { tokenQueryOptions } from '~/hooks/data/useTokenQuery'
 import { safeParseInt } from '~/utils/safeParseInt'
 import CombatGridTabletopGM from './-components/CombatGridTabletopGM'
 import DragDrop from './-components/DragDrop'
@@ -28,7 +29,8 @@ export const Route = createFileRoute('/tabletop/$campaignId/gm/')({
 			encounterList,
 			heroList,
 			enemyList,
-			heroRounds
+			heroRounds,
+			tokens
 		] = await Promise.all([
 			context.queryClient.ensureQueryData(tabletopNameQueryOptions(campaignId)),
 			context.queryClient.ensureQueryData(tabletopTilesQueryOptions(campaignId)),
@@ -37,7 +39,8 @@ export const Route = createFileRoute('/tabletop/$campaignId/gm/')({
 			context.queryClient.ensureQueryData(tabletopEncounterListQueryOptions(campaignId)),
 			context.queryClient.ensureQueryData(tabletopHeroListQueryOptions(campaignId)),
 			context.queryClient.ensureQueryData(tabletopEnemyListQueryOptions(campaignId)),
-			context.queryClient.ensureQueryData(tabletopHeroRoundsQueryOptions(campaignId))
+			context.queryClient.ensureQueryData(tabletopHeroRoundsQueryOptions(campaignId)),
+			context.queryClient.ensureQueryData(tokenQueryOptions)
 		])
 
 		return {
@@ -49,7 +52,8 @@ export const Route = createFileRoute('/tabletop/$campaignId/gm/')({
 			encounterList,
 			heroList,
 			enemyList,
-			heroRounds
+			heroRounds,
+			tokens
 		}
 	},
 	head: ({ loaderData }) => ({

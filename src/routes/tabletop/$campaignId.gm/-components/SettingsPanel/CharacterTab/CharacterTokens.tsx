@@ -1,6 +1,6 @@
 import { ActionIcon, Autocomplete, Box, Button, Card, Group, Image, Modal, NumberInput, Pill, Stack, Text, ThemeIcon, Title, Tooltip } from '@mantine/core'
 import { useForm } from '@mantine/form'
-import { useDisclosure, useListState } from '@mantine/hooks'
+import { useDisclosure, useListState, type UseListStateHandlers } from '@mantine/hooks'
 import { IconPencil, IconPlus } from '@tabler/icons-react'
 import { useMutation } from '@tanstack/react-query'
 import { getRouteApi } from '@tanstack/react-router'
@@ -14,13 +14,14 @@ import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
 import { int2 } from '~/utils/int'
 import { mutationError } from '~/utils/mutationError'
-import { useSettingsPanelStore } from '../../useSettingsPanelStore'
+import { useSettingsPanelStore } from '../useSettingsPanelStore'
 
 type TokenProps = {
 	tokens: TabletopHeroData['tokens']
+	characterType: Enums<'character_type'>
 }
 
-export default function Tokens({ tokens }: TokenProps) {
+export default function CharacterTokens({ tokens, characterType }: TokenProps) {
 	const [opened, { open, close }] = useDisclosure(false)
 
 	return (
@@ -40,7 +41,7 @@ export default function Tokens({ tokens }: TokenProps) {
 				</Group>
 			</Card>
 
-			<TokenEditModal opened={opened} close={close} tokens={tokens} />
+			<TokenEditModal opened={opened} close={close} tokens={tokens} characterType={characterType} />
 		</>
 	)
 }
@@ -94,9 +95,10 @@ type TokenEditModalProps = {
 	opened: boolean
 	close: () => void
 	tokens: TabletopHeroData['tokens']
+	characterType: Enums<'character_type'>
 }
 
-function TokenEditModal({ opened, close, tokens }: TokenEditModalProps) {
+function TokenEditModal({ opened, close, tokens, characterType }: TokenEditModalProps) {
 	const routeApi = getRouteApi('/tabletop/$campaignId/gm/')
 	const { queryClient } = routeApi.useRouteContext()
 	const { campaignId } = routeApi.useLoaderData()
@@ -113,8 +115,10 @@ function TokenEditModal({ opened, close, tokens }: TokenEditModalProps) {
 	const updateHeroToken = useMutation({
 		mutationFn: updateHeroTokenAction,
 		onMutate: ({ data }) => {
-			void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'hero', data.tabletopCharacterId] })
-			queryClient.setQueriesData({ queryKey: [campaignId, 'tabletop', 'hero', data.tabletopCharacterId] }, (oldData: TabletopHeroData) => {
+			const queryKey = [campaignId, 'tabletop', characterType.toLowerCase(), data.tabletopCharacterId]
+
+			void queryClient.cancelQueries({ queryKey })
+			queryClient.setQueriesData({ queryKey }, (oldData: TabletopHeroData) => {
 				return {
 					...oldData,
 					tokens: Object.entries(data.tokens).filter(([_name, amount]) => amount !== 0).map(([name, amount]) => ({ name, amount }))
@@ -134,31 +138,6 @@ function TokenEditModal({ opened, close, tokens }: TokenEditModalProps) {
 
 	const [virtualTokens, virtualTokensHandlers] = useListState(tokens)
 	const virtualTokenList = virtualTokens.map(token => token.name)
-
-	const tokensData = useTokenQuery()
-	const tokenName = useMemo(() => Object.keys(tokensData), [tokensData])
-	const autocompleteTokenData = useMemo(() => {
-		const out: Record<Enums<'token_alignment'>, { value: string, disabled: boolean }[]> = {
-			POSITIVE: [],
-			NEUTRAL: [],
-			NEGATIVE: []
-		}
-
-		for (const tokenData of Object.values(tokensData)) {
-			out[tokenData.alignment].push({
-				value: tokenData.name,
-				disabled: virtualTokenList.includes(tokenData.name)
-			})
-		}
-
-		return [
-			{ group: 'Positive', items: out.POSITIVE },
-			{ group: 'Neutral', items: out.NEUTRAL },
-			{ group: 'Negative', items: out.NEGATIVE }
-		]
-	}, [tokensData, virtualTokenList])
-
-	const [addTokenText, setAddTokenText] = useState('')
 
 	return (
 		<Modal
@@ -185,33 +164,7 @@ function TokenEditModal({ opened, close, tokens }: TokenEditModalProps) {
 						})}
 					</Stack>
 
-					<Group align='flex-end'>
-						<Autocomplete
-							clearable
-							label='Add token'
-							placeholder='Token Name'
-							value={addTokenText}
-							onChange={setAddTokenText}
-							data={autocompleteTokenData}
-							comboboxProps={{
-								transitionProps: {
-									transition: 'pop',
-									duration: 150
-								}
-							}}
-							flex={1}
-						/>
-						<ActionIcon
-							size={36}
-							disabled={!tokenName.includes(addTokenText)}
-							onClick={() => {
-								virtualTokensHandlers.append({ name: addTokenText, amount: 0 })
-								setAddTokenText('')
-							}}
-						>
-							<IconPlus />
-						</ActionIcon>
-					</Group>
+					<AddToken virtualTokenList={virtualTokenList} virtualTokensHandlers={virtualTokensHandlers} />
 
 					<Group>
 						<Button variant='default' onClick={close}>Cancel</Button>
@@ -220,6 +173,70 @@ function TokenEditModal({ opened, close, tokens }: TokenEditModalProps) {
 				</Stack>
 			</form>
 		</Modal>
+	)
+}
+
+type AddTokenProps = {
+	virtualTokenList: string[]
+	virtualTokensHandlers: UseListStateHandlers<{ name: string, amount: number }>
+}
+
+function AddToken({ virtualTokenList, virtualTokensHandlers }: AddTokenProps) {
+	const tokensData = useTokenQuery()
+
+	const tokenName = useMemo(() => Object.keys(tokensData), [tokensData])
+
+	const autocompleteTokenData = useMemo(() => {
+		const out: Record<Enums<'token_alignment'>, { value: string, disabled: boolean }[]> = {
+			POSITIVE: [],
+			NEUTRAL: [],
+			NEGATIVE: []
+		}
+
+		for (const tokenData of Object.values(tokensData)) {
+			out[tokenData.alignment].push({
+				value: tokenData.name,
+				disabled: virtualTokenList.includes(tokenData.name)
+			})
+		}
+
+		return [
+			{ group: 'Positive', items: out.POSITIVE },
+			{ group: 'Neutral', items: out.NEUTRAL },
+			{ group: 'Negative', items: out.NEGATIVE }
+		]
+	}, [tokensData, virtualTokenList])
+
+	const [addTokenText, setAddTokenText] = useState('')
+
+	return (
+		<Group align='flex-end'>
+			<Autocomplete
+				clearable
+				label='Add token'
+				placeholder='Token Name'
+				value={addTokenText}
+				onChange={setAddTokenText}
+				data={autocompleteTokenData}
+				comboboxProps={{
+					transitionProps: {
+						transition: 'pop',
+						duration: 150
+					}
+				}}
+				flex={1}
+			/>
+			<ActionIcon
+				size={36}
+				disabled={!tokenName.includes(addTokenText)}
+				onClick={() => {
+					virtualTokensHandlers.append({ name: addTokenText, amount: 0 })
+					setAddTokenText('')
+				}}
+			>
+				<IconPlus />
+			</ActionIcon>
+		</Group>
 	)
 }
 

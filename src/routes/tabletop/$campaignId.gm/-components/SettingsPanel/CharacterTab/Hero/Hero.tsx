@@ -1,8 +1,8 @@
 import { Avatar, Group, Stack, Text, Title } from '@mantine/core'
 import { useTabletopHeroes } from '../../../../-hooks/tabletopData/useTabletopHeroes'
 import { useSettingsPanelStore } from '../../useSettingsPanelStore'
+import CharacterTokens from '../CharacterTokens'
 import { Action, Runes, Slot } from './HeroActions'
-import Tokens from './HeroTokens'
 
 export default function Hero() {
 	const [selectedCharacterId] = useSettingsPanelStore(state => state.selectedCharacter)
@@ -20,7 +20,7 @@ export default function Hero() {
 				<Title order={3}>{heroData.heroName}</Title>
 			</Group>
 
-			<Tokens tokens={heroData.tokens} />
+			<CharacterTokens tokens={heroData.tokens} characterType='HERO' />
 
 			<Stack>
 				<Slot slot='PRIMARY'>

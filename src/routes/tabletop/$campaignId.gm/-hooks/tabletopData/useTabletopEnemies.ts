@@ -42,7 +42,11 @@ const enemyLoader = createServerFn({ method: 'GET' })
 				wounds,
 				shield,
 				trauma,
-				movement
+				movement,
+				token: tabletop_character_token (
+					name: token_name,
+					amount
+				)
 			`)
 			.eq('tt_character_id', tabletopCharacterId)
 			.limit(1)
@@ -65,7 +69,8 @@ const enemyLoader = createServerFn({ method: 'GET' })
 				trauma: data.trauma,
 				movement: data.movement
 			},
-			pos: data.tile[0] ? [data.tile[0].q, data.tile[0].r, data.tile[0].s] : null
+			pos: data.tile[0] ? [data.tile[0].q, data.tile[0].r, data.tile[0].s] : null,
+			tokens: data.token
 		}
 	})
 
