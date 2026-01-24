@@ -4,6 +4,7 @@ import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { requireAccount } from '~/supabase/requireAccount'
 import { typedObject } from '~/types/typedObject'
+import { TABLETOP_QUERY_STALE_TIME } from './tabletopDataOptions'
 
 const tilesLoaderSchema = type({
 	campaignId: 'number'
@@ -41,7 +42,8 @@ const tilesLoader = createServerFn({ method: 'GET' })
 
 export const tabletopTilesQueryOptions = (campaignId: number) => queryOptions({
 	queryKey: [campaignId, 'tabletop', 'tiles', 'characters'],
-	queryFn: () => tilesLoader({ data: { campaignId } })
+	queryFn: () => tilesLoader({ data: { campaignId } }),
+	staleTime: TABLETOP_QUERY_STALE_TIME
 })
 
 export function useTabletopTiles() {

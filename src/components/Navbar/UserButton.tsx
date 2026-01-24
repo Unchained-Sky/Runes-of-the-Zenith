@@ -14,7 +14,8 @@ export default function UserButton() {
 
 	const { data: userIdentity, isLoading } = useQuery({
 		queryKey: ['navbar', 'userIdentity'],
-		queryFn: getUserIdentity
+		queryFn: getUserIdentity,
+		staleTime: Infinity
 	})
 
 	if (isLoading) return null
@@ -50,12 +51,14 @@ const User = forwardRef<HTMLButtonElement, UserProps>(function User({ userIdenti
 	const { data: campaignCount } = useQuery({
 		queryKey: ['navbar', 'campaignCount'],
 		queryFn: getCampaignCount,
+		staleTime: 5 * 60 * 1000,
 		placeholderData: () => 0
 	})
 
 	const { data: heroCount } = useQuery({
 		queryKey: ['navbar', 'heroCount'],
 		queryFn: getHeroCount,
+		staleTime: 5 * 60 * 1000,
 		placeholderData: () => 0
 	})
 

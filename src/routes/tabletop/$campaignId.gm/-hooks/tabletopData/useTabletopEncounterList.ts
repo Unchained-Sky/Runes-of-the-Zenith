@@ -4,6 +4,7 @@ import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { adminUUID } from '~/supabase/adminAccount'
 import { requireAccount } from '~/supabase/requireAccount'
+import { TABLETOP_QUERY_STALE_TIME } from './tabletopDataOptions'
 
 const encounterListLoaderSchema = type({
 	campaignId: 'number'
@@ -63,7 +64,8 @@ const encounterListLoader = createServerFn({ method: 'GET' })
 
 export const tabletopEncounterListQueryOptions = (campaignId: number) => queryOptions({
 	queryKey: [campaignId, 'tabletop', 'encounters'],
-	queryFn: () => encounterListLoader({ data: { campaignId } })
+	queryFn: () => encounterListLoader({ data: { campaignId } }),
+	staleTime: TABLETOP_QUERY_STALE_TIME
 })
 
 export function useTabletopEncounterList() {

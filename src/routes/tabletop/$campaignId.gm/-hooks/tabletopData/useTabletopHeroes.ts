@@ -5,6 +5,7 @@ import { type } from 'arktype'
 import { type Enums } from '~/supabase/databaseTypes'
 import { requireAccount } from '~/supabase/requireAccount'
 import { typedObject } from '~/types/typedObject'
+import { TABLETOP_QUERY_STALE_TIME } from './tabletopDataOptions'
 import { useTabletopHeroList } from './useTabletopHeroList'
 
 const heroLoaderSchema = type({
@@ -16,7 +17,6 @@ const heroLoader = createServerFn({ method: 'GET' })
 	.handler(async ({ data: { tabletopCharacterId } }) => {
 		const { supabase } = await requireAccount({ backlink: '/campaigns' })
 
-		// TODO move runeInfo into a separate loader
 		const { data, error } = await supabase
 			.from('tabletop_characters')
 			.select(`
@@ -137,7 +137,8 @@ const heroLoader = createServerFn({ method: 'GET' })
 
 const tabletopHeroQueryOptions = (campaignId: number, tabletopCharacterId: number) => queryOptions({
 	queryKey: [campaignId, 'tabletop', 'hero', tabletopCharacterId],
-	queryFn: () => heroLoader({ data: { tabletopCharacterId } })
+	queryFn: () => heroLoader({ data: { tabletopCharacterId } }),
+	staleTime: TABLETOP_QUERY_STALE_TIME
 })
 
 type InternalTabletopHeroData = NonNullable<Awaited<ReturnType<typeof heroLoader>>>

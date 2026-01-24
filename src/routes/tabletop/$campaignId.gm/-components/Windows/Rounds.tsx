@@ -2,6 +2,7 @@ import { Window } from '@gfazioli/mantine-window'
 import { Avatar, Group, Stack, type StackProps, Text } from '@mantine/core'
 import { type TabletopHeroData, useTabletopHeroes } from '../../-hooks/tabletopData/useTabletopHeroes'
 import { useTabletopHeroRounds } from '../../-hooks/tabletopData/useTabletopHeroRounds'
+import { useTabletopRound } from '../../-hooks/tabletopData/useTabletopRound'
 
 type RoundsWindowProps = {
 	opened: boolean
@@ -15,6 +16,8 @@ export default function RoundsWindow({ opened, onClose }: RoundsWindowProps) {
 
 	const { data: heroesData } = useTabletopHeroes()
 
+	const { data: roundData } = useTabletopRound()
+
 	return (
 		<Window
 			id='round'
@@ -25,7 +28,7 @@ export default function RoundsWindow({ opened, onClose }: RoundsWindowProps) {
 			minWidth={360}
 			resizable='horizontal'
 			// TODO track round number
-			title='Round X'
+			title={`Round: ${roundData.round}`}
 		>
 			<Group gap='sm' align='flex-start' wrap='nowrap'>
 				{usedTurns.map(turn => {

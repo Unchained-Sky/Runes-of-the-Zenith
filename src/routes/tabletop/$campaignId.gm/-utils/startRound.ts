@@ -8,6 +8,7 @@ import { requireGM } from '~/supabase/requireGM'
 import { mutationError } from '~/utils/mutationError'
 import { type HeroTurn } from '../-hooks/tabletopData/useTabletopHeroRounds'
 import { type TabletopHeroData } from '../-hooks/tabletopData/useTabletopHeroes'
+import { type TabletopRoundData } from '../-hooks/tabletopData/useTabletopRound'
 
 export function useStartRound() {
 	const routeApi = getRouteApi('/tabletop/$campaignId/gm/')
@@ -58,6 +59,14 @@ export const startRoundQuerySync = ({ queryClient, campaignId }: StartRoundQuery
 				}
 			}
 		} satisfies TabletopHeroData
+	})
+
+	void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'round'] })
+	queryClient.setQueryData([campaignId, 'tabletop', 'round'], (oldData: TabletopRoundData) => {
+		return {
+			...oldData,
+			round: oldData.round + 1
+		} satisfies TabletopRoundData
 	})
 }
 
@@ -118,5 +127,21 @@ export const startRoundAction = createServerFn({ method: 'POST' })
 				.from('tabletop_hero_turn')
 				.insert(turns)
 			if (error) throw new Error(error.message, { cause: error })
+		}
+
+		{
+			const { data, error: selectError } = await supabase
+				.from('tabletop_info')
+				.select('round')
+				.eq('campaign_id', campaignId)
+				.limit(1)
+				.single()
+			if (selectError) throw new Error(selectError.message, { cause: selectError })
+
+			const { error: updateError } = await serviceClient
+				.from('tabletop_info')
+				.update({ round: data.round + 1 })
+				.eq('campaign_id', campaignId)
+			if (updateError) throw new Error(updateError.message, { cause: updateError })
 		}
 	})

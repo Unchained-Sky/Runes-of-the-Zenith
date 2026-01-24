@@ -202,7 +202,8 @@ const changeEncounterAction = createServerFn({ method: 'POST' })
 					maxHealth: max_health,
 					maxShield: max_shield,
 					enemyInfo: enemy_info (
-						enemyId: enemy_id
+						enemyId: enemy_id,
+						aggression
 					)
 				`)
 				.in('enemy_info.enemy_id', tilesWithEnemies.map(({ enemyId }) => enemyId))
@@ -229,10 +230,13 @@ const changeEncounterAction = createServerFn({ method: 'POST' })
 				const { error } = await serverClient
 					.from('tabletop_enemy')
 					.insert(
-						tilesWithEnemies.map(({ enemyId }, index) => ({
-							enemy_id: enemyId,
-							tt_character_id: characterIds[index]?.characterId ?? -1
-						}))
+						tilesWithEnemies.map(({ enemyId }, index) => {
+							return {
+								enemy_id: enemyId,
+								tt_character_id: characterIds[index]?.characterId ?? -1,
+								current_aggression: 0
+							} satisfies TablesInsert<'tabletop_enemy'>
+						})
 					)
 				if (error) throw new Error(error.message, { cause: error })
 			}

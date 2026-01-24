@@ -4,6 +4,7 @@ import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { requireAccount } from '~/supabase/requireAccount'
 import { type CombatTile } from '~/types/gameTypes/combatMap'
+import { TABLETOP_QUERY_STALE_TIME } from './tabletopDataOptions'
 
 const mapTilesLoaderSchema = type({
 	campaignId: 'number'
@@ -44,7 +45,8 @@ const mapTilesLoader = createServerFn({ method: 'GET' })
 
 export const tabletopMapTilesQueryOptions = (campaignId: number) => queryOptions({
 	queryKey: [campaignId, 'tabletop', 'tiles', 'map'],
-	queryFn: () => mapTilesLoader({ data: { campaignId } })
+	queryFn: () => mapTilesLoader({ data: { campaignId } }),
+	staleTime: TABLETOP_QUERY_STALE_TIME
 })
 
 export function useTabletopMapTiles() {

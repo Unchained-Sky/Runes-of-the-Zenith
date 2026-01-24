@@ -1,5 +1,6 @@
 import { Stack } from '@mantine/core'
-import NewRound from './NewRound'
+import EnemyAggression from './EnemyAggression'
+import NewRound from './NextRound'
 import TurnOrder from './TurnOrder'
 
 export default function RoundTab() {
@@ -7,6 +8,7 @@ export default function RoundTab() {
 		<Stack>
 			<NewRound />
 			<TurnOrder />
+			<EnemyAggression />
 		</Stack>
 	)
 }

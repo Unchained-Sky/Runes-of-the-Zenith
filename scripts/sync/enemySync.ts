@@ -1,4 +1,5 @@
 import { adminUUID } from '~/supabase/adminAccount'
+import { type TablesInsert, type TablesUpdate } from '~/supabase/databaseTypes'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { createCompendiumHash } from '../data/compendiumTypes'
 import enemyData, { type CompendiumEnemy } from '../data/enemies/enemyData'
@@ -17,7 +18,7 @@ async function insertEnemy(enemy: CompendiumEnemy) {
 			dex: enemy.stats.dex,
 			max_movement: enemy.stats.movement,
 			crit_chance: enemy.stats.critChance
-		})
+		} satisfies TablesInsert<'character_info'>)
 		.select('character_id')
 		.limit(1)
 		.single()
@@ -28,8 +29,9 @@ async function insertEnemy(enemy: CompendiumEnemy) {
 		.insert({
 			user_id: adminUUID,
 			enemy_name: enemy.name,
-			character_id: characterInfo.data.character_id
-		})
+			character_id: characterInfo.data.character_id,
+			aggression: enemy.stats.aggression
+		} satisfies TablesInsert<'enemy_info'>)
 		.select('enemy_id')
 		.limit(1)
 		.single()
@@ -44,8 +46,9 @@ async function updateEnemy(enemy: CompendiumEnemy, enemyId: number, characterId:
 		.update({
 			user_id: adminUUID,
 			enemy_name: enemy.name,
-			character_id: characterId
-		})
+			character_id: characterId,
+			aggression: enemy.stats.aggression
+		} satisfies TablesUpdate<'enemy_info'>)
 		.eq('enemy_id', enemyId)
 		.select('enemy_id')
 		.limit(1)
@@ -56,13 +59,13 @@ async function updateEnemy(enemy: CompendiumEnemy, enemyId: number, characterId:
 		.from('character_info')
 		.update({
 			max_health: enemy.stats.maxHealth,
-			shield: enemy.stats.shield,
+			max_shield: enemy.stats.shield,
 			int: enemy.stats.int,
 			str: enemy.stats.str,
 			dex: enemy.stats.dex,
-			movement: enemy.stats.movement,
+			max_movement: enemy.stats.movement,
 			crit_chance: enemy.stats.critChance
-		})
+		} satisfies TablesUpdate<'character_info'>)
 		.eq('character_id', characterId)
 		.select('character_id')
 		.limit(1)
