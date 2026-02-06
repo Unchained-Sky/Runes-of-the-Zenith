@@ -1,5 +1,4 @@
 import { useMutation } from '@tanstack/react-query'
-import { getRouteApi } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { getServiceClient } from '~/supabase/getServiceClient'
@@ -7,11 +6,10 @@ import { requireGM } from '~/supabase/requireGM'
 import { typedObject } from '~/types/typedObject'
 import { mutationError } from '~/utils/mutationError'
 import { type TabletopTile, type TabletopTiles } from '../-hooks/tabletopData/useTabletopTiles'
+import { useQuerySync } from '../-hooks/useQuerySync'
 
 export function useMoveCharacter() {
-	const routeApi = getRouteApi('/tabletop/$campaignId/gm/')
-	const { queryClient } = routeApi.useRouteContext()
-	const { campaignId } = routeApi.useLoaderData()
+	const { queryClient, campaignId } = useQuerySync()
 
 	return useMutation({
 		mutationFn: moveCharacterAction,

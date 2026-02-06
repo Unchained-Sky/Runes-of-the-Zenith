@@ -1,5 +1,4 @@
 import { useMutation } from '@tanstack/react-query'
-import { getRouteApi } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { type TablesUpdate } from '~/supabase/databaseTypes'
@@ -8,13 +7,13 @@ import { requireGM } from '~/supabase/requireGM'
 import { mutationError } from '~/utils/mutationError'
 import { type HeroTurn } from '../-hooks/tabletopData/useTabletopHeroRounds'
 import { type TabletopHeroData } from '../-hooks/tabletopData/useTabletopHeroes'
+import { useQuerySync } from '../-hooks/useQuerySync'
+import { increaseAggressionAction, increaseAggressionQuerySync } from './increaseAggression'
 
 const findNextOrder = (array: { order: number | null }[]) => Math.max(0, ...array.flatMap(({ order }) => order ? [order] : [])) + 1
 
 export function useAssignNextHeroTurn() {
-	const routeApi = getRouteApi('/tabletop/$campaignId/gm/')
-	const { queryClient } = routeApi.useRouteContext()
-	const { campaignId } = routeApi.useLoaderData()
+	const { queryClient, campaignId } = useQuerySync()
 
 	return useMutation({
 		mutationFn: assignNextHeroTurnAction,
@@ -47,6 +46,8 @@ export function useAssignNextHeroTurn() {
 					}
 				} satisfies TabletopHeroData
 			})
+
+			increaseAggressionQuerySync({ queryClient, campaignId })
 		},
 		onError: error => {
 			mutationError(error, 'Failed to assign next hero turn')
@@ -88,4 +89,6 @@ export const assignNextHeroTurnAction = createServerFn({ method: 'POST' })
 				.eq('turn_type', turnType)
 			if (error) throw new Error(error.message, { cause: error })
 		}
+
+		await increaseAggressionAction({ data: { campaignId } })
 	})

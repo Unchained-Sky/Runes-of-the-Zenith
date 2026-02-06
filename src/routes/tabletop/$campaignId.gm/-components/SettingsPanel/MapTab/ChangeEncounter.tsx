@@ -1,6 +1,5 @@
 import { Button, Card, Group, Modal, Stack, Text, Title, useModalsStack } from '@mantine/core'
 import { useMutation } from '@tanstack/react-query'
-import { getRouteApi } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { useState } from 'react'
@@ -10,13 +9,12 @@ import { requireGM } from '~/supabase/requireGM'
 import { mutationError } from '~/utils/mutationError'
 import { useTabletopCurrentEncounter } from '../../../-hooks/tabletopData/useTabletopCurrentEncounter'
 import { useTabletopEncounterList } from '../../../-hooks/tabletopData/useTabletopEncounterList'
+import { useQuerySync } from '../../../-hooks/useQuerySync'
 import { startRoundAction, startRoundQuerySync } from '../../../-utils/startRound'
 import { useSettingsPanelStore } from '../useSettingsPanelStore'
 
 export default function ChangeEncounter() {
-	const routeApi = getRouteApi('/tabletop/$campaignId/gm/')
-	const { queryClient } = routeApi.useRouteContext()
-	const { campaignId } = routeApi.useLoaderData()
+	const { queryClient, campaignId } = useQuerySync()
 
 	const { data: currentEncounterName } = useTabletopCurrentEncounter()
 	const { data: encounterData } = useTabletopEncounterList()
@@ -49,7 +47,7 @@ export default function ChangeEncounter() {
 		if (!selectedEncounter) return
 		useSettingsPanelStore.getState().deselectCharacter()
 		handleCleanupModal()
-		changeEncounter.mutate({ data: { campaignId: campaignId, encounterId: selectedEncounter } })
+		changeEncounter.mutate({ data: { campaignId, encounterId: selectedEncounter } })
 	}
 
 	return (

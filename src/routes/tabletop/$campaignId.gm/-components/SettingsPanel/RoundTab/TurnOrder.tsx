@@ -1,4 +1,5 @@
-import { Avatar, Button, Group, Menu, Stack, Text, Title } from '@mantine/core'
+import { Avatar, Button, Divider, Group, Menu, Stack, Text, Title } from '@mantine/core'
+import { useTabletopEnemies } from '../../../-hooks/tabletopData/useTabletopEnemies'
 import { type TabletopHeroData, useTabletopHeroes } from '../../../-hooks/tabletopData/useTabletopHeroes'
 import { useTabletopHeroRounds } from '../../../-hooks/tabletopData/useTabletopHeroRounds'
 import { useAssignNextHeroTurn } from '../../../-utils/assignNextHeroTurn'
@@ -10,6 +11,15 @@ export default function TurnOrder() {
 
 	const { data: heroesData } = useTabletopHeroes()
 
+	const { data: enemiesData } = useTabletopEnemies()
+	const enemiesOrder = Object.values(enemiesData).reduce<Record<number, number[]>>((prev, enemyData) => {
+		const aggressionLeft = Math.max(enemyData.stats.aggression - enemyData.tabletopStats.currentAggression, 0)
+		return {
+			...prev,
+			[aggressionLeft]: prev[aggressionLeft] ? [...prev[aggressionLeft], enemyData.tabletopCharacterId] : [enemyData.tabletopCharacterId]
+		}
+	}, {})
+
 	return (
 		<Stack align='flex-start'>
 			<Title order={3}>Turn Order</Title>
@@ -20,7 +30,21 @@ export default function TurnOrder() {
 			})}
 
 			{Array.from({ length: unusedTurnCount }).map((_, index) => {
-				return <UnusedTurn key={index} />
+				const enemies = enemiesOrder[index]?.map(tabletopCharacterId => enemiesData[tabletopCharacterId]?.enemyName ?? 'Unknown Enemy') ?? []
+				return (
+					<Stack key={index}>
+						{enemies.map((enemyName, index) => {
+							return (
+								<Divider
+									key={enemyName + index.toString()}
+									label={enemyName}
+									color='red'
+								/>
+							)
+						})}
+						<UnusedTurn />
+					</Stack>
+				)
 			})}
 
 			<AssignNextTurn />

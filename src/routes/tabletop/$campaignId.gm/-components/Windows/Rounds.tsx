@@ -1,6 +1,7 @@
 import { Window } from '@gfazioli/mantine-window'
 import { Avatar, Group, Stack, type StackProps, Text } from '@mantine/core'
-import { type TabletopHeroData, useTabletopHeroes } from '../../-hooks/tabletopData/useTabletopHeroes'
+import { useTabletopEnemies } from '../../-hooks/tabletopData/useTabletopEnemies'
+import { useTabletopHeroes } from '../../-hooks/tabletopData/useTabletopHeroes'
 import { useTabletopHeroRounds } from '../../-hooks/tabletopData/useTabletopHeroRounds'
 import { useTabletopRound } from '../../-hooks/tabletopData/useTabletopRound'
 
@@ -16,6 +17,15 @@ export default function RoundsWindow({ opened, onClose }: RoundsWindowProps) {
 
 	const { data: heroesData } = useTabletopHeroes()
 
+	const { data: enemiesData } = useTabletopEnemies()
+	const enemiesOrder = Object.values(enemiesData).reduce<Record<number, number[]>>((prev, enemyData) => {
+		const aggressionLeft = Math.max(enemyData.stats.aggression - enemyData.tabletopStats.currentAggression, 0)
+		return {
+			...prev,
+			[aggressionLeft]: prev[aggressionLeft] ? [...prev[aggressionLeft], enemyData.tabletopCharacterId] : [enemyData.tabletopCharacterId]
+		}
+	}, {})
+
 	const { data: roundData } = useTabletopRound()
 
 	return (
@@ -27,18 +37,27 @@ export default function RoundsWindow({ opened, onClose }: RoundsWindowProps) {
 			defaultSize={{ width: 480, height: 165 }}
 			minWidth={360}
 			resizable='horizontal'
-			// TODO track round number
 			title={`Round: ${roundData.round}`}
 		>
 			<Group gap='sm' align='flex-start' wrap='nowrap'>
 				{usedTurns.map(turn => {
 					const heroData = heroesData[turn.tabletopCharacterId]
 					if (!heroData) throw new Error(`Hero not found: ${turn.tabletopCharacterId}`)
-					return <UsedTurn key={turn.order} turnType={turn.turnType} heroData={heroData} />
+					return <UsedTurn key={turn.order} turnType={turn.turnType} characterData={heroData} />
 				})}
 
 				{Array.from({ length: unusedTurnCount }).map((_, index) => {
-					return <UnusedTurn key={index} />
+					const enemies = enemiesOrder[index]?.map(tabletopCharacterId => enemiesData[tabletopCharacterId]?.enemyName ?? 'Unknown Enemy') ?? []
+					return (
+						<Group key={index} gap='sm' align='flex-start' wrap='nowrap'>
+							{enemies.map((enemyName, index) => {
+								return (
+									<UsedTurn key={index} turnType='ENEMY' characterData={{ avatarUrl: '', heroName: enemyName }} />
+								)
+							})}
+							<UnusedTurn />
+						</Group>
+					)
 				})}
 			</Group>
 		</Window>
@@ -52,15 +71,18 @@ const TURN_STACK_PROPS: StackProps = {
 }
 
 type UsedTurnProps = {
-	turnType: 'PRIMARY' | 'SECONDARY'
-	heroData: TabletopHeroData
+	turnType: 'PRIMARY' | 'SECONDARY' | 'ENEMY'
+	characterData: {
+		avatarUrl: string
+		heroName: string
+	}
 }
 
-function UsedTurn({ turnType, heroData }: UsedTurnProps) {
+function UsedTurn({ turnType, characterData }: UsedTurnProps) {
 	return (
 		<Stack {...TURN_STACK_PROPS}>
-			<Avatar src={heroData.avatarUrl} name={heroData.heroName} color='green' />
-			<Text style={{ whiteSpace: 'nowrap' }}>{heroData.heroName}</Text>
+			<Avatar src={characterData.avatarUrl} name={characterData.heroName} color={turnType === 'ENEMY' ? 'red' : 'green'} />
+			<Text style={{ whiteSpace: 'nowrap' }}>{characterData.heroName}</Text>
 			<Text>{turnType}</Text>
 		</Stack>
 	)

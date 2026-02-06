@@ -3,7 +3,6 @@ import { useForm } from '@mantine/form'
 import { useDisclosure, useListState, type UseListStateHandlers } from '@mantine/hooks'
 import { IconPencil, IconPlus } from '@tabler/icons-react'
 import { useMutation } from '@tanstack/react-query'
-import { getRouteApi } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { useMemo, useState } from 'react'
@@ -14,6 +13,7 @@ import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
 import { int2 } from '~/utils/int'
 import { mutationError } from '~/utils/mutationError'
+import { useQuerySync } from '../../../-hooks/useQuerySync'
 import { useSettingsPanelStore } from '../useSettingsPanelStore'
 
 type TokenProps = {
@@ -99,9 +99,7 @@ type TokenEditModalProps = {
 }
 
 function TokenEditModal({ opened, close, tokens, characterType }: TokenEditModalProps) {
-	const routeApi = getRouteApi('/tabletop/$campaignId/gm/')
-	const { queryClient } = routeApi.useRouteContext()
-	const { campaignId } = routeApi.useLoaderData()
+	const { queryClient, campaignId } = useQuerySync()
 
 	const [selectedCharacterId] = useSettingsPanelStore(state => state.selectedCharacter)
 

@@ -1,6 +1,5 @@
 import { Menu } from '@mantine/core'
 import { useMutation } from '@tanstack/react-query'
-import { getRouteApi } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { Fragment, type ReactNode } from 'react'
@@ -13,6 +12,7 @@ import { mutationError } from '~/utils/mutationError'
 import { type TabletopHeroData, useTabletopHeroes } from '../-hooks/tabletopData/useTabletopHeroes'
 import { useTabletopHeroList } from '../-hooks/tabletopData/useTabletopHeroList'
 import { useTabletopTiles } from '../-hooks/tabletopData/useTabletopTiles'
+import { useQuerySync } from '../-hooks/useQuerySync'
 
 type HexContextMenuProps = {
 	children: ReactNode
@@ -39,9 +39,7 @@ type HeroesProps = {
 }
 
 function Heroes({ cord }: HeroesProps) {
-	const routeApi = getRouteApi('/tabletop/$campaignId/gm/')
-	const { queryClient } = routeApi.useRouteContext()
-	const { campaignId } = routeApi.useLoaderData()
+	const { queryClient, campaignId } = useQuerySync()
 
 	const { data: heroList } = useTabletopHeroList()
 	const inactiveHeroes = heroList.filter(hero => !hero.tabletopCharacterId)

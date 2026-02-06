@@ -1,6 +1,5 @@
 import { SimpleGrid, Title } from '@mantine/core'
 import { useMutation } from '@tanstack/react-query'
-import { getRouteApi } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { getServiceClient } from '~/supabase/getServiceClient'
@@ -8,12 +7,11 @@ import { requireGM } from '~/supabase/requireGM'
 import { mutationError } from '~/utils/mutationError'
 import { useTabletopHeroes } from '../../../-hooks/tabletopData/useTabletopHeroes'
 import { type TabletopHeroesList } from '../../../-hooks/tabletopData/useTabletopHeroList'
+import { useQuerySync } from '../../../-hooks/useQuerySync'
 import CharacterCard from './CharacterCard'
 
 export default function Heroes() {
-	const routeApi = getRouteApi('/tabletop/$campaignId/gm/')
-	const { queryClient } = routeApi.useRouteContext()
-	const { campaignId } = routeApi.useLoaderData()
+	const { queryClient, campaignId } = useQuerySync()
 
 	const { data: heroesData } = useTabletopHeroes()
 

@@ -3,7 +3,6 @@ import { isInRange, useForm } from '@mantine/form'
 import { useDisclosure } from '@mantine/hooks'
 import { IconPencil, IconTrash, IconX } from '@tabler/icons-react'
 import { useMutation } from '@tanstack/react-query'
-import { getRouteApi } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { type Enums } from '~/supabase/databaseTypes'
@@ -13,6 +12,7 @@ import { type CombatTileCord } from '~/types/gameTypes/combatMap'
 import { mutationError } from '~/utils/mutationError'
 import { type TabletopEnemyData } from '../../../-hooks/tabletopData/useTabletopEnemies'
 import { type TabletopHeroData } from '../../../-hooks/tabletopData/useTabletopHeroes'
+import { useQuerySync } from '../../../-hooks/useQuerySync'
 
 type CharacterCardProps = {
 	character: {
@@ -109,9 +109,7 @@ type EditCharacterModalProps = {
 }
 
 function EditCharacterModal({ character, openedModal, closeModal }: EditCharacterModalProps) {
-	const routeApi = getRouteApi('/tabletop/$campaignId/gm/')
-	const { queryClient } = routeApi.useRouteContext()
-	const { campaignId } = routeApi.useLoaderData()
+	const { queryClient, campaignId } = useQuerySync()
 
 	const form = useForm({
 		mode: 'uncontrolled',

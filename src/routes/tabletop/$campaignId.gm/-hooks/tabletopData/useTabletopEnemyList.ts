@@ -24,6 +24,8 @@ const enemyListLoader = createServerFn({ method: 'GET' })
 		return data.map(enemy => enemy.tabletopCharacterId)
 	})
 
+export type TabletopEnemyList = Awaited<ReturnType<typeof enemyListLoader>>
+
 export const tabletopEnemyListQueryOptions = (campaignId: number) => queryOptions({
 	queryKey: [campaignId, 'tabletop', 'enemy-list'],
 	queryFn: () => enemyListLoader({ data: { campaignId } }),

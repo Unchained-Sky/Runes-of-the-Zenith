@@ -1,17 +1,15 @@
 import { Button, Group, Modal, Stack, Text } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { useMutation } from '@tanstack/react-query'
-import { getRouteApi } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
 import { mutationError } from '~/utils/mutationError'
+import { useQuerySync } from '../../../-hooks/useQuerySync'
 
 export default function ClearEncounter() {
-	const routeApi = getRouteApi('/tabletop/$campaignId/gm/')
-	const { campaignId } = routeApi.useLoaderData()
-	const { queryClient } = routeApi.useRouteContext()
+	const { queryClient, campaignId } = useQuerySync()
 
 	const [opened, { open, close }] = useDisclosure(false)
 
