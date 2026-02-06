@@ -3,14 +3,14 @@ import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { getSupabaseServerClient } from '~/supabase/getSupabaseServerClient'
 
-const authLoginSearchSchema = type({
+const loginSearchSchema = type({
 	'backlink?': 'string'
 })
 
 export const Route = createFileRoute('/auth/login')({
 	preload: false,
 	validateSearch: search => {
-		const validator = authLoginSearchSchema(search)
+		const validator = loginSearchSchema(search)
 		if (validator instanceof type.errors) {
 			throw new Error(validator.summary)
 		}
@@ -19,21 +19,29 @@ export const Route = createFileRoute('/auth/login')({
 		}
 	},
 	loaderDeps: ({ search }) => search,
-	loader: async ({ deps: search }) => {
+	loader: async ({ deps: search, location }) => {
 		return await serverLoader({
-			data: { backlink: search.backlink }
+			data: {
+				origin: location.url.origin,
+				backlink: search.backlink
+			}
 		})
 	}
 })
 
+const authLoginSearchSchema = type({
+	origin: 'string',
+	backlink: 'string'
+})
+
 const serverLoader = createServerFn({ method: 'POST' })
 	.inputValidator(authLoginSearchSchema)
-	.handler(async ({ data: { backlink } }) => {
+	.handler(async ({ data: { origin, backlink } }) => {
 		const supabase = getSupabaseServerClient()
 		const { data, error } = await supabase.auth.signInWithOAuth({
 			provider: 'discord',
 			options: {
-				redirectTo: `${process.env.DOMAIN}/auth/callback?next=${backlink ?? '/'}`
+				redirectTo: `${origin}/auth/callback?next=${backlink}`
 			}
 		})
 
