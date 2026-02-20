@@ -4,6 +4,6 @@ type Env =
 	| 'SUPABASE_SERVICE_ROLE'
 
 declare namespace NodeJS {
-	// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+	// oxlint-disable-next-line typescript/no-empty-object-type
 	interface ProcessEnv extends Partial<Record<Env, string>> {}
 }

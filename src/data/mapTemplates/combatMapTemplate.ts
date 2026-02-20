@@ -13,13 +13,13 @@ const combatTemplateList = [
 	three
 ] as const satisfies CombatMap[]
 
-const combatTemplates = new Map<CombatMapTemplateName, CombatMapTemplate>([
-	...combatTemplateList.map<[CombatMapTemplateName, CombatMapTemplate]>(template => [template.name, template])
-])
+const combatTemplates = new Map<CombatMapTemplateName, CombatMapTemplate>(
+	combatTemplateList.map<[CombatMapTemplateName, CombatMapTemplate]>(template => [template.name, template])
+)
 
 export function getCombatMapTemplate(templateName: CombatMapTemplateName) {
 	if (!combatTemplates.has(templateName)) throw new Error(`Combat map template not found: ${templateName}`)
-	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+	// oxlint-disable-next-line typescript/no-non-null-assertion
 	return combatTemplates.get(templateName) ?? combatTemplates.get('one')!
 }
 

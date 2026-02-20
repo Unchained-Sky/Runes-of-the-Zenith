@@ -22,7 +22,7 @@ const submitMapChangesSchema = type({
 		'[string]': {
 			cord: ['number', 'number', 'number'],
 			image: 'string',
-			// eslint-disable-next-line @stylistic/quotes
+			// oxlint-disable-next-line @stylistic/quotes
 			terrainType: "'BLOCKED' | 'NORMAL' | 'ROUGH' | 'HARSH' | 'GAP'"
 		}
 	}
