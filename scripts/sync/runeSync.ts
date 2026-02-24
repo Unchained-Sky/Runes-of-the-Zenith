@@ -8,7 +8,7 @@ const supabase = getServiceClient()
 	const { error } = await supabase
 		.from('rune_info')
 		.delete()
-		// Supabase doesn't allow delete with a WHERE clause
+		// Supabase doesn't allow delete without a WHERE clause
 		.neq('rune_name', '')
 	if (error) throw new Error(error.message, { cause: error })
 }
@@ -25,9 +25,7 @@ const supabase = getServiceClient()
 				damage_type: rune.damageType,
 				archetype: rune.archetype,
 				subarchetype: rune.subarchetype,
-				data: {
-					description: rune.description
-				}
+				data: rune.data
 			}))
 		)
 	if (error) throw new Error(error.message, { cause: error })

@@ -2,6 +2,7 @@ import { queryOptions, useSuspenseQueries } from '@tanstack/react-query'
 import { getRouteApi } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
+import { type RuneExtraData, runeExtraDataSchema } from '~/scripts/data/runes/runeData'
 import { type Enums } from '~/supabase/databaseTypes'
 import { requireAccount } from '~/supabase/requireAccount'
 import { typedObject } from '~/types/typedObject'
@@ -166,10 +167,6 @@ export type TabletopHeroRuneData = {
 	data: RuneExtraData
 }
 
-const runeExtraDataSchema = type({
-	description: 'string'
-})
-export type RuneExtraData = typeof runeExtraDataSchema.infer
 const runeExtraDataFormatter = (rune: InternalTabletopHeroRuneData) => {
 	const json = JSON.parse(rune.data)
 	const out = runeExtraDataSchema(json)

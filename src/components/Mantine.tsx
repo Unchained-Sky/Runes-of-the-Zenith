@@ -1,6 +1,7 @@
 import '@mantine/core/styles.css'
 
 import '@gfazioli/mantine-window/styles.css'
+import '@mantine/charts/styles.css'
 import '@mantine/dropzone/styles.css'
 import '@mantine/notifications/styles.css'
 

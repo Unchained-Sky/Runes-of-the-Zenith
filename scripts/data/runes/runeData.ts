@@ -1,4 +1,4 @@
-import { type RuneExtraData } from '~/routes/tabletop/$campaignId.gm/-hooks/tabletopData/useTabletopHeroes'
+import { type } from 'arktype'
 import { type Archetype, type DamageType, type Subarchetype } from '../DamageType'
 import astral from './intelligence/arcane/astral'
 
@@ -14,6 +14,24 @@ type RuneSlotDurability = {
 	slot: 'PASSIVE'
 	durability: null
 }
+
+const damageValues = type({
+	flat: 'number',
+	scale: 'number'
+})
+
+export const runeExtraDataSchema = type({
+	'damage?': {
+		damageType: {
+			'int?': damageValues,
+			'dex?': damageValues,
+			'str?': damageValues
+		},
+		resolve: 'number',
+		accuracy: 'number'
+	}
+})
+export type RuneExtraData = typeof runeExtraDataSchema.infer
 
 export type RuneDataInternal = {
 	name: string

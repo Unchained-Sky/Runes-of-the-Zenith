@@ -52,7 +52,15 @@ export default function Hero() {
 					/>
 
 					<Title order={5}>Runes</Title>
-					<Runes runes={heroData.runes.PRIMARY} usedTurn={usedTurnPrimary} />
+					<Runes
+						runes={heroData.runes.PRIMARY}
+						usedTurn={usedTurnPrimary}
+						heroStats={{
+							int: heroData.stats.int,
+							dex: heroData.stats.dex,
+							str: heroData.stats.str
+						}}
+					/>
 				</Slot>
 
 				<Slot slot='SECONDARY'>
@@ -84,11 +92,27 @@ export default function Hero() {
 					/>
 
 					<Title order={5}>Runes</Title>
-					<Runes runes={heroData.runes.SECONDARY} usedTurn={usedTurnSecondary} />
+					<Runes
+						runes={heroData.runes.SECONDARY}
+						usedTurn={usedTurnSecondary}
+						heroStats={{
+							int: heroData.stats.int,
+							dex: heroData.stats.dex,
+							str: heroData.stats.str
+						}}
+					/>
 				</Slot>
 
 				<Slot slot='PASSIVE'>
-					<Runes runes={heroData.runes.PASSIVE} usedTurn={false} />
+					<Runes
+						runes={heroData.runes.PASSIVE}
+						usedTurn={false}
+						heroStats={{
+							int: heroData.stats.int,
+							dex: heroData.stats.dex,
+							str: heroData.stats.str
+						}}
+					/>
 				</Slot>
 			</Stack>
 		</Stack>
