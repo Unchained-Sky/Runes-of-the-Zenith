@@ -8,5 +8,8 @@ export type Character = {
 		dex: number
 		movement: number
 		critChance: number
+		intDef: number
+		strDef: number
+		dexDef: number
 	}
 }

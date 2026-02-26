@@ -153,8 +153,8 @@ function ActionDamageChart({ damageType, accuracy: _acc, heroStats }: ActionDama
 		damageData[hit] = {
 			damage: hit,
 			Average: percentage,
-			Squishy: TEST_DATA[i - TEST_DATA.length / 3]?.percentage ?? 0,
-			Tanky: TEST_DATA[i + TEST_DATA.length / 3]?.percentage ?? 0
+			Squishy: TEST_DATA[i - ~~(TEST_DATA.length / 3)]?.percentage ?? 0,
+			Tanky: TEST_DATA[i + ~~(TEST_DATA.length / 3)]?.percentage ?? 0
 		}
 	})
 

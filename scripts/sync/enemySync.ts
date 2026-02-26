@@ -17,7 +17,10 @@ async function insertEnemy(enemy: CompendiumEnemy) {
 			str: enemy.stats.str,
 			dex: enemy.stats.dex,
 			max_movement: enemy.stats.movement,
-			crit_chance: enemy.stats.critChance
+			crit_chance: enemy.stats.critChance,
+			int_def: enemy.stats.intDef,
+			str_def: enemy.stats.strDef,
+			dex_def: enemy.stats.dexDef
 		} satisfies TablesInsert<'character_info'>)
 		.select('character_id')
 		.limit(1)

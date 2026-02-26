@@ -11,6 +11,9 @@ export default {
 		dex: 40,
 		movement: 2,
 		critChance: 5,
-		aggression: 4
+		aggression: 4,
+		intDef: 5,
+		strDef: 5,
+		dexDef: 5
 	}
 } as const satisfies CompendiumEnemy

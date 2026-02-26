@@ -5,6 +5,7 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { useState } from 'react'
+import { type TablesInsert } from '~/supabase/databaseTypes'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireAccount } from '~/supabase/requireAccount'
 
@@ -82,8 +83,11 @@ const createHeroAction = createServerFn({ method: 'POST' })
 				str: 20,
 				dex: 20,
 				max_movement: 3,
-				crit_chance: 5
-			})
+				crit_chance: 5,
+				int_def: 5,
+				str_def: 5,
+				dex_def: 5
+			} satisfies TablesInsert<'character_info'>)
 			.select('characterId: character_id')
 			.limit(1)
 			.single()
@@ -94,7 +98,7 @@ const createHeroAction = createServerFn({ method: 'POST' })
 			.insert({
 				hero_name: heroName,
 				character_id: 0
-			})
+			} satisfies TablesInsert<'hero_info'>)
 			.select('heroId: hero_id')
 			.limit(1)
 			.single()
