@@ -1,39 +1,14 @@
 import { Button, Group, Stack, Text, Title } from '@mantine/core'
-import { useMutation } from '@tanstack/react-query'
-import { createServerFn } from '@tanstack/react-start'
-import { type } from 'arktype'
-import { getServiceClient } from '~/supabase/getServiceClient'
-import { requireGM } from '~/supabase/requireGM'
-import { mutationError } from '~/utils/mutationError'
-import { type TabletopEnemyData, useTabletopEnemies } from '../../../-hooks/tabletopData/useTabletopEnemies'
-import { useQuerySync } from '../../../-hooks/useQuerySync'
+import { useTabletopEnemies } from '../../../-hooks/tabletopData/useTabletopEnemies'
 import { useIncreaseAggression } from '../../../-utils/increaseAggression'
+import { useResetAggression } from '../../../-utils/resetAggression'
 
 export default function EnemyAggression() {
-	const { queryClient, campaignId } = useQuerySync()
-
 	const { data: enemiesData } = useTabletopEnemies()
 
 	const increaseAggression = useIncreaseAggression()
 
-	const resetAggression = useMutation({
-		mutationFn: resetAggressionAction,
-		onMutate: ({ data }) => {
-			void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'enemy', data.tabletopCharacterId] })
-			queryClient.setQueryData([campaignId, 'tabletop', 'enemy', data.tabletopCharacterId], (oldData: TabletopEnemyData) => {
-				return {
-					...oldData,
-					tabletopStats: {
-						...oldData.tabletopStats,
-						currentAggression: 0
-					}
-				} satisfies TabletopEnemyData
-			})
-		},
-		onError: error => {
-			mutationError(error, 'Failed to reset aggression')
-		}
-	})
+	const resetAggression = useResetAggression()
 
 	return (
 		<Stack>
@@ -61,23 +36,3 @@ export default function EnemyAggression() {
 		</Stack>
 	)
 }
-
-const resetAggressionSchema = type({
-	tabletopCharacterId: 'number'
-})
-
-const resetAggressionAction = createServerFn({ method: 'POST' })
-	.inputValidator(resetAggressionSchema)
-	.handler(async ({ data: { tabletopCharacterId } }) => {
-		await requireGM({ tabletopCharacterId })
-
-		const serviceClient = getServiceClient()
-
-		const { error } = await serviceClient
-			.from('tabletop_enemy')
-			.update({
-				current_aggression: 0
-			})
-			.eq('tt_character_id', tabletopCharacterId)
-		if (error) throw new Error(error.message, { cause: error })
-	})

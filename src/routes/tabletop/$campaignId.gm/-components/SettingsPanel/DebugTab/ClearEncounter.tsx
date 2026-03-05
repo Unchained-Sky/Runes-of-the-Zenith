@@ -41,7 +41,7 @@ export default function ClearEncounter() {
 					<Text>Are you sure you want to clear the encounter?</Text>
 					<Group>
 						<Button onClick={close} variant='default' flex={1}>Cancel</Button>
-						<Button color='red' onClick={handleConfirmSelection} flex={1}>Confirm</Button>
+						<Button color='red' onClick={handleConfirmSelection}>Confirm</Button>
 					</Group>
 				</Stack>
 			</Modal>
