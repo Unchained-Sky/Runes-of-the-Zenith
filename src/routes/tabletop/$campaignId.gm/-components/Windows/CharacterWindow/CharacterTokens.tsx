@@ -14,14 +14,14 @@ import { requireGM } from '~/supabase/requireGM'
 import { int2 } from '~/utils/int'
 import { mutationError } from '~/utils/mutationError'
 import { useQuerySync } from '../../../-hooks/useQuerySync'
-import { useSettingsPanelStore } from '../useSettingsPanelStore'
 
 type TokenProps = {
+	tabletopCharacterId: number
 	tokens: TabletopHeroData['tokens']
 	characterType: Enums<'character_type'>
 }
 
-export default function CharacterTokens({ tokens, characterType }: TokenProps) {
+export default function CharacterTokens({ tabletopCharacterId, tokens, characterType }: TokenProps) {
 	const [opened, { open, close }] = useDisclosure(false)
 
 	return (
@@ -41,7 +41,13 @@ export default function CharacterTokens({ tokens, characterType }: TokenProps) {
 				</Group>
 			</Card>
 
-			<TokenEditModal opened={opened} close={close} tokens={tokens} characterType={characterType} />
+			<TokenEditModal
+				opened={opened}
+				close={close}
+				tabletopCharacterId={tabletopCharacterId}
+				tokens={tokens}
+				characterType={characterType}
+			/>
 		</>
 	)
 }
@@ -94,14 +100,13 @@ function TokenIcon({ token }: TokenIconProps) {
 type TokenEditModalProps = {
 	opened: boolean
 	close: () => void
+	tabletopCharacterId: number
 	tokens: TabletopHeroData['tokens']
 	characterType: Enums<'character_type'>
 }
 
-function TokenEditModal({ opened, close, tokens, characterType }: TokenEditModalProps) {
+function TokenEditModal({ opened, tabletopCharacterId, close, tokens, characterType }: TokenEditModalProps) {
 	const { queryClient, campaignId } = useQuerySync()
-
-	const [selectedCharacterId] = useSettingsPanelStore(state => state.selectedCharacter)
 
 	const form = useForm({
 		mode: 'uncontrolled',
@@ -129,7 +134,7 @@ function TokenEditModal({ opened, close, tokens, characterType }: TokenEditModal
 	})
 
 	const handleSubmit = (values: typeof form.values) => {
-		updateHeroToken.mutate({ data: { tabletopCharacterId: selectedCharacterId, tokens: values.tokens } })
+		updateHeroToken.mutate({ data: { tabletopCharacterId, tokens: values.tokens } })
 		close()
 		form.setInitialValues(values)
 	}

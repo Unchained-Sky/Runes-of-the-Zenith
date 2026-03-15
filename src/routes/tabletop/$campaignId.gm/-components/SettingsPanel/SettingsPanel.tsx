@@ -1,7 +1,6 @@
 import { ActionIcon, Drawer, rem, ScrollArea, Tabs } from '@mantine/core'
 import { IconMenu2, IconX } from '@tabler/icons-react'
 import { Fragment } from 'react'
-import CharacterTab from './CharacterTab'
 import DebugTag from './DebugTab'
 import MapTab from './MapTab'
 import RoundTab from './RoundTab'
@@ -14,7 +13,6 @@ export default function SettingsPanel() {
 		activeTab,
 		closePanel,
 		openLastTab,
-		selectedCharacter: [selectedCharacterId],
 		setActiveTab
 	} = useSettingsPanelStore()
 
@@ -61,9 +59,6 @@ export default function SettingsPanel() {
 					}}
 				>
 					<Tabs.List>
-						<Tabs.Tab value='character' disabled={!selectedCharacterId}>
-							Character
-						</Tabs.Tab>
 						<Tabs.Tab value='units'>
 							Units
 						</Tabs.Tab>
@@ -87,9 +82,6 @@ export default function SettingsPanel() {
 						16px = top padding panels
 					*/}
 					<ScrollArea h='calc(100vh - 60px - 36px - 16px)'>
-						<Tabs.Panel value='character'>
-							<CharacterTab />
-						</Tabs.Panel>
 						<Tabs.Panel value='units'>
 							<UnitsTab />
 						</Tabs.Panel>

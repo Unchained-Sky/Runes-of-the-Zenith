@@ -7,6 +7,6 @@ type Split<S extends string, D extends string> =
 				? [T, ...Split<U, D>]
 				: [S]
 
-export function split<S extends string, D extends string>(string: S, splitter: D) {
+export function typedSplit<S extends string, D extends string>(string: S, splitter: D) {
 	return string.split(splitter) as Split<S, D>
 }

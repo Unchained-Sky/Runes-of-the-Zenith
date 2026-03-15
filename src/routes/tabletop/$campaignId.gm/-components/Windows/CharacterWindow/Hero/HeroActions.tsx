@@ -9,7 +9,7 @@ import { TEST_DATA } from '~/scripts/chart/damageData'
 import { type RuneExtraData } from '~/scripts/data/runes/runeData'
 import { type Enums } from '~/supabase/databaseTypes'
 import { titleCase } from '~/utils/stringCase'
-import { useSettingsPanelStore } from '../../useSettingsPanelStore'
+import { useHeroWindowContext } from './HeroWindowContext'
 
 type SlotProps = {
 	slot: Enums<'rune_slot'>
@@ -27,26 +27,32 @@ export function Slot({ slot, children }: SlotProps) {
 
 type ActionProps = {
 	tooltipText: string
-	usedTurn: boolean
 	slot: Enums<'rune_slot'>
 	onAction: () => undefined
 	inlineDescription: ReactNode
 	expandedDescription: ReactNode
 }
 
-export function Action({ tooltipText, usedTurn, slot, onAction, inlineDescription, expandedDescription }: ActionProps) {
-	const [selectedCharacterId] = useSettingsPanelStore(state => state.selectedCharacter)
+export function Action({ tooltipText, slot, onAction, inlineDescription, expandedDescription }: ActionProps) {
+	const heroData = useHeroWindowContext()
 
 	const assignNextTurn = useAssignNextHeroTurn()
 	const handleClick = () => {
 		if (slot !== 'PASSIVE') {
-			assignNextTurn.mutate({ data: { tabletopCharacterId: selectedCharacterId, turnType: slot } })
+			assignNextTurn.mutate({
+				data: {
+					tabletopCharacterId: heroData.tabletopCharacterId,
+					turnType: slot
+				}
+			})
 		}
 
 		onAction()
 	}
 
 	const [opened, { toggle }] = useDisclosure(false)
+
+	const usedTurn = slot === 'PASSIVE' ? true : (heroData.turn?.[slot].used ?? false)
 
 	return (
 		<Stack>
@@ -77,34 +83,32 @@ export function Action({ tooltipText, usedTurn, slot, onAction, inlineDescriptio
 
 type RunesProps = {
 	runes: TabletopHeroRuneData[]
-	usedTurn: boolean
-	heroStats: {
-		int: number
-		dex: number
-		str: number
-	}
 }
 
-export function Runes({ runes, usedTurn, heroStats }: RunesProps) {
+export function Runes({ runes }: RunesProps) {
 	return runes.length
 		? runes.map(rune => {
-			return <Rune key={rune.name} runeData={rune} usedTurn={usedTurn} heroStats={heroStats} />
+			return <Rune key={rune.name} runeData={rune} />
 		})
 		: <Text fs='italic'>None</Text>
 }
 
 type RuneProps = {
 	runeData: TabletopHeroRuneData
-	usedTurn: boolean
-	heroStats: RunesProps['heroStats']
 }
 
-function Rune({ runeData, usedTurn, heroStats }: RuneProps) {
+function Rune({ runeData }: RuneProps) {
+	const heroData = useHeroWindowContext()
+	const heroStats = {
+		int: heroData.stats.int,
+		dex: heroData.stats.dex,
+		str: heroData.stats.str
+	}
+
 	return (
 		<Action
 			tooltipText={`Cast ${runeData.name}`}
 			slot={runeData.slot}
-			usedTurn={usedTurn}
 			onAction={() => undefined}
 			inlineDescription={(
 				<>
@@ -135,7 +139,11 @@ type RuneExtraDataDamage = NonNullable<RuneExtraData['damage']>
 type ActionDamageChartProps = {
 	damageType: RuneExtraDataDamage['damageType']
 	accuracy: RuneExtraDataDamage['accuracy']
-	heroStats: RunesProps['heroStats']
+	heroStats: {
+		int: number
+		dex: number
+		str: number
+	}
 }
 
 function ActionDamageChart({ damageType, accuracy: _acc, heroStats }: ActionDamageChartProps) {

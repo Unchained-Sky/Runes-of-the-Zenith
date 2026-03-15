@@ -4,13 +4,9 @@ import { useTabletopEnemies } from '../../-hooks/tabletopData/useTabletopEnemies
 import { useTabletopHeroes } from '../../-hooks/tabletopData/useTabletopHeroes'
 import { useTabletopHeroRounds } from '../../-hooks/tabletopData/useTabletopHeroRounds'
 import { useTabletopRound } from '../../-hooks/tabletopData/useTabletopRound'
+import { DEFAULT_WINDOW_POSITION, type WindowProps } from './windowHelpers'
 
-type RoundsWindowProps = {
-	opened: boolean
-	onClose: () => void
-}
-
-export default function RoundsWindow({ opened, onClose }: RoundsWindowProps) {
+export default function RoundsWindow({ opened, onClose }: WindowProps) {
 	const { data: heroRounds } = useTabletopHeroRounds()
 	const usedTurns = heroRounds.filter(heroRound => heroRound.used)
 	const unusedTurnCount = heroRounds.filter(heroRound => !heroRound.used).length
@@ -33,7 +29,7 @@ export default function RoundsWindow({ opened, onClose }: RoundsWindowProps) {
 			id='round'
 			opened={opened}
 			onClose={onClose}
-			defaultPosition={{ x: 316, y: 16 }}
+			defaultPosition={DEFAULT_WINDOW_POSITION}
 			defaultSize={{ width: 480, height: 165 }}
 			minWidth={360}
 			resizable='horizontal'

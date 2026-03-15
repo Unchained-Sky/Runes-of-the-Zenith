@@ -20,7 +20,7 @@ type SettingsPanelActions = {
 	setActiveTab: (tab: string) => void
 	closePanel: () => void
 	openLastTab: () => void
-	openCharacterTab: (tabletopCharacterId: number, characterType: Enums<'character_type'>) => void
+	selectCharacter: (tabletopCharacterId: number, characterType: Enums<'character_type'>) => void
 	deselectCharacter: () => void
 }
 
@@ -36,18 +36,8 @@ const createSettingsPanelActions: Slice<SettingsPanelStore, SettingsPanelActions
 	},
 	closePanel: () => set({ activeTab: null }, ...actionName('closePanel')),
 	openLastTab: () => set({ activeTab: get().lastActiveTab }, ...actionName('openLastTab')),
-	openCharacterTab: (tabletopCharacterId, characterType) => {
-		set({
-			activeTab: 'character',
-			selectedCharacter: [tabletopCharacterId, characterType]
-		}, ...actionName('openCharacterTab'))
-	},
-	deselectCharacter: () => {
-		set(state => ({
-			selectedCharacter: [0, 'HERO'],
-			activeTab: state.activeTab === 'character' ? null : state.activeTab
-		}), ...actionName('deselectCharacter'))
-	}
+	selectCharacter: (tabletopCharacterId, characterType) => set({ selectedCharacter: [tabletopCharacterId, characterType] }, ...actionName('selectCharacter')),
+	deselectCharacter: () => set({ selectedCharacter: [0, 'HERO'] }, ...actionName('deselectCharacter'))
 })
 
 type SettingsPanelStore = SettingsPanelState & SettingsPanelActions

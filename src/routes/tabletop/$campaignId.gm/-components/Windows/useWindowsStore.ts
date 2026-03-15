@@ -1,8 +1,11 @@
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
+import { type Enums } from '~/supabase/databaseTypes'
 import { createActionName, type DevTools, type Slice } from '~/types/storeTypes'
 
-type WindowName = 'round'
+type WindowName =
+	| 'round'
+	| `character-${Enums<'character_type'>}-${number}`
 
 type WindowsState = {
 	opened: Record<WindowName, boolean>
@@ -16,6 +19,10 @@ const windowState: WindowsState = {
 
 type WindowsAction = {
 	toggleWindow: (windowName: WindowName) => void
+	/**
+	 * If the character is already open, does nothing
+	 */
+	addCharacter: (characterType: Enums<'character_type'>, tabletopCharacterId: number) => void
 }
 
 const actionName = createActionName<WindowsAction>('windows')
@@ -28,6 +35,14 @@ const createWindowActions: Slice<WindowsStore, WindowsAction, [DevTools]> = (set
 				[windowName]: !state.opened[windowName]
 			}
 		}), ...actionName('toggleWindow'))
+	},
+	addCharacter: (characterType, tabletopCharacterId) => {
+		set(state => ({
+			opened: {
+				[`character-${characterType}-${tabletopCharacterId}`]: false,
+				...state.opened
+			}
+		}), ...actionName('addCharacter'))
 	}
 })
 

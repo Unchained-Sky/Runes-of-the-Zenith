@@ -14,10 +14,10 @@ type CharacterIconProps = {
 export default function CharacterIcon({ tileData }: CharacterIconProps) {
 	const { tabletopCharacterId, characterType } = tileData
 
-	const activeTab = useSettingsPanelStore(state => state.activeTab)
 	const selectedCharacterId = useSettingsPanelStore(state => state.selectedCharacter)[0]
-	const isSelected = activeTab === 'character' && selectedCharacterId === tabletopCharacterId
+	const isSelected = selectedCharacterId === tabletopCharacterId
 
+	// TODO refactor to not load every character data on every characterIcon
 	const { data: heroesData } = useTabletopHeroes()
 	const { data: enemiesData } = useTabletopEnemies()
 
@@ -55,7 +55,7 @@ export default function CharacterIcon({ tileData }: CharacterIconProps) {
 			if (isSelected) {
 				useSettingsPanelStore.getState().deselectCharacter()
 			} else {
-				useSettingsPanelStore.getState().openCharacterTab(tabletopCharacterId, characterType)
+				useSettingsPanelStore.getState().selectCharacter(tabletopCharacterId, characterType)
 			}
 		}
 	})
