@@ -1,23 +1,25 @@
-import { type TablesInsert } from '~/supabase/databaseTypes'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import allRunes from '../data/runes/runeData'
 
 const supabase = getServiceClient()
 
 {
-	const { error } = await supabase
+	const { error, count } = await supabase
 		.from('rune_info')
-		.delete()
-		// Supabase doesn't allow delete without a WHERE clause
-		.neq('rune_name', '')
+		.delete({ count: 'exact' })
+		.not('rune_name', 'in', `(${allRunes.map(rune => rune.name).join(',')})`)
 	if (error) throw new Error(error.message, { cause: error })
+
+	if (count) {
+		console.log(`Deleted ${count} rune${count === 1 ? '' : 's'}`)
+	}
 }
 
 {
-	const { error } = await supabase
-		.from('rune_info')
-		.insert(
-			allRunes.map<TablesInsert<'rune_info'>>(rune => ({
+	for (const rune of allRunes) {
+		const { error } = await supabase
+			.from('rune_info')
+			.upsert({
 				rune_name: rune.name,
 				slot: rune.slot,
 				durability: rune.durability,
@@ -26,7 +28,10 @@ const supabase = getServiceClient()
 				archetype: rune.archetype,
 				subarchetype: rune.subarchetype,
 				data: rune.data
-			}))
-		)
-	if (error) throw new Error(error.message, { cause: error })
+			})
+			.eq('rune_name', rune.name)
+		if (error) throw new Error(error.message, { cause: error })
+	}
 }
+
+console.log(`Synced ${allRunes.length} runes`)

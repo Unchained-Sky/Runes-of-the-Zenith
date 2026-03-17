@@ -3,10 +3,9 @@ import { ActionIcon, Card, Code, Collapse, Group, Stack, Text, Title, Tooltip } 
 import { useDisclosure } from '@mantine/hooks'
 import { IconChevronDown, IconFlame } from '@tabler/icons-react'
 import { type ReactNode } from 'react'
-import { type TabletopHeroRuneData } from '~/routes/tabletop/$campaignId.gm/-hooks/tabletopData/useTabletopHeroes'
 import { useAssignNextHeroTurn } from '~/routes/tabletop/$campaignId.gm/-utils/assignNextHeroTurn'
 import { TEST_DATA } from '~/scripts/chart/damageData'
-import { type RuneExtraData } from '~/scripts/data/runes/runeData'
+import { type RuneData, type RuneExtraData } from '~/scripts/data/runes/runeData'
 import { type Enums } from '~/supabase/databaseTypes'
 import { titleCase } from '~/utils/stringCase'
 import { useHeroWindowContext } from './HeroWindowContext'
@@ -26,23 +25,23 @@ export function Slot({ slot, children }: SlotProps) {
 }
 
 type ActionProps = {
+	runeData: RuneData
 	tooltipText: string
-	slot: Enums<'rune_slot'>
 	onAction: () => undefined
-	inlineDescription: ReactNode
-	expandedDescription: ReactNode
+	inlineDescription?: ReactNode
+	expandedDescription?: ReactNode
 }
 
-export function Action({ tooltipText, slot, onAction, inlineDescription, expandedDescription }: ActionProps) {
+export function Action({ runeData, tooltipText, onAction, inlineDescription, expandedDescription }: ActionProps) {
 	const heroData = useHeroWindowContext()
 
 	const assignNextTurn = useAssignNextHeroTurn()
 	const handleClick = () => {
-		if (slot !== 'PASSIVE') {
+		if (runeData.slot !== 'PASSIVE') {
 			assignNextTurn.mutate({
 				data: {
 					tabletopCharacterId: heroData.tabletopCharacterId,
-					turnType: slot
+					turnType: runeData.slot
 				}
 			})
 		}
@@ -52,7 +51,7 @@ export function Action({ tooltipText, slot, onAction, inlineDescription, expande
 
 	const [opened, { toggle }] = useDisclosure(false)
 
-	const usedTurn = slot === 'PASSIVE' ? true : (heroData.turn?.[slot].used ?? false)
+	const usedTurn = runeData.slot === 'PASSIVE' ? true : (heroData.turn?.[runeData.slot].used ?? false)
 
 	return (
 		<Stack>
@@ -63,7 +62,7 @@ export function Action({ tooltipText, slot, onAction, inlineDescription, expande
 							<IconFlame />
 						</ActionIcon>
 					</Tooltip>
-					{inlineDescription}
+					{inlineDescription ?? <Text>{runeData.name}</Text>}
 				</Group>
 				<ActionIcon variant='transparent' onClick={toggle}>
 					<IconChevronDown
@@ -75,14 +74,14 @@ export function Action({ tooltipText, slot, onAction, inlineDescription, expande
 				</ActionIcon>
 			</Group>
 			<Collapse in={opened} ml={44}>
-				{expandedDescription}
+				{expandedDescription ?? <Text>{runeData.data.description}</Text>}
 			</Collapse>
 		</Stack>
 	)
 }
 
 type RunesProps = {
-	runes: TabletopHeroRuneData[]
+	runes: RuneData[]
 }
 
 export function Runes({ runes }: RunesProps) {
@@ -94,12 +93,12 @@ export function Runes({ runes }: RunesProps) {
 }
 
 type RuneProps = {
-	runeData: TabletopHeroRuneData
+	runeData: RuneData
 }
 
 function Rune({ runeData }: RuneProps) {
 	const heroData = useHeroWindowContext()
-	const heroStats = {
+	const heroMainStats = {
 		int: heroData.stats.int,
 		dex: heroData.stats.dex,
 		str: heroData.stats.str
@@ -107,8 +106,8 @@ function Rune({ runeData }: RuneProps) {
 
 	return (
 		<Action
+			runeData={runeData}
 			tooltipText={`Cast ${runeData.name}`}
-			slot={runeData.slot}
 			onAction={() => undefined}
 			inlineDescription={(
 				<>
@@ -124,9 +123,9 @@ function Rune({ runeData }: RuneProps) {
 					<Code>{JSON.stringify(runeData.data, null, 2)}</Code>
 					{runeData.data.damage && (
 						<ActionDamageChart
-							damageType={runeData.data.damage.damageType}
+							runeMainStats={runeData.data.damage.mainStats}
 							accuracy={runeData.data.damage.accuracy}
-							heroStats={heroStats}
+							heroMainStats={heroMainStats}
 						/>
 					)}
 				</Stack>
@@ -137,19 +136,19 @@ function Rune({ runeData }: RuneProps) {
 
 type RuneExtraDataDamage = NonNullable<RuneExtraData['damage']>
 type ActionDamageChartProps = {
-	damageType: RuneExtraDataDamage['damageType']
+	runeMainStats: RuneExtraDataDamage['mainStats']
 	accuracy: RuneExtraDataDamage['accuracy']
-	heroStats: {
+	heroMainStats: {
 		int: number
 		dex: number
 		str: number
 	}
 }
 
-function ActionDamageChart({ damageType, accuracy: _acc, heroStats }: ActionDamageChartProps) {
-	const intDamage = damageType.int ? damageType.int.flat + (damageType.int.scale * heroStats.int / 100) : 0
-	const dexDamage = damageType.dex ? damageType.dex.flat + (damageType.dex.scale * heroStats.dex / 100) : 0
-	const strDamage = damageType.str ? damageType.str.flat + (damageType.str.scale * heroStats.str / 100) : 0
+function ActionDamageChart({ runeMainStats, heroMainStats }: ActionDamageChartProps) {
+	const intDamage = runeMainStats.int ? runeMainStats.int.flat + (runeMainStats.int.scale * heroMainStats.int / 100) : 0
+	const dexDamage = runeMainStats.dex ? runeMainStats.dex.flat + (runeMainStats.dex.scale * heroMainStats.dex / 100) : 0
+	const strDamage = runeMainStats.str ? runeMainStats.str.flat + (runeMainStats.str.scale * heroMainStats.str / 100) : 0
 	const maxHit = intDamage + dexDamage + strDamage
 
 	const damageData: Record<number, { damage: number, Average: number, Squishy: number, Tanky: number }> = {}

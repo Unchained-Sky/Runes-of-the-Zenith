@@ -1,2 +1,2 @@
-import CharacterWindow from './CharacterWindow';
+import CharacterWindow from './CharacterWindow'
 export default CharacterWindow

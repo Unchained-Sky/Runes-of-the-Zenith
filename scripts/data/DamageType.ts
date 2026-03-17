@@ -20,21 +20,22 @@ type DamageTypeArchetype = {
 		nature: 'plant' | 'shapeshift' | 'thorns'
 	}
 	ferocity: {
-		weaponsMaster: 'bow' | 'shortSword' | 'axe' | 'bulwark' | 'greatSword' | 'daggers' | 'chains'
+		weaponsMaster: 'bow' | 'shortSword' | 'axe' | 'bulwark' | 'greatSword' | 'daggers' | 'chains' | 'whips'
+		beastMaster: 'terrestrial' | 'aerial' | 'aquatic'
 	}
 	omni: {
 		demonic: 'demonic'
-		generic: 'generic'
+		generic: 'generic' | 'base'
 	}
 }
 
 export type DamageType<T extends keyof DamageTypeArchetype = keyof DamageTypeArchetype> = keyof DamageTypeArchetype & T
+
 export type MainDamageType = DamageType<'intelligence' | 'dexterity' | 'strength'>
 export type HybridDamageType = DamageType<'charisma' | 'willpower' | 'ferocity'>
 export type TribridDamageType = DamageType<'omni'>
 
 export type Archetype<T extends DamageType> = keyof DamageTypeArchetype[T]
-
 export type Subarchetype<T extends DamageType, S extends keyof DamageTypeArchetype[T]> = {
 	[K in T]: DamageTypeArchetype[T][S]
 }[T]

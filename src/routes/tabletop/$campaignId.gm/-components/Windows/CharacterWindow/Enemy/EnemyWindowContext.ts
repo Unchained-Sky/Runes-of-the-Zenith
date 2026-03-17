@@ -1,5 +1,5 @@
-import { createContext, useContext } from 'react';
-import { TabletopEnemyData } from '~/routes/tabletop/$campaignId.gm/-hooks/tabletopData/useTabletopEnemies';
+import { createContext, useContext } from 'react'
+import { type TabletopEnemyData } from '~/routes/tabletop/$campaignId.gm/-hooks/tabletopData/useTabletopEnemies'
 
 export const EnemyWindowContext = createContext<TabletopEnemyData | null>(null)
 

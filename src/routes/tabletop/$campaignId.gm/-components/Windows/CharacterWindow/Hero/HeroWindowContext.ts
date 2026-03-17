@@ -1,5 +1,5 @@
-import { createContext, useContext } from 'react';
-import { TabletopHeroData } from '~/routes/tabletop/$campaignId.gm/-hooks/tabletopData/useTabletopHeroes';
+import { createContext, useContext } from 'react'
+import { type TabletopHeroData } from '~/routes/tabletop/$campaignId.gm/-hooks/tabletopData/useTabletopHeroes'
 
 export const HeroWindowContext = createContext<TabletopHeroData | null>(null)
 

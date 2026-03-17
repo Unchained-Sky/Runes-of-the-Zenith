@@ -8,11 +8,13 @@ const astralRunes = [
 		slot: 'PRIMARY',
 		durability: 'REINFORCED',
 		data: {
+			range: 3,
 			damage: {
-				damageType: { int: { flat: 40, scale: 20 } },
+				mainStats: { int: { flat: 40, scale: 20 } },
 				accuracy: 50,
 				resolve: 4
-			}
+			},
+			target: { characterType: 'ENEMY', selectType: 'CHARACTER', amount: 1 }
 		}
 	},
 	{
@@ -21,11 +23,13 @@ const astralRunes = [
 		slot: 'SECONDARY',
 		durability: 'REINFORCED',
 		data: {
+			range: 1,
 			damage: {
-				damageType: { int: { flat: 50, scale: 30 } },
+				mainStats: { int: { flat: 50, scale: 30 } },
 				accuracy: 50,
 				resolve: 4
-			}
+			},
+			target: { characterType: 'ALLY', selectType: 'CHARACTER', amount: 2 }
 		}
 	},
 	{
@@ -33,7 +37,9 @@ const astralRunes = [
 		description: 'Astral Rune 3',
 		slot: 'PASSIVE',
 		durability: null,
-		data: {}
+		data: {
+			target: { characterType: 'SELF', selectType: 'CHARACTER', amount: 1 }
+		}
 	},
 	{
 		name: 'astral-4',
@@ -41,11 +47,13 @@ const astralRunes = [
 		slot: 'PRIMARY',
 		durability: 'UNSTABLE',
 		data: {
+			range: 2,
 			damage: {
-				damageType: { int: { flat: 80, scale: 50 } },
+				mainStats: { int: { flat: 80, scale: 50 } },
 				accuracy: 20,
 				resolve: 4
-			}
+			},
+			target: { characterType: 'ENEMY', selectType: 'AREA', amount: 2 }
 		}
 	},
 	{
@@ -54,11 +62,13 @@ const astralRunes = [
 		slot: 'SECONDARY',
 		durability: 'FRAGILE',
 		data: {
+			range: 4,
 			damage: {
-				damageType: { int: { flat: 100, scale: 100 } },
+				mainStats: { int: { flat: 100, scale: 100 } },
 				accuracy: 50,
 				resolve: 4
-			}
+			},
+			target: { characterType: 'ALL', selectType: 'TILE', amount: 1 }
 		}
 	},
 	{
@@ -68,10 +78,11 @@ const astralRunes = [
 		durability: 'STABLE',
 		data: {
 			damage: {
-				damageType: { int: { flat: 200, scale: 120 } },
+				mainStats: { int: { flat: 200, scale: 120 } },
 				accuracy: 80,
 				resolve: 4
-			}
+			},
+			target: { characterType: 'ENEMY', selectType: 'TILE', amount: 3 }
 		}
 	}
 ] satisfies RuneDataInternal[]

@@ -15,20 +15,43 @@ type RuneSlotDurability = {
 	durability: null
 }
 
-const damageValues = type({
+const powerValues = type({
 	flat: 'number',
 	scale: 'number'
 })
 
+const mainStats = type({
+	'int': powerValues,
+	'dex?': powerValues,
+	'str?': powerValues
+}).or({
+	'int?': powerValues,
+	'dex': powerValues,
+	'str?': powerValues
+}).or({
+	'int?': powerValues,
+	'dex?': powerValues,
+	'str': powerValues
+})
+
+const targetCharacterType = type('"ENEMY" | "HERO" | "ALLY" | "ALL" | "SELF" | "NONE"')
+const targetSelectType = type('"CHARACTER" | "AREA" | "TILE" | "NONE"')
+
+const damageHealing = type({
+	mainStats,
+	resolve: 'number',
+	accuracy: 'number'
+})
+
 export const runeExtraDataSchema = type({
-	'damage?': {
-		damageType: {
-			'int?': damageValues,
-			'dex?': damageValues,
-			'str?': damageValues
-		},
-		resolve: 'number',
-		accuracy: 'number'
+	'description': 'string',
+	'range?': 'number',
+	'damage?': damageHealing,
+	'healing?': damageHealing,
+	'target': {
+		characterType: targetCharacterType,
+		selectType: targetSelectType,
+		amount: 'number'
 	}
 })
 export type RuneExtraData = typeof runeExtraDataSchema.infer
@@ -46,7 +69,7 @@ export type RuneData<T extends DamageType = DamageType> = T extends DamageType ?
 	 * The inference doesn't work perfectly here, it lists all possible subarchetypes for the damage type
 	 */
 	subarchetype: Subarchetype<T, Archetype<T>>
-} & RuneDataInternal : never
+} & Omit<RuneDataInternal, 'description'> & { data: RuneDataInternal['data'] & { description: string } } : never
 
 const allRunes = [
 	astral
