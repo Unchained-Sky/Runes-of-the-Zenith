@@ -8,6 +8,7 @@ import { TEST_DATA } from '~/scripts/chart/damageData'
 import { type RuneData, type RuneExtraData } from '~/scripts/data/runes/runeData'
 import { type Enums } from '~/supabase/databaseTypes'
 import { titleCase } from '~/utils/stringCase'
+import { useConfirmTargetStore } from '../../ConfirmTargetWindow/useConfirmTargetStore'
 import { useHeroWindowContext } from './HeroWindowContext'
 
 type SlotProps = {
@@ -27,38 +28,43 @@ export function Slot({ slot, children }: SlotProps) {
 type ActionProps = {
 	runeData: RuneData
 	tooltipText: string
-	onAction: () => undefined
 	inlineDescription?: ReactNode
 	expandedDescription?: ReactNode
 }
 
-export function Action({ runeData, tooltipText, onAction, inlineDescription, expandedDescription }: ActionProps) {
+export function Action({ runeData, tooltipText, inlineDescription, expandedDescription }: ActionProps) {
 	const heroData = useHeroWindowContext()
 
-	const assignNextTurn = useAssignNextHeroTurn()
-	const handleClick = () => {
-		if (runeData.slot !== 'PASSIVE') {
-			assignNextTurn.mutate({
-				data: {
-					tabletopCharacterId: heroData.tabletopCharacterId,
-					turnType: runeData.slot
-				}
-			})
-		}
+	const open = useConfirmTargetStore(state => state.open)
 
-		onAction()
+	const _assignNextTurn = useAssignNextHeroTurn()
+	const targetRune = () => {
+		// if (runeData.slot !== 'PASSIVE') {
+		// 	assignNextTurn.mutate({
+		// 		data: {
+		// 			tabletopCharacterId: heroData.tabletopCharacterId,
+		// 			turnType: runeData.slot
+		// 		}
+		// 	})
+		// }
+
+		open({
+			tabletopCharacterId: heroData.tabletopCharacterId,
+			tabletopCharacterType: 'HERO',
+			runeData
+		})
 	}
 
 	const [opened, { toggle }] = useDisclosure(false)
 
-	const usedTurn = runeData.slot === 'PASSIVE' ? true : (heroData.turn?.[runeData.slot].used ?? false)
+	const usedTurn = runeData.slot === 'PASSIVE' ? false : (heroData.turn?.[runeData.slot].used ?? false)
 
 	return (
 		<Stack>
 			<Group justify='space-between'>
 				<Group>
 					<Tooltip label={tooltipText}>
-						<ActionIcon variant='subtle' disabled={usedTurn} onClick={handleClick}>
+						<ActionIcon variant='subtle' disabled={usedTurn} onClick={targetRune}>
 							<IconFlame />
 						</ActionIcon>
 					</Tooltip>
@@ -108,7 +114,6 @@ function Rune({ runeData }: RuneProps) {
 		<Action
 			runeData={runeData}
 			tooltipText={`Cast ${runeData.name}`}
-			onAction={() => undefined}
 			inlineDescription={(
 				<>
 					<Stack gap={0}>

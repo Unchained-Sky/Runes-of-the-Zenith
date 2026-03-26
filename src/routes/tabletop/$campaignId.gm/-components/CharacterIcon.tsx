@@ -5,17 +5,17 @@ import { useTabletopEnemies } from '../-hooks/tabletopData/useTabletopEnemies'
 import { useTabletopHeroes } from '../-hooks/tabletopData/useTabletopHeroes'
 import { type TabletopTile } from '../-hooks/tabletopData/useTabletopTiles'
 import { type CharacterDraggable } from './DragDrop'
-import { useSettingsPanelStore } from './SettingsPanel/useSettingsPanelStore'
+import { useConfirmTargetStore } from './Windows/ConfirmTargetWindow/useConfirmTargetStore'
 
 type CharacterIconProps = {
 	tileData: TabletopTile
 }
 
-export default function CharacterIcon({ tileData }: CharacterIconProps) {
-	const { tabletopCharacterId, characterType } = tileData
-
-	const selectedCharacterId = useSettingsPanelStore(state => state.selectedCharacter)[0]
-	const isSelected = selectedCharacterId === tabletopCharacterId
+export default function CharacterIcon({ tileData: { tabletopCharacterId, characterType } }: CharacterIconProps) {
+	const isTargetting = useConfirmTargetStore(state => state.opened)
+	const toggleTarget = useConfirmTargetStore(state => state.toggleTarget)
+	const targetCharacters = useConfirmTargetStore(state => state.targeted?.characters) ?? []
+	const isTargetted = targetCharacters.includes(tabletopCharacterId)
 
 	// TODO refactor to not load every character data on every characterIcon
 	const { data: heroesData } = useTabletopHeroes()
@@ -24,7 +24,7 @@ export default function CharacterIcon({ tileData }: CharacterIconProps) {
 	const { ref, isDragging } = useDraggable({
 		id: `character-${tabletopCharacterId}`,
 		type: 'character',
-		disabled: !isSelected,
+		disabled: isTargetting,
 		data: {
 			draggableType: 'CHARACTER',
 			tabletopCharacterId,
@@ -52,11 +52,7 @@ export default function CharacterIcon({ tileData }: CharacterIconProps) {
 
 	const mouseEvents = useHoldButton({
 		clickCallback: () => {
-			if (isSelected) {
-				useSettingsPanelStore.getState().deselectCharacter()
-			} else {
-				useSettingsPanelStore.getState().selectCharacter(tabletopCharacterId, characterType)
-			}
+			toggleTarget({ tabletopCharacterId })
 		}
 	})
 
@@ -72,8 +68,8 @@ export default function CharacterIcon({ tileData }: CharacterIconProps) {
 			top='50%'
 			style={{
 				transform: 'translate(-50%, -50%)',
-				cursor: isSelected ? 'grab' : 'pointer',
-				outline: isSelected ? 'red 2px solid' : undefined,
+				cursor: isTargetting ? 'pointer' : 'grab',
+				outline: isTargetted ? 'red 2px solid' : undefined,
 				scale: isDragging ? '0.8' : undefined,
 				transition: 'scale 150ms ease-in-out'
 			}}

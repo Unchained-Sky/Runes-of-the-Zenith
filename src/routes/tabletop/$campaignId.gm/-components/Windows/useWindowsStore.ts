@@ -11,11 +11,11 @@ type WindowsState = {
 	opened: Record<WindowName, boolean>
 }
 
-const windowState: WindowsState = {
+const windowState = {
 	opened: {
 		round: false
 	}
-}
+} satisfies WindowsState
 
 type WindowsAction = {
 	toggleWindow: (windowName: WindowName) => void

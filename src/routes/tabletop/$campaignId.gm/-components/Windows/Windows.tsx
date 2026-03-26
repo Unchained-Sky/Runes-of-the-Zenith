@@ -1,6 +1,7 @@
 import { typedSplit } from '~/types/split'
 import { typedObject } from '~/types/typedObject'
 import CharacterWindow from './CharacterWindow'
+import ConfirmTargetWindow from './ConfirmTargetWindow'
 import RoundsWindow from './RoundsWindow'
 import { useWindowsStore } from './useWindowsStore'
 
@@ -13,6 +14,8 @@ export default function Windows() {
 
 	return (
 		<>
+			<ConfirmTargetWindow />
+
 			<RoundsWindow opened={opened.round} onClose={() => toggleWindow('round')} />
 
 			{characters.map(character => {

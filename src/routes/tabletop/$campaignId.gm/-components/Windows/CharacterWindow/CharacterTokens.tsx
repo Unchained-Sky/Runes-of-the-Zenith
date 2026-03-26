@@ -171,7 +171,7 @@ function TokenEditModal({ opened, tabletopCharacterId, close, tokens, characterT
 
 					<Group>
 						<Button variant='default' onClick={close}>Cancel</Button>
-						<Button flex={1} type='submit'>Update</Button>
+						<Button flex={1} color='green' type='submit'>Update</Button>
 					</Group>
 				</Stack>
 			</form>

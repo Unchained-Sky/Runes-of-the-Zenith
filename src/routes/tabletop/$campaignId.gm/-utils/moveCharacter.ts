@@ -5,6 +5,8 @@ import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
 import { typedObject } from '~/types/typedObject'
 import { mutationError } from '~/utils/mutationError'
+import { type TabletopEnemyData } from '../-hooks/tabletopData/useTabletopEnemies'
+import { type TabletopHeroData } from '../-hooks/tabletopData/useTabletopHeroes'
 import { type TabletopTile, type TabletopTiles } from '../-hooks/tabletopData/useTabletopTiles'
 import { useQuerySync } from '../-hooks/useQuerySync'
 
@@ -13,6 +15,9 @@ export function useMoveCharacter() {
 
 	return useMutation({
 		mutationFn: moveCharacterAction,
+		scope: {
+			id: 'tabletop-move-character'
+		},
 		onMutate: ({ data }) => {
 			void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'tiles', 'characters'] })
 			queryClient.setQueryData([campaignId, 'tabletop', 'tiles', 'characters'], (oldData: TabletopTiles) => {
@@ -30,6 +35,25 @@ export function useMoveCharacter() {
 				}
 				return out
 			})
+
+			switch (data.characterType) {
+				case 'HERO': {
+					void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'hero', data.tabletopCharacterId] })
+					queryClient.setQueriesData({ queryKey: [campaignId, 'tabletop', 'hero', data.tabletopCharacterId] }, (oldData: TabletopHeroData) => ({
+						...oldData,
+						pos: data.cord
+					} satisfies TabletopHeroData))
+					break
+				}
+				case 'ENEMY': {
+					void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'enemy', data.tabletopCharacterId] })
+					queryClient.setQueriesData({ queryKey: [campaignId, 'tabletop', 'enemy', data.tabletopCharacterId] }, (oldData: TabletopEnemyData) => ({
+						...oldData,
+						pos: data.cord
+					} satisfies TabletopEnemyData))
+					break
+				}
+			}
 		},
 		onError: error => {
 			mutationError(error, 'Failed to move character')

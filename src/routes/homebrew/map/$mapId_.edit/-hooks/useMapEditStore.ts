@@ -19,7 +19,7 @@ type MapEditStateValues = {
 	tiles: Record<CombatTileCordString, CombatTile>
 }
 
-const mapEditState: MapEditState = {
+const mapEditState = {
 	syncValue: 0,
 	submitting: false,
 	hasChanged: {},
@@ -27,7 +27,7 @@ const mapEditState: MapEditState = {
 
 	mapName: null,
 	tiles: {}
-}
+} satisfies MapEditState
 
 type MapEditActions = {
 	syncLoader: (loader: MapEditLoader) => void

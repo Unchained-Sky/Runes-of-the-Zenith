@@ -21,19 +21,16 @@ export default function Hero() {
 					<Action
 						runeData={baseRunes['Basic Attack']}
 						tooltipText='Basic Attack'
-						onAction={() => undefined}
 					/>
 
 					<Action
 						runeData={baseRunes.Inspire}
 						tooltipText='Inspire'
-						onAction={() => undefined}
 					/>
 
 					<Action
 						runeData={baseRunes.Rest}
 						tooltipText='Rest'
-						onAction={() => undefined}
 					/>
 
 					<Title order={5}>Runes</Title>
@@ -44,19 +41,16 @@ export default function Hero() {
 					<Action
 						runeData={baseRunes.Interact}
 						tooltipText='Interact'
-						onAction={() => undefined}
 					/>
 
 					<Action
 						runeData={baseRunes.Rush}
 						tooltipText='Rush'
-						onAction={() => undefined}
 					/>
 
 					<Action
 						runeData={baseRunes.Item}
 						tooltipText='Use an item'
-						onAction={() => undefined}
 					/>
 
 					<Title order={5}>Runes</Title>

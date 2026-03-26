@@ -11,7 +11,6 @@ import { useTabletopCurrentEncounter } from '../../../-hooks/tabletopData/useTab
 import { useTabletopEncounterList } from '../../../-hooks/tabletopData/useTabletopEncounterList'
 import { useQuerySync } from '../../../-hooks/useQuerySync'
 import { startRoundAction, startRoundQuerySync } from '../../../-utils/startRound'
-import { useSettingsPanelStore } from '../useSettingsPanelStore'
 
 export default function ChangeEncounter() {
 	const { queryClient, campaignId } = useQuerySync()
@@ -45,7 +44,7 @@ export default function ChangeEncounter() {
 
 	const handleConfirmSelection = () => {
 		if (!selectedEncounter) return
-		useSettingsPanelStore.getState().deselectCharacter()
+		// TODO clear state like rune targetting
 		handleCleanupModal()
 		changeEncounter.mutate({ data: { campaignId, encounterId: selectedEncounter } })
 	}

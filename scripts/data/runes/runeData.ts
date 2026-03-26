@@ -34,7 +34,7 @@ const mainStats = type({
 	'str': powerValues
 })
 
-const targetCharacterType = type('"ENEMY" | "HERO" | "ALLY" | "ALL" | "SELF" | "NONE"')
+const targetCharacterType = type('"ENEMY" | "HERO" | "ALLY" | "ALL" | "SELF" | "NONE"') // TODO Summon?
 const targetSelectType = type('"CHARACTER" | "AREA" | "TILE" | "NONE"')
 
 const damageHealing = type({
