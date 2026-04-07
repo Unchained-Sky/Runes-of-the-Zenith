@@ -8,6 +8,7 @@ import { type TabletopTile, useTabletopTiles } from '../-hooks/tabletopData/useT
 import CharacterIcon from './CharacterIcon'
 import { type TileDroppable } from './DragDrop'
 import HexContextMenu from './HexContextMenu'
+import { useConfirmTargetStore } from './Windows/ConfirmTargetWindow/useConfirmTargetStore'
 
 export default function CombatGridTabletopGM() {
 	const { data: mapTiles } = useTabletopMapTiles()
@@ -32,9 +33,10 @@ type TileProps = {
 
 function Tile({ tile, tileData, offset }: TileProps) {
 	const { cord } = tile
+	const cordString = `${cord[0]},${cord[1]},${cord[2]}` as const
 
 	const { ref, isDropTarget } = useDroppable({
-		id: `tile-${cord.toString()}`,
+		id: `tile-${cordString}`,
 		accept: 'character',
 		data: {
 			droppableType: 'TILE',
@@ -43,21 +45,33 @@ function Tile({ tile, tileData, offset }: TileProps) {
 		disabled: !!tileData?.characterType
 	})
 
+	const isTargettingTiles = useConfirmTargetStore(state => state.target?.selectType === 'TILE')
+
+	const selectedTiles = useConfirmTargetStore(state => state.selected?.tiles) ?? []
+	const isSelected = selectedTiles.includes(cordString)
+
+	const hexClickHandler = (_event: React.MouseEvent<HTMLDivElement>) => {
+		if (!isTargettingTiles) return
+		useConfirmTargetStore.getState().toggleTarget({ cord: cordString })
+	}
+
 	return (
-		<HexContextMenu key={cord.toString()} cord={cord}>
+		<HexContextMenu key={cordString} cord={cord}>
 			<Hex
 				ref={ref}
 				tile={tile}
 				offset={offset}
+				onClick={hexClickHandler}
 				hexProps={{
 					onDragStart: (event: React.DragEvent<HTMLButtonElement>) => event.preventDefault(),
 					style: {
-						scale: isDropTarget ? '0.9' : undefined,
-						transition: 'scale 150ms ease-in-out'
+						scale: isDropTarget || isSelected ? 0.9 : undefined,
+						transition: 'scale 150ms ease-in-out',
+						cursor: isTargettingTiles ? 'pointer' : 'default' // TODO change cursor of characterIcon too?
 					}
 				}}
 			>
-				{tileData && <CharacterIcon tileData={tileData} />}
+				{tileData && <CharacterIcon tabletopCharacterId={tileData.tabletopCharacterId} characterType={tileData.characterType} />}
 			</Hex>
 		</HexContextMenu>
 	)

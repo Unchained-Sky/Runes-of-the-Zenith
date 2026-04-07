@@ -10,10 +10,12 @@ type HexProps = {
 	children?: ReactNode
 }
 
-const Hex = forwardRef<HTMLDivElement, HexProps>(function Hex({ tile: { cord, image }, offset, hexProps, children }, ref) {
+const Hex = forwardRef<HTMLDivElement, HexProps & PolymorphicComponentProps<'div', BoxComponentProps>>(function Hex({ tile: { cord, image }, offset, hexProps, children, ...parentProps }, ref) {
 	const { left, top, width, height, clipPath } = useHexSize(cord, offset)
 
 	const { style, ...props } = hexProps ?? {}
+
+	const hasScale = !!(style && 'scale' in style && style.scale)
 
 	return (
 		<Box
@@ -23,6 +25,7 @@ const Hex = forwardRef<HTMLDivElement, HexProps>(function Hex({ tile: { cord, im
 			h={height}
 			left={left}
 			top={top}
+			{...parentProps}
 		>
 			<Box
 				pos='absolute'
@@ -38,14 +41,18 @@ const Hex = forwardRef<HTMLDivElement, HexProps>(function Hex({ tile: { cord, im
 				<Image src={`/combatTiles/${image}.png`} onMouseDown={e => e.preventDefault()} />
 			</Box>
 			<Text
-				pos='absolute'
-				top={96}
-				left={4}
+				pos='relative'
+				top={132}
+				left={-2}
 				c='white'
 				style={{
-					textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000'
+					textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000',
+					rotate: '30deg',
+					transition: '150ms ease-in-out',
+					translate: hasScale ? '5px -6px' : 0 // TODO calculate this off of scale
 				}}
-			>{cord.toString()}
+			>
+				{cord.toString()}
 			</Text>
 			{children}
 		</Box>

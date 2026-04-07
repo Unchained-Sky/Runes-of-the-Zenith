@@ -1,25 +1,82 @@
 import { useDraggable } from '@dnd-kit/react'
 import { Avatar } from '@mantine/core'
 import useHoldButton from '~/hooks/useHoldButton'
+import { type Enums } from '~/supabase/databaseTypes'
 import { useTabletopEnemies } from '../-hooks/tabletopData/useTabletopEnemies'
 import { useTabletopHeroes } from '../-hooks/tabletopData/useTabletopHeroes'
-import { type TabletopTile } from '../-hooks/tabletopData/useTabletopTiles'
 import { type CharacterDraggable } from './DragDrop'
 import { useConfirmTargetStore } from './Windows/ConfirmTargetWindow/useConfirmTargetStore'
 
 type CharacterIconProps = {
-	tileData: TabletopTile
+	tabletopCharacterId: number
+	characterType: Enums<'character_type'>
 }
 
-export default function CharacterIcon({ tileData: { tabletopCharacterId, characterType } }: CharacterIconProps) {
-	const isTargetting = useConfirmTargetStore(state => state.opened)
-	const toggleTarget = useConfirmTargetStore(state => state.toggleTarget)
-	const targetCharacters = useConfirmTargetStore(state => state.targeted?.characters) ?? []
-	const isTargetted = targetCharacters.includes(tabletopCharacterId)
+export default function CharacterIcon({ tabletopCharacterId, characterType }: CharacterIconProps) {
+	switch (characterType) {
+		case 'HERO':
+			return <CharacterIconHero tabletopCharacterId={tabletopCharacterId} />
+		case 'ENEMY':
+			return <CharacterIconEnemy tabletopCharacterId={tabletopCharacterId} />
+	}
+}
 
-	// TODO refactor to not load every character data on every characterIcon
+type CharacterIconHeroProps = {
+	tabletopCharacterId: number
+}
+
+function CharacterIconHero({ tabletopCharacterId }: CharacterIconHeroProps) {
 	const { data: heroesData } = useTabletopHeroes()
+	const heroData = heroesData[tabletopCharacterId]
+	if (!heroData) {
+		console.error(`Hero not found: ${tabletopCharacterId}`)
+		return null
+	}
+
+	return (
+		<CharacterIconInner
+			tabletopCharacterId={tabletopCharacterId}
+			characterType='HERO'
+			characterName={heroData.heroName}
+			avatarUrl={heroData.avatarUrl}
+		/>
+	)
+}
+
+type CharacterIconEnemyProps = {
+	tabletopCharacterId: number
+}
+
+function CharacterIconEnemy({ tabletopCharacterId }: CharacterIconEnemyProps) {
 	const { data: enemiesData } = useTabletopEnemies()
+	const enemyData = enemiesData[tabletopCharacterId]
+	if (!enemyData) {
+		console.error(`Enemy not found: ${tabletopCharacterId}`)
+		return null
+	}
+
+	return (
+		<CharacterIconInner
+			tabletopCharacterId={tabletopCharacterId}
+			characterType='ENEMY'
+			characterName={enemyData.enemyName}
+			avatarUrl=''
+		/>
+	)
+}
+
+type CharacterIconInnerProps = {
+	tabletopCharacterId: number
+	characterType: Enums<'character_type'>
+	characterName: string
+	avatarUrl: string
+}
+
+function CharacterIconInner({ tabletopCharacterId, characterType, characterName, avatarUrl }: CharacterIconInnerProps) {
+	const isTargetting = useConfirmTargetStore(state => state.opened)
+	const isTargettingCharacters = useConfirmTargetStore(state => state.target?.selectType === 'CHARACTER')
+	const selectedCharacters = useConfirmTargetStore(state => state.selected?.characters) ?? []
+	const isTargetted = selectedCharacters.includes(tabletopCharacterId)
 
 	const { ref, isDragging } = useDraggable({
 		id: `character-${tabletopCharacterId}`,
@@ -32,35 +89,24 @@ export default function CharacterIcon({ tileData: { tabletopCharacterId, charact
 		} satisfies CharacterDraggable
 	})
 
-	const getName = () => {
-		switch (characterType) {
-			case 'HERO':
-				return heroesData[tabletopCharacterId]?.heroName ?? ''
-			case 'ENEMY':
-				return enemiesData[tabletopCharacterId]?.enemyName ?? ''
-		}
-	}
-
-	const getAvatar = () => {
-		switch (characterType) {
-			case 'HERO':
-				return heroesData[tabletopCharacterId]?.avatarUrl
-			case 'ENEMY':
-				return undefined
-		}
-	}
-
 	const mouseEvents = useHoldButton({
 		clickCallback: () => {
-			toggleTarget({ tabletopCharacterId })
+			useConfirmTargetStore.getState().toggleTarget({ tabletopCharacterId })
 		}
 	})
+
+	const getCursor = () => {
+		if (isDragging) return 'grabbing'
+		if (isTargettingCharacters) return 'pointer'
+		if (isTargetting) return 'default'
+		return 'grab'
+	}
 
 	return (
 		<Avatar
 			ref={ref}
-			name={getName()}
-			src={getAvatar()}
+			name={characterName}
+			src={avatarUrl}
 			color={characterType === 'HERO' ? 'green' : 'red'}
 			size='xl'
 			pos='absolute'
@@ -68,7 +114,7 @@ export default function CharacterIcon({ tileData: { tabletopCharacterId, charact
 			top='50%'
 			style={{
 				transform: 'translate(-50%, -50%)',
-				cursor: isTargetting ? 'pointer' : 'grab',
+				cursor: getCursor(),
 				outline: isTargetted ? 'red 2px solid' : undefined,
 				scale: isDragging ? '0.8' : undefined,
 				transition: 'scale 150ms ease-in-out'

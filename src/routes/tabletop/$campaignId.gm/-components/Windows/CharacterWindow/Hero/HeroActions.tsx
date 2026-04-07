@@ -3,7 +3,6 @@ import { ActionIcon, Card, Code, Collapse, Group, Stack, Text, Title, Tooltip } 
 import { useDisclosure } from '@mantine/hooks'
 import { IconChevronDown, IconFlame } from '@tabler/icons-react'
 import { type ReactNode } from 'react'
-import { useAssignNextHeroTurn } from '~/routes/tabletop/$campaignId.gm/-utils/assignNextHeroTurn'
 import { TEST_DATA } from '~/scripts/chart/damageData'
 import { type RuneData, type RuneExtraData } from '~/scripts/data/runes/runeData'
 import { type Enums } from '~/supabase/databaseTypes'
@@ -37,17 +36,7 @@ export function Action({ runeData, tooltipText, inlineDescription, expandedDescr
 
 	const open = useConfirmTargetStore(state => state.open)
 
-	const _assignNextTurn = useAssignNextHeroTurn()
 	const targetRune = () => {
-		// if (runeData.slot !== 'PASSIVE') {
-		// 	assignNextTurn.mutate({
-		// 		data: {
-		// 			tabletopCharacterId: heroData.tabletopCharacterId,
-		// 			turnType: runeData.slot
-		// 		}
-		// 	})
-		// }
-
 		open({
 			tabletopCharacterId: heroData.tabletopCharacterId,
 			tabletopCharacterType: 'HERO',
@@ -80,7 +69,10 @@ export function Action({ runeData, tooltipText, inlineDescription, expandedDescr
 				</ActionIcon>
 			</Group>
 			<Collapse in={opened} ml={44}>
-				{expandedDescription ?? <Text>{runeData.data.description}</Text>}
+				<Stack gap={0}>
+					{expandedDescription ?? <Text>{runeData.data.description}</Text>}
+					<Code>{JSON.stringify(runeData.data, null, 2)}</Code>
+				</Stack>
 			</Collapse>
 		</Stack>
 	)
@@ -125,7 +117,6 @@ function Rune({ runeData }: RuneProps) {
 			)}
 			expandedDescription={(
 				<Stack>
-					<Code>{JSON.stringify(runeData.data, null, 2)}</Code>
 					{runeData.data.damage && (
 						<ActionDamageChart
 							runeMainStats={runeData.data.damage.mainStats}

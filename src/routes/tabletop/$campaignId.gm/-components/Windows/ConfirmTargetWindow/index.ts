@@ -1,2 +1,2 @@
-import ConfirmTargetWindow from './ConfirmTargetWindow';
+import ConfirmTargetWindow from './ConfirmTargetWindow'
 export default ConfirmTargetWindow

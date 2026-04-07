@@ -24,6 +24,7 @@ const DEFAULT_WINDOW_PROPS = {
 } satisfies WindowProps
 
 export default function CharacterWindow(props: CharacterWindowProps) {
+	// TODO fix scroll not working.
 	switch (props.characterType) {
 		case 'HERO': return <HeroWindow {...props} />
 		case 'ENEMY': return <EnemyWindow {...props} />

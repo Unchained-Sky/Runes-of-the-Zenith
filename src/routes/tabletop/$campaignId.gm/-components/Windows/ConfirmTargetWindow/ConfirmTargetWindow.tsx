@@ -48,7 +48,7 @@ function WindowInner() {
 		<Stack>
 			<Text>Target type: {runeData.data.target.selectType} {runeData.data.target.characterType} ({runeData.data.target.amount})</Text>
 			<Group>
-				<Button variant='default'>Cancel</Button>
+				<Button variant='default' onClick={close}>Cancel</Button>
 				<Button flex={1} color='green' onClick={confirmTarget}>Confirm</Button>
 			</Group>
 		</Stack>

@@ -10,7 +10,8 @@ type ConfirmTargetState = {
 	tabletopCharacterId: number
 	tabletopCharacterType: Enums<'character_type'>
 	runeData: RuneData
-	targeted: {
+	target: RuneData['data']['target']
+	selected: {
 		tiles: CombatTileCordString[]
 		characters: number[]
 	}
@@ -19,7 +20,8 @@ type ConfirmTargetState = {
 	tabletopCharacterId: null
 	tabletopCharacterType: null
 	runeData: null
-	targeted: null
+	target: null
+	selected: null
 }
 
 const confirmTargetState = {
@@ -27,7 +29,8 @@ const confirmTargetState = {
 	tabletopCharacterId: null,
 	tabletopCharacterType: null,
 	runeData: null,
-	targeted: null
+	target: null,
+	selected: null
 } satisfies ConfirmTargetState
 
 type OpenActionProps = { tabletopCharacterId: number, tabletopCharacterType: Enums<'character_type'>, runeData: RuneData }
@@ -47,7 +50,8 @@ const createConfirmWindowActions: Slice<ConfirmTargetStore, ConfirmTargetAction,
 			tabletopCharacterId: null,
 			tabletopCharacterType: null,
 			runeData: null,
-			targeted: null
+			target: null,
+			selected: null
 		} satisfies ConfirmTargetState, ...actionName('close'))
 	},
 	open: ({ tabletopCharacterId, tabletopCharacterType, runeData }) => {
@@ -56,7 +60,8 @@ const createConfirmWindowActions: Slice<ConfirmTargetStore, ConfirmTargetAction,
 			tabletopCharacterId,
 			tabletopCharacterType,
 			runeData,
-			targeted: {
+			target: runeData.data.target,
+			selected: {
 				tiles: [],
 				characters: []
 			}
@@ -68,25 +73,25 @@ const createConfirmWindowActions: Slice<ConfirmTargetStore, ConfirmTargetAction,
 
 		if (cord) {
 			set(state => {
-				if (!state.targeted) return state
+				if (!state.selected || state.target.selectType !== 'TILE') return state
 				return {
-					targeted: {
-						tiles: state.targeted.tiles.includes(cord)
-							? state.targeted.tiles.filter(t => t !== cord)
-							: [...state.targeted.tiles, cord],
-						characters: state.targeted.characters
+					selected: {
+						tiles: state.selected.tiles.includes(cord)
+							? state.selected.tiles.filter(t => t !== cord)
+							: [...state.selected.tiles, cord],
+						characters: state.selected.characters
 					}
 				}
 			}, ...actionName('toggleTarget/cord'))
 		} else if (characterId) {
 			set(state => {
-				if (!state.targeted) return state
+				if (!state.selected || state.target.selectType !== 'CHARACTER') return state
 				return {
-					targeted: {
-						tiles: state.targeted.tiles,
-						characters: state.targeted.characters.includes(characterId)
-							? state.targeted.characters.filter(c => c !== characterId)
-							: [...state.targeted.characters, characterId]
+					selected: {
+						tiles: state.selected.tiles,
+						characters: state.selected.characters.includes(characterId)
+							? state.selected.characters.filter(c => c !== characterId)
+							: [...state.selected.characters, characterId]
 					}
 				}
 			}, ...actionName('toggleTarget/characterId'))
