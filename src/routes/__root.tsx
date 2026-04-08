@@ -1,4 +1,4 @@
-import { Box, Group } from '@mantine/core'
+import { Box, Group, mantineHtmlProps } from '@mantine/core'
 import { createBrowserClient } from '@supabase/ssr'
 import { type QueryClient } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
@@ -8,7 +8,7 @@ import { useState, type ReactNode } from 'react'
 import { DefaultCatchBoundary } from '~/components/DefaultCatchBoundary'
 import Mantine from '~/components/Mantine'
 import Navbar from '~/components/Navbar'
-import '~/styles/font.css'
+import { stylesheets } from '~/styles/stylesheets'
 import { type Database } from '~/supabase/databaseTypes'
 import { getSupabaseClientEnv } from '~/supabase/supabaseEnv'
 import { SupabaseContext } from '~/supabase/useSupabase'
@@ -29,7 +29,8 @@ export const Route = createRootRouteWithContext<{
 			{ charSet: 'utf-8' },
 			{ name: 'viewport', content: 'width=device-width, initial-scale=1' },
 			{ title: 'Runes of the Zenith' }
-		]
+		],
+		links: stylesheets
 	})
 })
 
@@ -51,7 +52,7 @@ function RootComponent() {
 
 function RootDocument({ children }: { children: ReactNode }) {
 	return (
-		<html lang='en'>
+		<html lang='en' {...mantineHtmlProps}>
 			<head>
 				<HeadContent />
 			</head>

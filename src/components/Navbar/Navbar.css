@@ -1,4 +1,4 @@
-.control {
+.navbar-linkgroup-control {
   font-weight: 500;
   display: block;
   width: 100%;
@@ -6,13 +6,13 @@
   color: var(--mantine-color-text);
   font-size: var(--mantine-font-size-sm);
 
-  @mixin hover {
+  &:hover {
     background-color: var(--mantine-color-dark-7);
     color: var(--mantine-color-dark-0);
   }
 }
 
-.link {
+.navbar-linkgroup-link {
   font-weight: 500;
   display: block;
   text-decoration: none;
@@ -23,8 +23,19 @@
   color: var(--mantine-color-dark-0);
   border-left: 1px solid var(--mantine-color-dark-4);
 
-  @mixin hover {
+  &:hover {
     background-color: var(--mantine-color-dark-7);
     color: var(--mantine-color-dark-0);
+  }
+}
+
+.navbar-userbutton-user {
+  display: block;
+  width: 100%;
+  padding: var(--mantine-spacing-md);
+  color: var(--mantine-color-dark-0);
+
+  &:hover {
+    background-color: var(--mantine-color-dark-8);
   }
 }

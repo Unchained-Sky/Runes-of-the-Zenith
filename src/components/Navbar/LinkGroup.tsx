@@ -4,7 +4,6 @@ import { IconChevronRight } from '@tabler/icons-react'
 import { Link, type LinkProps } from '@tanstack/react-router'
 import { Fragment } from 'react'
 import { iconSize } from '~/utils/iconSize'
-import classes from './LinkGroup.module.css'
 import { type NavLink, type NestedLink } from './navbarLinks'
 
 function isNestedLink(navLink: NavLink): navLink is NestedLink {
@@ -30,7 +29,7 @@ export default function LinkGroup(navLink: NavLink) {
 
 	return (
 		<Fragment>
-			<UnstyledButton className={classes.control} {...props}>
+			<UnstyledButton className='navbar-linkgroup-control' {...props}>
 				<Group justify='space-between' gap={0}>
 					<Group align='center' gap={0}>
 						<ThemeIcon>
@@ -59,7 +58,7 @@ export default function LinkGroup(navLink: NavLink) {
 						{
 							navLink.links.map(({ label, link }) => {
 								return (
-									<Link key={label} className={classes.link} to={link}>
+									<Link key={label} className='navbar-linkgroup-link' to={link}>
 										{label}
 									</Link>
 								)

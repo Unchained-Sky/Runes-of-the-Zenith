@@ -7,7 +7,6 @@ import { createServerFn } from '@tanstack/react-start'
 import { forwardRef, Fragment } from 'react'
 import { getSupabaseServerClient } from '~/supabase/getSupabaseServerClient'
 import { iconSize } from '~/utils/iconSize'
-import classes from './UserButton.module.css'
 
 export default function UserButton() {
 	const [menuOpened, { toggle }] = useDisclosure(false)
@@ -37,7 +36,7 @@ function Login() {
 	return (
 		<Fragment>
 			<input type='text' name='_intent' value='discord' hidden readOnly />
-			<UnstyledButton className={classes.user} ta='center' type='submit' component={Link} to='/auth/login'>Login with Discord</UnstyledButton>
+			<UnstyledButton className='navbar-userbutton-user' ta='center' type='submit' component={Link} to='/auth/login'>Login with Discord</UnstyledButton>
 		</Fragment>
 	)
 }
@@ -65,7 +64,7 @@ const User = forwardRef<HTMLButtonElement, UserProps>(function User({ userIdenti
 	if (!userIdentity) return null
 
 	return (
-		<UnstyledButton className={classes.user} ref={ref} onClick={toggle}>
+		<UnstyledButton className='navbar-userbutton-user' ref={ref} onClick={toggle}>
 			<Group>
 				<Avatar
 					src={userIdentity.avatar_url}

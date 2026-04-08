@@ -1,11 +1,4 @@
-import '@mantine/core/styles.css'
-
-import '@gfazioli/mantine-window/styles.css'
-import '@mantine/charts/styles.css'
-import '@mantine/dropzone/styles.css'
-import '@mantine/notifications/styles.css'
-
-import { Avatar, createTheme, type MantineColorScheme, MantineProvider, Tooltip } from '@mantine/core'
+import { Avatar, ColorSchemeScript, createTheme, type MantineColorScheme, MantineProvider, Tooltip } from '@mantine/core'
 import { Notifications } from '@mantine/notifications'
 import { type ReactNode } from 'react'
 
@@ -31,9 +24,13 @@ const theme = createTheme({
 
 export default function Mantine({ children }: { children: ReactNode }) {
 	return (
-		<MantineProvider defaultColorScheme={defaultColorScheme} theme={theme}>
-			<Notifications />
-			{children}
-		</MantineProvider>
+		<>
+			<ColorSchemeScript defaultColorScheme={defaultColorScheme} />
+
+			<MantineProvider defaultColorScheme={defaultColorScheme} theme={theme}>
+				<Notifications />
+				{children}
+			</MantineProvider>
+		</>
 	)
 }
