@@ -1,11 +1,9 @@
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
-import { staticFunctionMiddleware } from '@tanstack/start-static-server-functions'
 import { type Token } from '~/scripts/data/tokens/tokens'
 import { getSupabaseServerClient } from '~/supabase/getSupabaseServerClient'
 
 const tokenQueryAction = createServerFn({ method: 'GET' })
-	.middleware([staticFunctionMiddleware])
 	.handler(async () => {
 		const supabase = getSupabaseServerClient()
 
