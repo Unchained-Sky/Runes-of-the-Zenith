@@ -54,7 +54,7 @@ export default function LinkGroup(navLink: NavLink) {
 
 			{
 				isNestedLink(navLink) && (
-					<Collapse in={opened}>
+					<Collapse expanded={opened}>
 						{
 							navLink.links.map(({ label, link }) => {
 								return (

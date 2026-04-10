@@ -3,4 +3,5 @@ export type WindowProps = {
 	onClose: () => void
 }
 
-export const DEFAULT_WINDOW_POSITION = { x: 316, y: 16 }
+export const DEFAULT_WINDOW_POSITION_X = 316
+export const DEFAULT_WINDOW_POSITION_Y = 16

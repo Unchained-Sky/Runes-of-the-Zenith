@@ -13,7 +13,8 @@ export default function ConfirmTargetWindow() {
 			opened={opened}
 			onClose={close}
 			resizable='none'
-			defaultSize={{ height: 160, width: 320 }}
+			defaultWidth={320}
+			defaultHeight={160}
 		>
 			<WindowInner />
 		</Window>

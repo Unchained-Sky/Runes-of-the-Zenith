@@ -1,4 +1,4 @@
-import { Avatar, ColorSchemeScript, createTheme, type MantineColorScheme, MantineProvider, Tooltip } from '@mantine/core'
+import { Avatar, ColorSchemeScript, createTheme, type MantineColorScheme, MantineProvider, Tooltip, v8CssVariablesResolver } from '@mantine/core'
 import { Notifications } from '@mantine/notifications'
 import { type ReactNode } from 'react'
 
@@ -27,7 +27,11 @@ export default function Mantine({ children }: { children: ReactNode }) {
 		<>
 			<ColorSchemeScript defaultColorScheme={defaultColorScheme} />
 
-			<MantineProvider defaultColorScheme={defaultColorScheme} theme={theme}>
+			<MantineProvider
+				defaultColorScheme={defaultColorScheme}
+				theme={theme}
+				cssVariablesResolver={v8CssVariablesResolver}
+			>
 				<Notifications />
 				{children}
 			</MantineProvider>

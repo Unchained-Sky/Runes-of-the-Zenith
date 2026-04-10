@@ -2,7 +2,7 @@ import { Window, type WindowProps } from '@gfazioli/mantine-window'
 import { type Enums } from '~/supabase/databaseTypes'
 import { useTabletopEnemies } from '../../../-hooks/tabletopData/useTabletopEnemies'
 import { useTabletopHeroes } from '../../../-hooks/tabletopData/useTabletopHeroes'
-import { DEFAULT_WINDOW_POSITION, type WindowProps as CustomWindowProps } from '../windowHelpers'
+import { DEFAULT_WINDOW_POSITION_X, DEFAULT_WINDOW_POSITION_Y, type WindowProps as CustomWindowProps } from '../windowHelpers'
 import Enemy from './Enemy'
 import { EnemyWindowContext } from './Enemy/EnemyWindowContext'
 import Hero from './Hero'
@@ -14,8 +14,10 @@ type CharacterWindowProps = {
 } & CustomWindowProps
 
 const DEFAULT_WINDOW_PROPS = {
-	defaultPosition: DEFAULT_WINDOW_POSITION,
-	defaultSize: { width: 560, height: 640 },
+	defaultX: DEFAULT_WINDOW_POSITION_X,
+	defaultY: DEFAULT_WINDOW_POSITION_Y,
+	defaultWidth: 560,
+	defaultHeight: 640,
 	minWidth: 480,
 	minHeight: 480,
 	maxHeight: '100vh',
@@ -24,7 +26,7 @@ const DEFAULT_WINDOW_PROPS = {
 } satisfies WindowProps
 
 export default function CharacterWindow(props: CharacterWindowProps) {
-	// TODO fix scroll not working.
+	// TODO fix scroll not working while side draw is open
 	switch (props.characterType) {
 		case 'HERO': return <HeroWindow {...props} />
 		case 'ENEMY': return <EnemyWindow {...props} />

@@ -68,7 +68,7 @@ export function Action({ runeData, tooltipText, inlineDescription, expandedDescr
 					/>
 				</ActionIcon>
 			</Group>
-			<Collapse in={opened} ml={44}>
+			<Collapse expanded={opened} ml={44}>
 				<Stack gap={0}>
 					{expandedDescription ?? <Text>{runeData.data.description}</Text>}
 					<Code>{JSON.stringify(runeData.data, null, 2)}</Code>

@@ -4,7 +4,7 @@ import { useTabletopEnemies } from '../../-hooks/tabletopData/useTabletopEnemies
 import { useTabletopHeroes } from '../../-hooks/tabletopData/useTabletopHeroes'
 import { useTabletopHeroRounds } from '../../-hooks/tabletopData/useTabletopHeroRounds'
 import { useTabletopRound } from '../../-hooks/tabletopData/useTabletopRound'
-import { DEFAULT_WINDOW_POSITION, type WindowProps } from './windowHelpers'
+import { DEFAULT_WINDOW_POSITION_X, DEFAULT_WINDOW_POSITION_Y, type WindowProps } from './windowHelpers'
 
 export default function RoundsWindow({ opened, onClose }: WindowProps) {
 	const { data: heroRounds } = useTabletopHeroRounds()
@@ -29,8 +29,10 @@ export default function RoundsWindow({ opened, onClose }: WindowProps) {
 			id='round'
 			opened={opened}
 			onClose={onClose}
-			defaultPosition={DEFAULT_WINDOW_POSITION}
-			defaultSize={{ width: 480, height: 165 }}
+			defaultX={DEFAULT_WINDOW_POSITION_X}
+			defaultY={DEFAULT_WINDOW_POSITION_Y}
+			defaultWidth={480}
+			defaultHeight={165}
 			minWidth={360}
 			resizable='horizontal'
 			title={`Round: ${roundData.round}`}
