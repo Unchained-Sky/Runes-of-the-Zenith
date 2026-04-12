@@ -30,7 +30,12 @@ export const tabletopNameQueryOptions = (campaignId: number) => queryOptions({
 	staleTime: Infinity
 })
 
-export function useTabletopName() {
+export function useGMTabletopName() {
 	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useLoaderData()
+	return useSuspenseQuery(tabletopNameQueryOptions(campaignId))
+}
+
+export function usePlayerTabletopName() {
+	const { campaignId } = getRouteApi('/tabletop/$campaignId/player/').useLoaderData()
 	return useSuspenseQuery(tabletopNameQueryOptions(campaignId))
 }

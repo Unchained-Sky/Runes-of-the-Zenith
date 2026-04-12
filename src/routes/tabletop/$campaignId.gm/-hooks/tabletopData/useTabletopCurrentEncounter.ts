@@ -3,7 +3,7 @@ import { getRouteApi } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { requireAccount } from '~/supabase/requireAccount'
-import { TABLETOP_QUERY_STALE_TIME } from './tabletopDataOptions'
+import { TABLETOP_QUERY_STALE_TIME } from '../../../-hooks/tabletopData/tabletopDataOptions'
 
 const currentEncounterLoaderSchema = type({
 	campaignId: 'number'
@@ -35,7 +35,7 @@ export const tabletopCurrentEncounterQueryOptions = (campaignId: number) => quer
 	staleTime: TABLETOP_QUERY_STALE_TIME
 })
 
-export function useTabletopCurrentEncounter() {
+export function useGMTabletopCurrentEncounter() {
 	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useLoaderData()
 	return useSuspenseQuery(tabletopCurrentEncounterQueryOptions(campaignId))
 }

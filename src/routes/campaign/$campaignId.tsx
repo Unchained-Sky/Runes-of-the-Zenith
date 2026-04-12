@@ -69,7 +69,7 @@ function RouteComponent() {
 							<Button
 								key={heroId}
 								component={Link}
-								to='/hero/${hero_id}'
+								to={`/hero/${heroId}`}
 							>
 								{heroName}
 							</Button>
@@ -81,7 +81,7 @@ function RouteComponent() {
 			<Title order={2}>Tabletop</Title>
 			<Button
 				component={Link}
-				to={`/tabletop/${campaignId}${isOwner ? '/gm' : ''}`}
+				to={`/tabletop/${campaignId}${isOwner ? '/gm' : '/player'}`}
 				maw={rem(240)}
 			>Play
 			</Button>

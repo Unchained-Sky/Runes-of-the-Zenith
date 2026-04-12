@@ -5,10 +5,10 @@ import { type TablesInsert } from '~/supabase/databaseTypes'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
 import { mutationError } from '~/utils/mutationError'
-import { type HeroTurn } from '../-hooks/tabletopData/useTabletopHeroRounds'
-import { type TabletopHeroData } from '../-hooks/tabletopData/useTabletopHeroes'
-import { type TabletopRoundData } from '../-hooks/tabletopData/useTabletopRound'
-import { useQuerySync } from '../-hooks/useQuerySync'
+import { type TabletopHeroData } from '../../-hooks/tabletopData/useTabletopHeroes'
+import { type HeroTurn } from '../../-hooks/tabletopData/useTabletopHeroRounds'
+import { type TabletopRoundData } from '../../-hooks/tabletopData/useTabletopRound'
+import { useQuerySync } from '../../-hooks/useQuerySync'
 
 export function useStartRound() {
 	const { queryClient, campaignId } = useQuerySync()

@@ -4,8 +4,8 @@ import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { requireAccount } from '~/supabase/requireAccount'
 import { typedObject } from '~/types/typedObject'
-import { TABLETOP_QUERY_STALE_TIME } from './tabletopDataOptions'
-import { useTabletopEnemyList } from './useTabletopEnemyList'
+import { TABLETOP_QUERY_STALE_TIME } from '../../../-hooks/tabletopData/tabletopDataOptions'
+import { useGMTabletopEnemyList } from '../../../-hooks/tabletopData/useTabletopEnemyList'
 
 const enemyLoaderSchema = type({
 	tabletopCharacterId: 'number'
@@ -99,9 +99,9 @@ type TabletopEnemiesData = {
 	[tabletopCharacterId: number]: TabletopEnemyData
 }
 
-export function useTabletopEnemies() {
+export function useGMTabletopEnemies() {
 	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useLoaderData()
-	const { data: tabletopCharacterIds } = useTabletopEnemyList()
+	const { data: tabletopCharacterIds } = useGMTabletopEnemyList()
 	const queries = useQueries({
 		queries: tabletopCharacterIds.map(tabletopCharacterId => tabletopEnemyQueryOptions(campaignId, tabletopCharacterId))
 	})

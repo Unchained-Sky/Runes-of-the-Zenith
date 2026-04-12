@@ -11,8 +11,8 @@ import { requireGM } from '~/supabase/requireGM'
 import { type CombatTileCord } from '~/types/gameTypes/combatMap'
 import { mutationError } from '~/utils/mutationError'
 import { type TabletopEnemyData } from '../../../-hooks/tabletopData/useTabletopEnemies'
-import { type TabletopHeroData } from '../../../-hooks/tabletopData/useTabletopHeroes'
-import { useQuerySync } from '../../../-hooks/useQuerySync'
+import { type TabletopHeroData } from '../../../../-hooks/tabletopData/useTabletopHeroes'
+import { useQuerySync } from '../../../../-hooks/useQuerySync'
 
 type CharacterCardProps = {
 	character: {

@@ -1,9 +1,9 @@
 import { SimpleGrid, Title } from '@mantine/core'
-import { useTabletopEnemies } from '../../../-hooks/tabletopData/useTabletopEnemies'
+import { useGMTabletopEnemies } from '../../../-hooks/tabletopData/useTabletopEnemies'
 import CharacterCard from './CharacterCard'
 
 export default function Enemies() {
-	const { data: enemiesData } = useTabletopEnemies()
+	const { data: enemiesData } = useGMTabletopEnemies()
 
 	return (
 		<>

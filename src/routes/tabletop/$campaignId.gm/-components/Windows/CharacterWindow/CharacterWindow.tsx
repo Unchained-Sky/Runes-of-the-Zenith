@@ -1,7 +1,7 @@
 import { Window, type WindowProps } from '@gfazioli/mantine-window'
 import { type Enums } from '~/supabase/databaseTypes'
-import { useTabletopEnemies } from '../../../-hooks/tabletopData/useTabletopEnemies'
-import { useTabletopHeroes } from '../../../-hooks/tabletopData/useTabletopHeroes'
+import { useGMTabletopEnemies } from '../../../-hooks/tabletopData/useTabletopEnemies'
+import { useGMTabletopHeroes } from '../../../../-hooks/tabletopData/useTabletopHeroes'
 import { DEFAULT_WINDOW_POSITION_X, DEFAULT_WINDOW_POSITION_Y, type WindowProps as CustomWindowProps } from '../windowHelpers'
 import Enemy from './Enemy'
 import { EnemyWindowContext } from './Enemy/EnemyWindowContext'
@@ -34,7 +34,7 @@ export default function CharacterWindow(props: CharacterWindowProps) {
 }
 
 function HeroWindow({ opened, onClose, tabletopCharacterId }: CharacterWindowProps) {
-	const { data: heroesData } = useTabletopHeroes()
+	const { data: heroesData } = useGMTabletopHeroes()
 	const heroData = heroesData[tabletopCharacterId]
 	if (!heroData) throw new Error('Hero not found')
 
@@ -54,7 +54,7 @@ function HeroWindow({ opened, onClose, tabletopCharacterId }: CharacterWindowPro
 }
 
 function EnemyWindow({ opened, onClose, tabletopCharacterId }: CharacterWindowProps) {
-	const { data: enemiesData } = useTabletopEnemies()
+	const { data: enemiesData } = useGMTabletopEnemies()
 	const enemyData = enemiesData[tabletopCharacterId]
 	if (!enemyData) throw new Error('Enemy not found')
 

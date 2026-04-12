@@ -1,9 +1,9 @@
 import { Button, Stack, Title } from '@mantine/core'
-import { useTabletopRound } from '../../../-hooks/tabletopData/useTabletopRound'
 import { useStartRound } from '../../../-utils/startRound'
+import { useGMTabletopRound } from '../../../../-hooks/tabletopData/useTabletopRound'
 
 export default function NewRound() {
-	const { data: roundData } = useTabletopRound()
+	const { data: roundData } = useGMTabletopRound()
 
 	const startRound = useStartRound()
 

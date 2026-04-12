@@ -1,17 +1,17 @@
 import { Avatar, Button, Divider, Group, Menu, Stack, Text, Title } from '@mantine/core'
-import { useTabletopEnemies } from '../../../-hooks/tabletopData/useTabletopEnemies'
-import { type TabletopHeroData, useTabletopHeroes } from '../../../-hooks/tabletopData/useTabletopHeroes'
-import { useTabletopHeroRounds } from '../../../-hooks/tabletopData/useTabletopHeroRounds'
+import { useGMTabletopEnemies } from '../../../-hooks/tabletopData/useTabletopEnemies'
 import { useAssignNextHeroTurn } from '../../../-utils/assignNextHeroTurn'
+import { type TabletopHeroData, useGMTabletopHeroes } from '../../../../-hooks/tabletopData/useTabletopHeroes'
+import { useGMTabletopHeroRounds } from '../../../../-hooks/tabletopData/useTabletopHeroRounds'
 
 export default function TurnOrder() {
-	const { data: heroRounds } = useTabletopHeroRounds()
+	const { data: heroRounds } = useGMTabletopHeroRounds()
 	const usedTurns = heroRounds.filter(heroRound => heroRound.used)
 	const unusedTurnCount = heroRounds.filter(heroRound => !heroRound.used).length
 
-	const { data: heroesData } = useTabletopHeroes()
+	const { data: heroesData } = useGMTabletopHeroes()
 
-	const { data: enemiesData } = useTabletopEnemies()
+	const { data: enemiesData } = useGMTabletopEnemies()
 	const enemiesOrder = Object.values(enemiesData).reduce<Record<number, number[]>>((prev, enemyData) => {
 		const aggressionLeft = Math.max(enemyData.stats.aggression - enemyData.tabletopStats.currentAggression, 0)
 		return {
@@ -76,8 +76,8 @@ function UnusedTurn() {
 }
 
 function AssignNextTurn() {
-	const { data: heroesData } = useTabletopHeroes()
-	const { data: heroRounds } = useTabletopHeroRounds()
+	const { data: heroesData } = useGMTabletopHeroes()
+	const { data: heroRounds } = useGMTabletopHeroRounds()
 
 	const assignNextHeroTurn = useAssignNextHeroTurn()
 

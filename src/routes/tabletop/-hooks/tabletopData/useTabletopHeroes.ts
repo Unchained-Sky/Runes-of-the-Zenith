@@ -1,13 +1,16 @@
-import { queryOptions, useSuspenseQueries } from '@tanstack/react-query'
+import { queryOptions, useSuspenseQueries, type UseSuspenseQueryResult } from '@tanstack/react-query'
 import { getRouteApi } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
+import { useState } from 'react'
+import useMountEffect from '~/hooks/useMountEffect'
 import { type RuneData, runeExtraDataSchema } from '~/scripts/data/runes/runeData'
 import { type Enums } from '~/supabase/databaseTypes'
 import { requireAccount } from '~/supabase/requireAccount'
+import { useSupabase } from '~/supabase/useSupabase'
 import { typedObject } from '~/types/typedObject'
 import { TABLETOP_QUERY_STALE_TIME } from './tabletopDataOptions'
-import { useTabletopHeroList } from './useTabletopHeroList'
+import { useGMTabletopHeroList } from './useTabletopHeroList'
 
 const heroLoaderSchema = type({
 	tabletopCharacterId: 'number'
@@ -172,13 +175,7 @@ type Turn = {
 	order: number | null
 }
 
-export function useTabletopHeroes() {
-	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useLoaderData()
-	const { data: heroList } = useTabletopHeroList()
-	const queries = useSuspenseQueries({
-		queries: heroList.flatMap(hero => hero.tabletopCharacterId ? tabletopHeroQueryOptions(campaignId, hero.tabletopCharacterId) : [])
-	})
-
+function combineHeroData(queries: UseSuspenseQueryResult<InternalTabletopHeroData | null>[]) {
 	const dataTuple = queries
 		.map<[number, TabletopHeroData] | null>(hero => {
 			if (!hero.data) return null
@@ -195,10 +192,51 @@ export function useTabletopHeroes() {
 			]
 		})
 		.filter(hero => hero !== null)
+
 	const combine: { [tabletopCharacterId: number]: TabletopHeroData } = typedObject.fromEntries(dataTuple)
+	return combine
+}
+
+export function useGMTabletopHeroes() {
+	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useLoaderData()
+	const { data: heroList } = useGMTabletopHeroList()
+
+	const queries = useSuspenseQueries({
+		queries: heroList.flatMap(hero => hero.tabletopCharacterId ? tabletopHeroQueryOptions(campaignId, hero.tabletopCharacterId) : [])
+	})
 
 	return {
-		data: combine,
+		data: combineHeroData(queries),
+		queries
+	}
+}
+
+export function usePlayerTabletopHeroes() {
+	const { campaignId } = getRouteApi('/tabletop/$campaignId/player/').useLoaderData()
+	const { data: heroList } = useGMTabletopHeroList()
+
+	const supabase = useSupabase()
+	const [userId, setUserId] = useState<string | null>(null)
+
+	useMountEffect(() => {
+		async function getUserId() {
+			const { data, error } = await supabase.auth.getUser()
+			if (error) throw new Error(error.message, { cause: error })
+			setUserId(data.user.id)
+		}
+		getUserId().catch(console.error)
+	})
+
+	const queries = useSuspenseQueries({
+		queries: userId
+			? heroList.flatMap(hero => hero.tabletopCharacterId && hero.userId === userId
+				? tabletopHeroQueryOptions(campaignId, hero.tabletopCharacterId)
+				: [])
+			: []
+	})
+
+	return {
+		data: combineHeroData(queries),
 		queries
 	}
 }

@@ -49,7 +49,12 @@ export const tabletopMapTilesQueryOptions = (campaignId: number) => queryOptions
 	staleTime: TABLETOP_QUERY_STALE_TIME
 })
 
-export function useTabletopMapTiles() {
+export function useGMTabletopMapTiles() {
 	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useLoaderData()
+	return useSuspenseQuery(tabletopMapTilesQueryOptions(campaignId))
+}
+
+export function usePlayerTabletopMapTiles() {
+	const { campaignId } = getRouteApi('/tabletop/$campaignId/player/').useLoaderData()
 	return useSuspenseQuery(tabletopMapTilesQueryOptions(campaignId))
 }

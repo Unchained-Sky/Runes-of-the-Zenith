@@ -18,6 +18,7 @@ const heroListLoader = createServerFn({ method: 'GET' })
 			.select(`
 				heroId: hero_id,
 				heroName: hero_name,
+				userId: user_id,
 				tabletopHero: tabletop_heroes (
 					tabletopCharacterId: tt_character_id
 				)
@@ -28,6 +29,7 @@ const heroListLoader = createServerFn({ method: 'GET' })
 		return data.map(hero => ({
 			heroId: hero.heroId,
 			heroName: hero.heroName,
+			userId: hero.userId,
 			tabletopCharacterId: hero.tabletopHero?.tabletopCharacterId ?? null
 		}))
 	})
@@ -40,7 +42,12 @@ export const tabletopHeroListQueryOptions = (campaignId: number) => queryOptions
 	staleTime: Infinity
 })
 
-export function useTabletopHeroList() {
+export function useGMTabletopHeroList() {
 	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useLoaderData()
+	return useSuspenseQuery(tabletopHeroListQueryOptions(campaignId))
+}
+
+export function usePlayerTabletopHeroList() {
+	const { campaignId } = getRouteApi('/tabletop/$campaignId/player/').useLoaderData()
 	return useSuspenseQuery(tabletopHeroListQueryOptions(campaignId))
 }

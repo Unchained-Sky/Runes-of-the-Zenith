@@ -7,16 +7,16 @@ import { type TablesInsert, type TablesUpdate } from '~/supabase/databaseTypes'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
 import { mutationError } from '~/utils/mutationError'
-import { useTabletopCurrentEncounter } from '../../../-hooks/tabletopData/useTabletopCurrentEncounter'
-import { useTabletopEncounterList } from '../../../-hooks/tabletopData/useTabletopEncounterList'
-import { useQuerySync } from '../../../-hooks/useQuerySync'
+import { useGMTabletopCurrentEncounter } from '../../../-hooks/tabletopData/useTabletopCurrentEncounter'
+import { useGMTabletopEncounterList } from '../../../-hooks/tabletopData/useTabletopEncounterList'
 import { startRoundAction, startRoundQuerySync } from '../../../-utils/startRound'
+import { useQuerySync } from '../../../../-hooks/useQuerySync'
 
 export default function ChangeEncounter() {
 	const { queryClient, campaignId } = useQuerySync()
 
-	const { data: currentEncounterName } = useTabletopCurrentEncounter()
-	const { data: encounterData } = useTabletopEncounterList()
+	const { data: currentEncounterName } = useGMTabletopCurrentEncounter()
+	const { data: encounterData } = useGMTabletopEncounterList()
 
 	const modalStack = useModalsStack(['encounter-list', 'confirm'])
 

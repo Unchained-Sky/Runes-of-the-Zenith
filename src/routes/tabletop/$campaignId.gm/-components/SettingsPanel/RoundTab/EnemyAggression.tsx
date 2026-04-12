@@ -1,10 +1,10 @@
 import { Button, Group, Stack, Text, Title } from '@mantine/core'
-import { useTabletopEnemies } from '../../../-hooks/tabletopData/useTabletopEnemies'
+import { useGMTabletopEnemies } from '../../../-hooks/tabletopData/useTabletopEnemies'
 import { useIncreaseAggression } from '../../../-utils/increaseAggression'
 import { useResetAggression } from '../../../-utils/resetAggression'
 
 export default function EnemyAggression() {
-	const { data: enemiesData } = useTabletopEnemies()
+	const { data: enemiesData } = useGMTabletopEnemies()
 
 	const increaseAggression = useIncreaseAggression()
 

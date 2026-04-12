@@ -1,19 +1,19 @@
 import { Window } from '@gfazioli/mantine-window'
 import { Avatar, Group, Stack, type StackProps, Text } from '@mantine/core'
-import { useTabletopEnemies } from '../../-hooks/tabletopData/useTabletopEnemies'
-import { useTabletopHeroes } from '../../-hooks/tabletopData/useTabletopHeroes'
-import { useTabletopHeroRounds } from '../../-hooks/tabletopData/useTabletopHeroRounds'
-import { useTabletopRound } from '../../-hooks/tabletopData/useTabletopRound'
+import { useGMTabletopEnemies } from '../../-hooks/tabletopData/useTabletopEnemies'
+import { useGMTabletopHeroes } from '../../../-hooks/tabletopData/useTabletopHeroes'
+import { useGMTabletopHeroRounds } from '../../../-hooks/tabletopData/useTabletopHeroRounds'
+import { useGMTabletopRound } from '../../../-hooks/tabletopData/useTabletopRound'
 import { DEFAULT_WINDOW_POSITION_X, DEFAULT_WINDOW_POSITION_Y, type WindowProps } from './windowHelpers'
 
 export default function RoundsWindow({ opened, onClose }: WindowProps) {
-	const { data: heroRounds } = useTabletopHeroRounds()
+	const { data: heroRounds } = useGMTabletopHeroRounds()
 	const usedTurns = heroRounds.filter(heroRound => heroRound.used)
 	const unusedTurnCount = heroRounds.filter(heroRound => !heroRound.used).length
 
-	const { data: heroesData } = useTabletopHeroes()
+	const { data: heroesData } = useGMTabletopHeroes()
 
-	const { data: enemiesData } = useTabletopEnemies()
+	const { data: enemiesData } = useGMTabletopEnemies()
 	const enemiesOrder = Object.values(enemiesData).reduce<Record<number, number[]>>((prev, enemyData) => {
 		const aggressionLeft = Math.max(enemyData.stats.aggression - enemyData.tabletopStats.currentAggression, 0)
 		return {
@@ -22,7 +22,7 @@ export default function RoundsWindow({ opened, onClose }: WindowProps) {
 		}
 	}, {})
 
-	const { data: roundData } = useTabletopRound()
+	const { data: roundData } = useGMTabletopRound()
 
 	return (
 		<Window

@@ -5,9 +5,9 @@ import { type TablesUpdate } from '~/supabase/databaseTypes'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
 import { mutationError } from '~/utils/mutationError'
-import { type HeroTurn } from '../-hooks/tabletopData/useTabletopHeroRounds'
-import { type TabletopHeroData } from '../-hooks/tabletopData/useTabletopHeroes'
-import { useQuerySync } from '../-hooks/useQuerySync'
+import { type TabletopHeroData } from '../../-hooks/tabletopData/useTabletopHeroes'
+import { type HeroTurn } from '../../-hooks/tabletopData/useTabletopHeroRounds'
+import { useQuerySync } from '../../-hooks/useQuerySync'
 import { increaseAggressionAction, increaseAggressionQuerySync } from './increaseAggression'
 
 const findNextOrder = (array: { order: number | null }[]) => Math.max(0, ...array.flatMap(({ order }) => order ? [order] : [])) + 1

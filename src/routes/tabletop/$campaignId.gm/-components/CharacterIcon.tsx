@@ -2,8 +2,8 @@ import { useDraggable } from '@dnd-kit/react'
 import { Avatar } from '@mantine/core'
 import useHoldButton from '~/hooks/useHoldButton'
 import { type Enums } from '~/supabase/databaseTypes'
-import { useTabletopEnemies } from '../-hooks/tabletopData/useTabletopEnemies'
-import { useTabletopHeroes } from '../-hooks/tabletopData/useTabletopHeroes'
+import { useGMTabletopEnemies } from '../-hooks/tabletopData/useTabletopEnemies'
+import { useGMTabletopHeroes } from '../../-hooks/tabletopData/useTabletopHeroes'
 import { type CharacterDraggable } from './DragDrop'
 import { useConfirmTargetStore } from './Windows/ConfirmTargetWindow/useConfirmTargetStore'
 
@@ -26,7 +26,7 @@ type CharacterIconHeroProps = {
 }
 
 function CharacterIconHero({ tabletopCharacterId }: CharacterIconHeroProps) {
-	const { data: heroesData } = useTabletopHeroes()
+	const { data: heroesData } = useGMTabletopHeroes()
 	const heroData = heroesData[tabletopCharacterId]
 	if (!heroData) {
 		console.error(`Hero not found: ${tabletopCharacterId}`)
@@ -48,7 +48,7 @@ type CharacterIconEnemyProps = {
 }
 
 function CharacterIconEnemy({ tabletopCharacterId }: CharacterIconEnemyProps) {
-	const { data: enemiesData } = useTabletopEnemies()
+	const { data: enemiesData } = useGMTabletopEnemies()
 	const enemyData = enemiesData[tabletopCharacterId]
 	if (!enemyData) {
 		console.error(`Enemy not found: ${tabletopCharacterId}`)

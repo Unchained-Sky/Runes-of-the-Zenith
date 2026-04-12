@@ -2,7 +2,7 @@ import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 import { getRouteApi } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
-import { requireGM } from '~/supabase/requireGM'
+import { requireAccount } from '~/supabase/requireAccount'
 import { TABLETOP_QUERY_STALE_TIME } from './tabletopDataOptions'
 
 const heroRoundsLoaderSchema = type({
@@ -12,7 +12,7 @@ const heroRoundsLoaderSchema = type({
 const heroRoundsLoader = createServerFn({ method: 'GET' })
 	.inputValidator(heroRoundsLoaderSchema)
 	.handler(async ({ data: { campaignId } }) => {
-		const { supabase } = await requireGM({ campaignId })
+		const { supabase } = await requireAccount()
 
 		const { data, error } = await supabase
 			.from('tabletop_hero_turn')
@@ -32,17 +32,6 @@ const heroRoundsLoader = createServerFn({ method: 'GET' })
 		return data
 	})
 
-export const tabletopHeroRoundsQueryOptions = (campaignId: number) => queryOptions({
-	queryKey: [campaignId, 'tabletop', 'hero-rounds'],
-	queryFn: () => heroRoundsLoader({ data: { campaignId } }),
-	staleTime: TABLETOP_QUERY_STALE_TIME
-})
-
-export function useTabletopHeroRounds() {
-	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useLoaderData()
-	return useSuspenseQuery(tabletopHeroRoundsQueryOptions(campaignId))
-}
-
 export type HeroTurn = UsedHeroTurn | UnusedHeroTurn
 
 type HeroTurnFallback = {
@@ -60,4 +49,20 @@ interface UsedHeroTurn extends HeroTurnFallback {
 interface UnusedHeroTurn extends HeroTurnFallback {
 	used: false
 	order: null
+}
+
+export const tabletopHeroRoundsQueryOptions = (campaignId: number) => queryOptions({
+	queryKey: [campaignId, 'tabletop', 'hero-rounds'],
+	queryFn: () => heroRoundsLoader({ data: { campaignId } }),
+	staleTime: TABLETOP_QUERY_STALE_TIME
+})
+
+export function useGMTabletopHeroRounds() {
+	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useLoaderData()
+	return useSuspenseQuery(tabletopHeroRoundsQueryOptions(campaignId))
+}
+
+export function usePlayerTabletopHeroRounds() {
+	const { campaignId } = getRouteApi('/tabletop/$campaignId/player/').useLoaderData()
+	return useSuspenseQuery(tabletopHeroRoundsQueryOptions(campaignId))
 }

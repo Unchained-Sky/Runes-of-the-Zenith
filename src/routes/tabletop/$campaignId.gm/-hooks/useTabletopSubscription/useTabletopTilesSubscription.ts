@@ -2,7 +2,7 @@ import { getRouteApi } from '@tanstack/react-router'
 import useMountEffect from '~/hooks/useMountEffect'
 import { type Tables } from '~/supabase/databaseTypes'
 import { typedObject } from '~/types/typedObject'
-import { type TabletopTile, type TabletopTiles } from '../tabletopData/useTabletopTiles'
+import { type TabletopTile, type TabletopTiles } from '../../../-hooks/tabletopData/useTabletopTiles'
 import { LOG_SUBSCRIPTION_PAYLOADS, type SubscribeHookProps } from './useTabletopSubscription'
 
 type TabletopTilesTable = Omit<Tables<'tabletop_tiles'>, 'tt_character_id'> & { tt_character_id?: number | null }

@@ -6,18 +6,18 @@ import { type } from 'arktype'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
 import { mutationError } from '~/utils/mutationError'
-import { useTabletopEnemyList } from '../../../-hooks/tabletopData/useTabletopEnemyList'
-import { type TabletopRoundData } from '../../../-hooks/tabletopData/useTabletopRound'
-import { useQuerySync } from '../../../-hooks/useQuerySync'
 import { resetAggressionAction, resetAggressionQuerySync } from '../../../-utils/resetAggression'
 import { startRoundAction, startRoundQuerySync } from '../../../-utils/startRound'
+import { useGMTabletopEnemyList } from '../../../../-hooks/tabletopData/useTabletopEnemyList'
+import { type TabletopRoundData } from '../../../../-hooks/tabletopData/useTabletopRound'
+import { useQuerySync } from '../../../../-hooks/useQuerySync'
 
 export default function ResetRounds() {
 	const { queryClient, campaignId } = useQuerySync()
 
 	const [opened, { open, close }] = useDisclosure(false)
 
-	const { data: enemyList } = useTabletopEnemyList()
+	const { data: enemyList } = useGMTabletopEnemyList()
 
 	const resetRounds = useMutation({
 		mutationFn: resetRoundsAction,

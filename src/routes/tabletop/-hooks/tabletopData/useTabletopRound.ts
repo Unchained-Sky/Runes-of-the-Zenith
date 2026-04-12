@@ -21,10 +21,10 @@ const roundLoader = createServerFn({ method: 'GET' })
 			`)
 			.eq('campaign_id', campaignId)
 			.limit(1)
-			.single()
+			.maybeSingle()
 		if (error) throw new Error(error.message, { cause: error })
 
-		return data
+		return data ?? 0
 	})
 
 export type TabletopRoundData = Awaited<ReturnType<typeof roundLoader>>
@@ -35,7 +35,12 @@ export const tabletopRoundQueryOptions = (campaignId: number) => queryOptions({
 	staleTime: TABLETOP_QUERY_STALE_TIME
 })
 
-export function useTabletopRound() {
+export function useGMTabletopRound() {
 	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useLoaderData()
+	return useSuspenseQuery(tabletopRoundQueryOptions(campaignId))
+}
+
+export function usePlayerTabletopRound() {
+	const { campaignId } = getRouteApi('/tabletop/$campaignId/player/').useLoaderData()
 	return useSuspenseQuery(tabletopRoundQueryOptions(campaignId))
 }

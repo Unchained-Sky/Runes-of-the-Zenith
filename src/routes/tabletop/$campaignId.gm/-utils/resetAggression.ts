@@ -5,7 +5,7 @@ import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
 import { mutationError } from '~/utils/mutationError'
 import { type TabletopEnemyData } from '../-hooks/tabletopData/useTabletopEnemies'
-import { useQuerySync } from '../-hooks/useQuerySync'
+import { useQuerySync } from '../../-hooks/useQuerySync'
 
 export function useResetAggression() {
 	const { queryClient, campaignId } = useQuerySync()

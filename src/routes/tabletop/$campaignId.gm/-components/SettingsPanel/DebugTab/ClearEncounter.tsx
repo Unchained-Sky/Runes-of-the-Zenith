@@ -6,7 +6,7 @@ import { type } from 'arktype'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
 import { mutationError } from '~/utils/mutationError'
-import { useQuerySync } from '../../../-hooks/useQuerySync'
+import { useQuerySync } from '../../../../-hooks/useQuerySync'
 
 export default function ClearEncounter() {
 	const { queryClient, campaignId } = useQuerySync()

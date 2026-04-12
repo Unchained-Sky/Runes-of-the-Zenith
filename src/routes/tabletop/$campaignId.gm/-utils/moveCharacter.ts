@@ -6,9 +6,9 @@ import { requireGM } from '~/supabase/requireGM'
 import { typedObject } from '~/types/typedObject'
 import { mutationError } from '~/utils/mutationError'
 import { type TabletopEnemyData } from '../-hooks/tabletopData/useTabletopEnemies'
-import { type TabletopHeroData } from '../-hooks/tabletopData/useTabletopHeroes'
-import { type TabletopTile, type TabletopTiles } from '../-hooks/tabletopData/useTabletopTiles'
-import { useQuerySync } from '../-hooks/useQuerySync'
+import { type TabletopHeroData } from '../../-hooks/tabletopData/useTabletopHeroes'
+import { type TabletopTile, type TabletopTiles } from '../../-hooks/tabletopData/useTabletopTiles'
+import { useQuerySync } from '../../-hooks/useQuerySync'
 
 export function useMoveCharacter() {
 	const { queryClient, campaignId } = useQuerySync()

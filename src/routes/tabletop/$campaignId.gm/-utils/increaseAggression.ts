@@ -5,8 +5,8 @@ import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
 import { mutationError } from '~/utils/mutationError'
 import { type TabletopEnemyData } from '../-hooks/tabletopData/useTabletopEnemies'
-import { type TabletopEnemyList } from '../-hooks/tabletopData/useTabletopEnemyList'
-import { useQuerySync } from '../-hooks/useQuerySync'
+import { type TabletopEnemyList } from '../../-hooks/tabletopData/useTabletopEnemyList'
+import { useQuerySync } from '../../-hooks/useQuerySync'
 
 const DEFAULT_INCREASE_AMOUNT = 1
 

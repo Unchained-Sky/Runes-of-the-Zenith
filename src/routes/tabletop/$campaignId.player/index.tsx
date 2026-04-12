@@ -1,39 +1,57 @@
 import { Title } from '@mantine/core'
 import { createFileRoute, redirect } from '@tanstack/react-router'
-import { createServerFn } from '@tanstack/react-start'
-import { type } from 'arktype'
-import { requireAccount } from '~/supabase/requireAccount'
+import { tokenQueryOptions } from '~/hooks/data/useTokenQuery'
+import { safeParseInt } from '~/utils/safeParseInt'
+import { tabletopEnemyListQueryOptions } from '../-hooks/tabletopData/useTabletopEnemyList'
+import { tabletopHeroListQueryOptions } from '../-hooks/tabletopData/useTabletopHeroList'
+import { tabletopHeroRoundsQueryOptions } from '../-hooks/tabletopData/useTabletopHeroRounds'
+import { tabletopMapTilesQueryOptions } from '../-hooks/tabletopData/useTabletopMapTiles'
+import { tabletopNameQueryOptions } from '../-hooks/tabletopData/useTabletopName'
+import { tabletopRoundQueryOptions } from '../-hooks/tabletopData/useTabletopRound'
+import { tabletopTilesQueryOptions } from '../-hooks/tabletopData/useTabletopTiles'
 
 export const Route = createFileRoute('/tabletop/$campaignId/player/')({
 	component: RouteComponent,
-	loader: async ({ params: { campaignId } }) => await serverLoader({ data: { campaignId: +campaignId } }),
+	loader: async ({ params: { campaignId: campaignIdString }, context }) => {
+		const campaignId = safeParseInt(campaignIdString)
+		if (!campaignId) throw redirect({ to: '/campaign' })
+
+		const [
+			campaignName,
+			tiles,
+			mapTiles,
+			heroList,
+			enemyList,
+			heroRounds,
+			round,
+			tokens
+		] = await Promise.all([
+			context.queryClient.ensureQueryData(tabletopNameQueryOptions(campaignId)),
+			context.queryClient.ensureQueryData(tabletopTilesQueryOptions(campaignId)),
+			context.queryClient.ensureQueryData(tabletopMapTilesQueryOptions(campaignId)),
+			context.queryClient.ensureQueryData(tabletopHeroListQueryOptions(campaignId)),
+			context.queryClient.ensureQueryData(tabletopEnemyListQueryOptions(campaignId)),
+			context.queryClient.ensureQueryData(tabletopHeroRoundsQueryOptions(campaignId)),
+			context.queryClient.ensureQueryData(tabletopRoundQueryOptions(campaignId)),
+			context.queryClient.ensureQueryData(tokenQueryOptions)
+		])
+
+		return {
+			campaignId,
+			campaignName,
+			tiles,
+			mapTiles,
+			heroList,
+			enemyList,
+			heroRounds,
+			round,
+			tokens
+		}
+	},
 	head: ({ loaderData }) => ({
 		meta: loaderData ? [{ title: loaderData.campaignName }] : undefined
 	})
 })
-
-const serverLoaderSchema = type({
-	campaignId: 'number'
-})
-
-const serverLoader = createServerFn({ method: 'GET' })
-	.inputValidator(serverLoaderSchema)
-	.handler(async ({ data: { campaignId } }) => {
-		const { supabase } = await requireAccount({ backlink: '/tabletop/$id/player' })
-
-		const { data, error } = await supabase
-			.from('campaign_info')
-			.select('campaignName: campaign_name')
-			.eq('campaign_id', campaignId)
-			.limit(1)
-			.maybeSingle()
-		if (error) throw new Error(error.message, { cause: error })
-		if (!data) throw redirect({ to: '/campaign' })
-
-		return {
-			campaignName: data.campaignName
-		}
-	})
 
 function RouteComponent() {
 	const { campaignName } = Route.useLoaderData()

@@ -4,7 +4,7 @@ import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { adminUUID } from '~/supabase/adminAccount'
 import { requireAccount } from '~/supabase/requireAccount'
-import { TABLETOP_QUERY_STALE_TIME } from './tabletopDataOptions'
+import { TABLETOP_QUERY_STALE_TIME } from '../../../-hooks/tabletopData/tabletopDataOptions'
 
 const encounterListLoaderSchema = type({
 	campaignId: 'number'
@@ -68,7 +68,7 @@ export const tabletopEncounterListQueryOptions = (campaignId: number) => queryOp
 	staleTime: TABLETOP_QUERY_STALE_TIME
 })
 
-export function useTabletopEncounterList() {
+export function useGMTabletopEncounterList() {
 	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useLoaderData()
 	return useSuspenseQuery(tabletopEncounterListQueryOptions(campaignId))
 }

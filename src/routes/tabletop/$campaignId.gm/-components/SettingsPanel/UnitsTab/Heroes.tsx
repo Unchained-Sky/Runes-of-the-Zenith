@@ -5,15 +5,15 @@ import { type } from 'arktype'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
 import { mutationError } from '~/utils/mutationError'
-import { useTabletopHeroes } from '../../../-hooks/tabletopData/useTabletopHeroes'
-import { type TabletopHeroesList } from '../../../-hooks/tabletopData/useTabletopHeroList'
-import { useQuerySync } from '../../../-hooks/useQuerySync'
+import { useGMTabletopHeroes } from '../../../../-hooks/tabletopData/useTabletopHeroes'
+import { type TabletopHeroesList } from '../../../../-hooks/tabletopData/useTabletopHeroList'
+import { useQuerySync } from '../../../../-hooks/useQuerySync'
 import CharacterCard from './CharacterCard'
 
 export default function Heroes() {
 	const { queryClient, campaignId } = useQuerySync()
 
-	const { data: heroesData } = useTabletopHeroes()
+	const { data: heroesData } = useGMTabletopHeroes()
 
 	const removeHero = useMutation({
 		mutationFn: removeHeroAction,

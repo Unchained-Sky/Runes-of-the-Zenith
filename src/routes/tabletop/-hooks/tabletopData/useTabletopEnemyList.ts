@@ -32,7 +32,12 @@ export const tabletopEnemyListQueryOptions = (campaignId: number) => queryOption
 	staleTime: TABLETOP_QUERY_STALE_TIME
 })
 
-export function useTabletopEnemyList() {
+export function useGMTabletopEnemyList() {
 	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useLoaderData()
+	return useSuspenseQuery(tabletopEnemyListQueryOptions(campaignId))
+}
+
+export function usePlayerTabletopEnemyList() {
+	const { campaignId } = getRouteApi('/tabletop/$campaignId/player/').useLoaderData()
 	return useSuspenseQuery(tabletopEnemyListQueryOptions(campaignId))
 }

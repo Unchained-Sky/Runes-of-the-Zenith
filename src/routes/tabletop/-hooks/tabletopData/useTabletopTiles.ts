@@ -40,16 +40,21 @@ const tilesLoader = createServerFn({ method: 'GET' })
 		]))
 	})
 
+export type TabletopTiles = ReturnType<typeof useGMTabletopTiles>['data']
+export type TabletopTile = NonNullable<TabletopTiles[keyof TabletopTiles]>
+
 export const tabletopTilesQueryOptions = (campaignId: number) => queryOptions({
 	queryKey: [campaignId, 'tabletop', 'tiles', 'characters'],
 	queryFn: () => tilesLoader({ data: { campaignId } }),
 	staleTime: TABLETOP_QUERY_STALE_TIME
 })
 
-export function useTabletopTiles() {
+export function useGMTabletopTiles() {
 	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useLoaderData()
 	return useSuspenseQuery(tabletopTilesQueryOptions(campaignId))
 }
 
-export type TabletopTiles = ReturnType<typeof useTabletopTiles>['data']
-export type TabletopTile = NonNullable<TabletopTiles[keyof TabletopTiles]>
+export function usePlayerTabletopTiles() {
+	const { campaignId } = getRouteApi('/tabletop/$campaignId/player/').useLoaderData()
+	return useSuspenseQuery(tabletopTilesQueryOptions(campaignId))
+}
