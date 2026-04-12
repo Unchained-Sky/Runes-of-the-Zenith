@@ -3,6 +3,7 @@ import { getRouteApi } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { adminUUID } from '~/supabase/adminAccount'
+import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireAccount } from '~/supabase/requireAccount'
 import { TABLETOP_QUERY_STALE_TIME } from '../../../-hooks/tabletopData/tabletopDataOptions'
 
@@ -24,7 +25,9 @@ const encounterListLoader = createServerFn({ method: 'GET' })
 		if (tabletopInfo.error) throw new Error(tabletopInfo.error.message, { cause: tabletopInfo.error })
 
 		if (!tabletopInfo.data) {
-			const { error } = await supabase
+			const serviceClient = getServiceClient()
+
+			const { error } = await serviceClient
 				.from('tabletop_info')
 				.insert({ campaign_id: campaignId })
 			if (error) throw new Error(error.message, { cause: error })
@@ -63,7 +66,7 @@ const encounterListLoader = createServerFn({ method: 'GET' })
 	})
 
 export const tabletopEncounterListQueryOptions = (campaignId: number) => queryOptions({
-	queryKey: [campaignId, 'tabletop', 'encounters'],
+	queryKey: [campaignId, 'tabletop-gm', 'encounters'],
 	queryFn: () => encounterListLoader({ data: { campaignId } }),
 	staleTime: TABLETOP_QUERY_STALE_TIME
 })

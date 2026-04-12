@@ -1,4 +1,3 @@
-import { Title } from '@mantine/core'
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { tokenQueryOptions } from '~/hooks/data/useTokenQuery'
 import { safeParseInt } from '~/utils/safeParseInt'
@@ -9,6 +8,7 @@ import { tabletopMapTilesQueryOptions } from '../-hooks/tabletopData/useTabletop
 import { tabletopNameQueryOptions } from '../-hooks/tabletopData/useTabletopName'
 import { tabletopRoundQueryOptions } from '../-hooks/tabletopData/useTabletopRound'
 import { tabletopTilesQueryOptions } from '../-hooks/tabletopData/useTabletopTiles'
+import CombatGridTabletopPlayer from './-components/CombatGridTabletopPlayer'
 
 export const Route = createFileRoute('/tabletop/$campaignId/player/')({
 	component: RouteComponent,
@@ -54,7 +54,9 @@ export const Route = createFileRoute('/tabletop/$campaignId/player/')({
 })
 
 function RouteComponent() {
-	const { campaignName } = Route.useLoaderData()
-
-	return <Title>{campaignName}</Title>
+	return (
+		<>
+			<CombatGridTabletopPlayer />
+		</>
+	)
 }

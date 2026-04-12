@@ -2,10 +2,10 @@ import { queryOptions, useQueries } from '@tanstack/react-query'
 import { getRouteApi } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
+import { TABLETOP_QUERY_STALE_TIME } from '~/routes/tabletop/-hooks/tabletopData/tabletopDataOptions'
+import { usePlayerTabletopEnemyList } from '~/routes/tabletop/-hooks/tabletopData/useTabletopEnemyList'
 import { requireAccount } from '~/supabase/requireAccount'
 import { typedObject } from '~/types/typedObject'
-import { TABLETOP_QUERY_STALE_TIME } from '../../../-hooks/tabletopData/tabletopDataOptions'
-import { useGMTabletopEnemyList } from '../../../-hooks/tabletopData/useTabletopEnemyList'
 
 const enemyLoaderSchema = type({
 	tabletopCharacterId: 'number'
@@ -22,17 +22,7 @@ const enemyLoader = createServerFn({ method: 'GET' })
 				tabletopEnemy: tabletop_enemy (
 					enemyId: enemy_id,
 					enemyInfo: enemy_info (
-						enemyName: enemy_name,
-						characterInfo: character_info (
-							maxHealth: max_health,
-							maxShield: max_shield,
-							int,
-							str,
-							dex,
-							maxMovement: max_movement,
-							critChance: crit_chance
-						),
-						aggression
+						enemyName: enemy_name
 					),
 					currentAggression: current_aggression
 				),
@@ -42,11 +32,6 @@ const enemyLoader = createServerFn({ method: 'GET' })
 					r,
 					s
 				),
-				health,
-				wounds,
-				shield,
-				trauma,
-				movement,
 				token: tabletop_character_token (
 					name: token_name,
 					amount
@@ -66,22 +51,7 @@ const enemyLoader = createServerFn({ method: 'GET' })
 			tabletopCharacterId,
 			enemyId: tabletopEnemy.enemyId,
 			enemyName: tabletopEnemy.enemyInfo.enemyName,
-			stats: {
-				maxHealth: tabletopEnemy.enemyInfo.characterInfo.maxHealth,
-				maxShield: tabletopEnemy.enemyInfo.characterInfo.maxShield,
-				int: tabletopEnemy.enemyInfo.characterInfo.int,
-				str: tabletopEnemy.enemyInfo.characterInfo.str,
-				dex: tabletopEnemy.enemyInfo.characterInfo.dex,
-				maxMovement: tabletopEnemy.enemyInfo.characterInfo.maxMovement,
-				critChance: tabletopEnemy.enemyInfo.characterInfo.critChance,
-				aggression: tabletopEnemy.enemyInfo.aggression
-			},
 			tabletopStats: {
-				health: data.health,
-				wounds: data.wounds,
-				shield: data.shield,
-				trauma: data.trauma,
-				movement: data.movement,
 				currentAggression: tabletopEnemy.currentAggression
 			},
 			pos: data.tile[0] ? [data.tile[0].q, data.tile[0].r, data.tile[0].s] : null,
@@ -90,7 +60,7 @@ const enemyLoader = createServerFn({ method: 'GET' })
 	})
 
 const tabletopEnemyQueryOptions = (campaignId: number, tabletopCharacterId: number) => queryOptions({
-	queryKey: [campaignId, 'tabletop-gm', 'enemy', tabletopCharacterId],
+	queryKey: [campaignId, 'tabletop-player', 'enemy', tabletopCharacterId],
 	queryFn: () => enemyLoader({ data: { tabletopCharacterId } }),
 	staleTime: TABLETOP_QUERY_STALE_TIME
 })
@@ -100,9 +70,9 @@ type TabletopEnemiesData = {
 	[tabletopCharacterId: number]: TabletopEnemyData
 }
 
-export function useGMTabletopEnemies() {
-	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useLoaderData()
-	const { data: tabletopCharacterIds } = useGMTabletopEnemyList()
+export function usePlayerTabletopEnemies() {
+	const { campaignId } = getRouteApi('/tabletop/$campaignId/player/').useLoaderData()
+	const { data: tabletopCharacterIds } = usePlayerTabletopEnemyList()
 	const queries = useQueries({
 		queries: tabletopCharacterIds.map(tabletopCharacterId => tabletopEnemyQueryOptions(campaignId, tabletopCharacterId))
 	})

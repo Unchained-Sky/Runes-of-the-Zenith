@@ -30,7 +30,7 @@ const currentEncounterLoader = createServerFn({ method: 'GET' })
 	})
 
 export const tabletopCurrentEncounterQueryOptions = (campaignId: number) => queryOptions({
-	queryKey: [campaignId, 'tabletop', 'encounter-name'],
+	queryKey: [campaignId, 'tabletop-gm', 'encounter-name'],
 	queryFn: () => currentEncounterLoader({ data: { campaignId } }),
 	staleTime: TABLETOP_QUERY_STALE_TIME
 })

@@ -2,15 +2,12 @@ import { queryOptions, useSuspenseQueries, type UseSuspenseQueryResult } from '@
 import { getRouteApi } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
-import { useState } from 'react'
-import useMountEffect from '~/hooks/useMountEffect'
 import { type RuneData, runeExtraDataSchema } from '~/scripts/data/runes/runeData'
 import { type Enums } from '~/supabase/databaseTypes'
 import { requireAccount } from '~/supabase/requireAccount'
-import { useSupabase } from '~/supabase/useSupabase'
 import { typedObject } from '~/types/typedObject'
 import { TABLETOP_QUERY_STALE_TIME } from './tabletopDataOptions'
-import { useGMTabletopHeroList } from './useTabletopHeroList'
+import { useGMTabletopHeroList, usePlayerTabletopHeroList } from './useTabletopHeroList'
 
 const heroLoaderSchema = type({
 	tabletopCharacterId: 'number'
@@ -202,7 +199,9 @@ export function useGMTabletopHeroes() {
 	const { data: heroList } = useGMTabletopHeroList()
 
 	const queries = useSuspenseQueries({
-		queries: heroList.flatMap(hero => hero.tabletopCharacterId ? tabletopHeroQueryOptions(campaignId, hero.tabletopCharacterId) : [])
+		queries: heroList.flatMap(hero => hero.tabletopCharacterId
+			? tabletopHeroQueryOptions(campaignId, hero.tabletopCharacterId)
+			: [])
 	})
 
 	return {
@@ -213,26 +212,12 @@ export function useGMTabletopHeroes() {
 
 export function usePlayerTabletopHeroes() {
 	const { campaignId } = getRouteApi('/tabletop/$campaignId/player/').useLoaderData()
-	const { data: heroList } = useGMTabletopHeroList()
-
-	const supabase = useSupabase()
-	const [userId, setUserId] = useState<string | null>(null)
-
-	useMountEffect(() => {
-		async function getUserId() {
-			const { data, error } = await supabase.auth.getUser()
-			if (error) throw new Error(error.message, { cause: error })
-			setUserId(data.user.id)
-		}
-		getUserId().catch(console.error)
-	})
+	const { data: heroList } = usePlayerTabletopHeroList()
 
 	const queries = useSuspenseQueries({
-		queries: userId
-			? heroList.flatMap(hero => hero.tabletopCharacterId && hero.userId === userId
-				? tabletopHeroQueryOptions(campaignId, hero.tabletopCharacterId)
-				: [])
-			: []
+		queries: heroList.flatMap(hero => hero.tabletopCharacterId
+			? tabletopHeroQueryOptions(campaignId, hero.tabletopCharacterId)
+			: [])
 	})
 
 	return {
