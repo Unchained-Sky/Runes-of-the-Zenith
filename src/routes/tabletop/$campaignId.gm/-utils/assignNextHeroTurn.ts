@@ -4,16 +4,16 @@ import { type } from 'arktype'
 import { type TablesUpdate } from '~/supabase/databaseTypes'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
+import { useTabletopContext } from '~/tt/-context/TabletopContext'
+import { type TabletopHeroData } from '~/tt/-hooks/tabletopData/useTabletopHeroes'
+import { type HeroTurn } from '~/tt/-hooks/tabletopData/useTabletopHeroRounds'
 import { mutationError } from '~/utils/mutationError'
-import { type TabletopHeroData } from '../../-hooks/tabletopData/useTabletopHeroes'
-import { type HeroTurn } from '../../-hooks/tabletopData/useTabletopHeroRounds'
-import { useQuerySync } from '../../-hooks/useQuerySync'
 import { increaseAggressionAction, increaseAggressionQuerySync } from './increaseAggression'
 
 const findNextOrder = (array: { order: number | null }[]) => Math.max(0, ...array.flatMap(({ order }) => order ? [order] : [])) + 1
 
 export function useAssignNextHeroTurn() {
-	const { queryClient, campaignId } = useQuerySync()
+	const { queryClient, campaignId } = useTabletopContext()
 
 	return useMutation({
 		mutationFn: assignNextHeroTurnAction,

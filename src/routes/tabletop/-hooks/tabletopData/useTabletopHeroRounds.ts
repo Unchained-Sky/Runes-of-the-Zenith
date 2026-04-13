@@ -1,8 +1,8 @@
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
-import { getRouteApi } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { requireAccount } from '~/supabase/requireAccount'
+import { useTabletopContext } from '~/tt/-context/TabletopContext'
 import { TABLETOP_QUERY_STALE_TIME } from './tabletopDataOptions'
 
 const heroRoundsLoaderSchema = type({
@@ -57,12 +57,7 @@ export const tabletopHeroRoundsQueryOptions = (campaignId: number) => queryOptio
 	staleTime: TABLETOP_QUERY_STALE_TIME
 })
 
-export function useGMTabletopHeroRounds() {
-	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useLoaderData()
-	return useSuspenseQuery(tabletopHeroRoundsQueryOptions(campaignId))
-}
-
-export function usePlayerTabletopHeroRounds() {
-	const { campaignId } = getRouteApi('/tabletop/$campaignId/player/').useLoaderData()
+export function useTabletopHeroRounds() {
+	const { campaignId } = useTabletopContext()
 	return useSuspenseQuery(tabletopHeroRoundsQueryOptions(campaignId))
 }

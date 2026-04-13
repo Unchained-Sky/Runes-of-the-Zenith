@@ -1,11 +1,11 @@
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
-import { getRouteApi } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
+import { useTabletopContext } from '~/routes/tabletop/-context/TabletopContext'
 import { adminUUID } from '~/supabase/adminAccount'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireAccount } from '~/supabase/requireAccount'
-import { TABLETOP_QUERY_STALE_TIME } from '../../../-hooks/tabletopData/tabletopDataOptions'
+import { TABLETOP_QUERY_STALE_TIME } from '~/tt/-hooks/tabletopData/tabletopDataOptions'
 
 const encounterListLoaderSchema = type({
 	campaignId: 'number'
@@ -72,6 +72,6 @@ export const tabletopEncounterListQueryOptions = (campaignId: number) => queryOp
 })
 
 export function useGMTabletopEncounterList() {
-	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useLoaderData()
+	const { campaignId } = useTabletopContext()
 	return useSuspenseQuery(tabletopEncounterListQueryOptions(campaignId))
 }

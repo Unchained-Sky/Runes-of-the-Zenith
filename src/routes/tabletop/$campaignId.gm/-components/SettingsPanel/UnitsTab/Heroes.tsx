@@ -2,18 +2,18 @@ import { SimpleGrid, Title } from '@mantine/core'
 import { useMutation } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
+import { useTabletopContext } from '~/routes/tabletop/-context/TabletopContext'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
+import { useTabletopHeroes } from '~/tt/-hooks/tabletopData/useTabletopHeroes'
+import { type TabletopHeroesList } from '~/tt/-hooks/tabletopData/useTabletopHeroList'
 import { mutationError } from '~/utils/mutationError'
-import { useGMTabletopHeroes } from '../../../../-hooks/tabletopData/useTabletopHeroes'
-import { type TabletopHeroesList } from '../../../../-hooks/tabletopData/useTabletopHeroList'
-import { useQuerySync } from '../../../../-hooks/useQuerySync'
 import CharacterCard from './CharacterCard'
 
 export default function Heroes() {
-	const { queryClient, campaignId } = useQuerySync()
+	const { queryClient, campaignId } = useTabletopContext()
 
-	const { data: heroesData } = useGMTabletopHeroes()
+	const { data: heroesData } = useTabletopHeroes()
 
 	const removeHero = useMutation({
 		mutationFn: removeHeroAction,

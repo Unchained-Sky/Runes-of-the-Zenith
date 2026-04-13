@@ -1,9 +1,9 @@
 import { queryOptions, useQueries } from '@tanstack/react-query'
-import { getRouteApi } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
+import { useTabletopContext } from '~/routes/tabletop/-context/TabletopContext'
 import { TABLETOP_QUERY_STALE_TIME } from '~/routes/tabletop/-hooks/tabletopData/tabletopDataOptions'
-import { usePlayerTabletopEnemyList } from '~/routes/tabletop/-hooks/tabletopData/useTabletopEnemyList'
+import { useTabletopEnemyList } from '~/routes/tabletop/-hooks/tabletopData/useTabletopEnemyList'
 import { requireAccount } from '~/supabase/requireAccount'
 import { typedObject } from '~/types/typedObject'
 
@@ -71,8 +71,8 @@ type TabletopEnemiesData = {
 }
 
 export function usePlayerTabletopEnemies() {
-	const { campaignId } = getRouteApi('/tabletop/$campaignId/player/').useLoaderData()
-	const { data: tabletopCharacterIds } = usePlayerTabletopEnemyList()
+	const { campaignId } = useTabletopContext()
+	const { data: tabletopCharacterIds } = useTabletopEnemyList()
 	const queries = useQueries({
 		queries: tabletopCharacterIds.map(tabletopCharacterId => tabletopEnemyQueryOptions(campaignId, tabletopCharacterId))
 	})

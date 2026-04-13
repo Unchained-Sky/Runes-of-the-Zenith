@@ -1,7 +1,7 @@
 import { Avatar } from '@mantine/core'
 import { type Enums } from '~/supabase/databaseTypes'
-import { usePlayerTabletopEnemies } from '../-hooks/tabletopData/useTabletopEnemies'
-import { usePlayerTabletopHeroes } from '../../-hooks/tabletopData/useTabletopHeroes'
+import { usePlayerTabletopEnemies } from '~/tt-player/-hooks/tabletopData/useTabletopEnemies'
+import { useTabletopHeroes } from '~/tt/-hooks/tabletopData/useTabletopHeroes'
 
 type CharacterIconProps = {
 	tabletopCharacterId: number
@@ -22,7 +22,7 @@ type CharacterIconHeroProps = {
 }
 
 function CharacterIconHero({ tabletopCharacterId }: CharacterIconHeroProps) {
-	const { data: heroesData } = usePlayerTabletopHeroes()
+	const { data: heroesData } = useTabletopHeroes()
 	const heroData = heroesData[tabletopCharacterId]
 	if (!heroData) {
 		console.error(`Hero not found: ${tabletopCharacterId}`)
@@ -47,6 +47,7 @@ function CharacterIconEnemy({ tabletopCharacterId }: CharacterIconEnemyProps) {
 	const { data: enemiesData } = usePlayerTabletopEnemies()
 	const enemyData = enemiesData[tabletopCharacterId]
 	if (!enemyData) {
+		// TODO suspend the loading of enemies and put up a loader
 		console.error(`Enemy not found: ${tabletopCharacterId}`)
 		return null
 	}

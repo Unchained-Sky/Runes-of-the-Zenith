@@ -1,17 +1,18 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { tokenQueryOptions } from '~/hooks/data/useTokenQuery'
+import { TabletopContext } from '~/tt/-context/TabletopContext'
+import { tabletopEnemyListQueryOptions } from '~/tt/-hooks/tabletopData/useTabletopEnemyList'
+import { tabletopHeroListQueryOptions } from '~/tt/-hooks/tabletopData/useTabletopHeroList'
+import { tabletopHeroRoundsQueryOptions } from '~/tt/-hooks/tabletopData/useTabletopHeroRounds'
+import { tabletopMapTilesQueryOptions } from '~/tt/-hooks/tabletopData/useTabletopMapTiles'
+import { tabletopNameQueryOptions } from '~/tt/-hooks/tabletopData/useTabletopName'
+import { tabletopRoundQueryOptions } from '~/tt/-hooks/tabletopData/useTabletopRound'
+import { tabletopTilesQueryOptions } from '~/tt/-hooks/tabletopData/useTabletopTiles'
+import Windows from '~/tt/-windows'
 import { safeParseInt } from '~/utils/safeParseInt'
-import { tabletopEnemyListQueryOptions } from '../-hooks/tabletopData/useTabletopEnemyList'
-import { tabletopHeroListQueryOptions } from '../-hooks/tabletopData/useTabletopHeroList'
-import { tabletopHeroRoundsQueryOptions } from '../-hooks/tabletopData/useTabletopHeroRounds'
-import { tabletopMapTilesQueryOptions } from '../-hooks/tabletopData/useTabletopMapTiles'
-import { tabletopNameQueryOptions } from '../-hooks/tabletopData/useTabletopName'
-import { tabletopRoundQueryOptions } from '../-hooks/tabletopData/useTabletopRound'
-import { tabletopTilesQueryOptions } from '../-hooks/tabletopData/useTabletopTiles'
 import CombatGridTabletopGM from './-components/CombatGridTabletopGM'
 import DragDrop from './-components/DragDrop'
 import SettingsPanel from './-components/SettingsPanel'
-import Windows from './-components/Windows'
 import { tabletopCurrentEncounterQueryOptions } from './-hooks/tabletopData/useTabletopCurrentEncounter'
 import { tabletopEncounterListQueryOptions } from './-hooks/tabletopData/useTabletopEncounterList'
 import useTabletopGMSubscription from './-hooks/useTabletopSubscription'
@@ -66,13 +67,24 @@ export const Route = createFileRoute('/tabletop/$campaignId/gm/')({
 })
 
 function RouteComponent() {
+	const { campaignId } = Route.useLoaderData()
+	const { queryClient } = Route.useRouteContext()
+
 	useTabletopGMSubscription()
 
 	return (
-		<DragDrop>
-			<CombatGridTabletopGM />
-			<SettingsPanel />
-			<Windows />
-		</DragDrop>
+		<TabletopContext
+			value={{
+				campaignId,
+				queryClient,
+				route: '/tabletop/$campaignId/gm/'
+			}}
+		>
+			<DragDrop>
+				<CombatGridTabletopGM />
+				<SettingsPanel />
+				<Windows />
+			</DragDrop>
+		</TabletopContext>
 	)
 }

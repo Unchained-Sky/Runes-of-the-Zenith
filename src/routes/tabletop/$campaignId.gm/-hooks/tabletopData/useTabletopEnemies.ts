@@ -1,11 +1,11 @@
 import { queryOptions, useQueries } from '@tanstack/react-query'
-import { getRouteApi } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
+import { useTabletopContext } from '~/routes/tabletop/-context/TabletopContext'
 import { requireAccount } from '~/supabase/requireAccount'
+import { TABLETOP_QUERY_STALE_TIME } from '~/tt/-hooks/tabletopData/tabletopDataOptions'
+import { useTabletopEnemyList } from '~/tt/-hooks/tabletopData/useTabletopEnemyList'
 import { typedObject } from '~/types/typedObject'
-import { TABLETOP_QUERY_STALE_TIME } from '../../../-hooks/tabletopData/tabletopDataOptions'
-import { useGMTabletopEnemyList } from '../../../-hooks/tabletopData/useTabletopEnemyList'
 
 const enemyLoaderSchema = type({
 	tabletopCharacterId: 'number'
@@ -101,8 +101,8 @@ type TabletopEnemiesData = {
 }
 
 export function useGMTabletopEnemies() {
-	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useLoaderData()
-	const { data: tabletopCharacterIds } = useGMTabletopEnemyList()
+	const { campaignId } = useTabletopContext()
+	const { data: tabletopCharacterIds } = useTabletopEnemyList()
 	const queries = useQueries({
 		queries: tabletopCharacterIds.map(tabletopCharacterId => tabletopEnemyQueryOptions(campaignId, tabletopCharacterId))
 	})

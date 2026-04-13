@@ -1,6 +1,6 @@
 import { Avatar, Group, Stack, Title } from '@mantine/core'
 import baseRunes from '~/data/baseRunes'
-import CharacterTokens from '../CharacterTokens'
+import CharacterTokens from '~/tt/-windows/CharacterWindow/CharacterTokens'
 import { Action, Runes, Slot } from './HeroActions'
 import { useHeroWindowContext } from './HeroWindowContext'
 

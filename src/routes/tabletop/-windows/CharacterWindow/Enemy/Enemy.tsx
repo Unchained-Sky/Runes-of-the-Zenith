@@ -1,5 +1,5 @@
 import { Stack, Title } from '@mantine/core'
-import CharacterTokens from '../CharacterTokens'
+import CharacterTokens from '~/tt/-windows/CharacterWindow/CharacterTokens'
 import { useEnemyWindowContext } from './EnemyWindowContext'
 
 export default function Enemy() {

@@ -1,8 +1,8 @@
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
-import { getRouteApi } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { requireAccount } from '~/supabase/requireAccount'
+import { useTabletopContext } from '~/tt/-context/TabletopContext'
 import { typedObject } from '~/types/typedObject'
 import { TABLETOP_QUERY_STALE_TIME } from './tabletopDataOptions'
 
@@ -40,7 +40,7 @@ const tilesLoader = createServerFn({ method: 'GET' })
 		]))
 	})
 
-export type TabletopTiles = ReturnType<typeof useGMTabletopTiles>['data']
+export type TabletopTiles = ReturnType<typeof useTabletopTiles>['data']
 export type TabletopTile = NonNullable<TabletopTiles[keyof TabletopTiles]>
 
 export const tabletopTilesQueryOptions = (campaignId: number) => queryOptions({
@@ -49,12 +49,7 @@ export const tabletopTilesQueryOptions = (campaignId: number) => queryOptions({
 	staleTime: TABLETOP_QUERY_STALE_TIME
 })
 
-export function useGMTabletopTiles() {
-	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useLoaderData()
-	return useSuspenseQuery(tabletopTilesQueryOptions(campaignId))
-}
-
-export function usePlayerTabletopTiles() {
-	const { campaignId } = getRouteApi('/tabletop/$campaignId/player/').useLoaderData()
+export function useTabletopTiles() {
+	const { campaignId } = useTabletopContext()
 	return useSuspenseQuery(tabletopTilesQueryOptions(campaignId))
 }

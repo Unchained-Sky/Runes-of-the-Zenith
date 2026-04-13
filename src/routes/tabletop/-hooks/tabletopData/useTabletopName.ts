@@ -1,8 +1,8 @@
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
-import { getRouteApi } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { requireAccount } from '~/supabase/requireAccount'
+import { useTabletopContext } from '~/tt/-context/TabletopContext'
 
 const nameLoaderSchema = type({
 	campaignId: 'number'
@@ -30,12 +30,7 @@ export const tabletopNameQueryOptions = (campaignId: number) => queryOptions({
 	staleTime: Infinity
 })
 
-export function useGMTabletopName() {
-	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useLoaderData()
-	return useSuspenseQuery(tabletopNameQueryOptions(campaignId))
-}
-
-export function usePlayerTabletopName() {
-	const { campaignId } = getRouteApi('/tabletop/$campaignId/player/').useLoaderData()
+export function useTabletopName() {
+	const { campaignId } = useTabletopContext()
 	return useSuspenseQuery(tabletopNameQueryOptions(campaignId))
 }

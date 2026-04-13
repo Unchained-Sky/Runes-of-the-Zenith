@@ -1,8 +1,8 @@
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
-import { getRouteApi } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { requireAccount } from '~/supabase/requireAccount'
+import { useTabletopContext } from '~/tt/-context/TabletopContext'
 import { TABLETOP_QUERY_STALE_TIME } from './tabletopDataOptions'
 
 const roundLoaderSchema = type({
@@ -24,7 +24,7 @@ const roundLoader = createServerFn({ method: 'GET' })
 			.maybeSingle()
 		if (error) throw new Error(error.message, { cause: error })
 
-		return data ?? 0
+		return data ?? { round: 0 }
 	})
 
 export type TabletopRoundData = Awaited<ReturnType<typeof roundLoader>>
@@ -35,12 +35,7 @@ export const tabletopRoundQueryOptions = (campaignId: number) => queryOptions({
 	staleTime: TABLETOP_QUERY_STALE_TIME
 })
 
-export function useGMTabletopRound() {
-	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useLoaderData()
-	return useSuspenseQuery(tabletopRoundQueryOptions(campaignId))
-}
-
-export function usePlayerTabletopRound() {
-	const { campaignId } = getRouteApi('/tabletop/$campaignId/player/').useLoaderData()
+export function useTabletopRound() {
+	const { campaignId } = useTabletopContext()
 	return useSuspenseQuery(tabletopRoundQueryOptions(campaignId))
 }

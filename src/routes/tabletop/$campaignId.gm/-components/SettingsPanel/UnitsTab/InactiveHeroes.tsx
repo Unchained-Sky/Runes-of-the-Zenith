@@ -1,8 +1,8 @@
 import { Avatar, Card, Group, Stack, Text, Title } from '@mantine/core'
-import { useGMTabletopHeroList } from '../../../../-hooks/tabletopData/useTabletopHeroList'
+import { useTabletopHeroList } from '~/tt/-hooks/tabletopData/useTabletopHeroList'
 
 export default function InactiveHeroes() {
-	const { data: heroList } = useGMTabletopHeroList()
+	const { data: heroList } = useTabletopHeroList()
 	const inactiveHeroes = heroList.filter(hero => !hero.tabletopCharacterId)
 
 	return inactiveHeroes.length > 0 && (

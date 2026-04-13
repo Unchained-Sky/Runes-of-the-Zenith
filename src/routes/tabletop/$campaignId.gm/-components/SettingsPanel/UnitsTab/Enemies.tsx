@@ -1,5 +1,5 @@
 import { SimpleGrid, Title } from '@mantine/core'
-import { useGMTabletopEnemies } from '../../../-hooks/tabletopData/useTabletopEnemies'
+import { useGMTabletopEnemies } from '~/tt-gm/-hooks/tabletopData/useTabletopEnemies'
 import CharacterCard from './CharacterCard'
 
 export default function Enemies() {

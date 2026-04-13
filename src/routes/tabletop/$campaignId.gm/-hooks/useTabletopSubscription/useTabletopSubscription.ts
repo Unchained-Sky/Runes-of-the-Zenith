@@ -10,7 +10,7 @@ import useTabletopTilesSubscription from './useTabletopTilesSubscription'
 export const LOG_SUBSCRIPTION_PAYLOADS = process.env.NODE_ENV === 'development'
 
 export default function useTabletopGMSubscription() {
-	const supabase = useSupabase()
+	const { supabase } = useSupabase()
 
 	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useLoaderData()
 

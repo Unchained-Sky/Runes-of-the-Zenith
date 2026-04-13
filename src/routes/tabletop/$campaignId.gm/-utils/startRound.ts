@@ -4,14 +4,14 @@ import { type } from 'arktype'
 import { type TablesInsert } from '~/supabase/databaseTypes'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
+import { useTabletopContext } from '~/tt/-context/TabletopContext'
+import { type TabletopHeroData } from '~/tt/-hooks/tabletopData/useTabletopHeroes'
+import { type HeroTurn } from '~/tt/-hooks/tabletopData/useTabletopHeroRounds'
+import { type TabletopRoundData } from '~/tt/-hooks/tabletopData/useTabletopRound'
 import { mutationError } from '~/utils/mutationError'
-import { type TabletopHeroData } from '../../-hooks/tabletopData/useTabletopHeroes'
-import { type HeroTurn } from '../../-hooks/tabletopData/useTabletopHeroRounds'
-import { type TabletopRoundData } from '../../-hooks/tabletopData/useTabletopRound'
-import { useQuerySync } from '../../-hooks/useQuerySync'
 
 export function useStartRound() {
-	const { queryClient, campaignId } = useQuerySync()
+	const { queryClient, campaignId } = useTabletopContext()
 
 	return useMutation({
 		mutationFn: () => startRoundAction({ data: { campaignId } }),

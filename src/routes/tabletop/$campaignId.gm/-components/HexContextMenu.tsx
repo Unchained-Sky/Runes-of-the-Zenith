@@ -7,12 +7,12 @@ import ContextMenu from '~/components/ContextMenu'
 import { type TablesInsert } from '~/supabase/databaseTypes'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
+import { useTabletopContext } from '~/tt/-context/TabletopContext'
+import { type TabletopHeroData, useTabletopHeroes } from '~/tt/-hooks/tabletopData/useTabletopHeroes'
+import { useTabletopHeroList } from '~/tt/-hooks/tabletopData/useTabletopHeroList'
+import { useTabletopTiles } from '~/tt/-hooks/tabletopData/useTabletopTiles'
 import { type CombatTileCord } from '~/types/gameTypes/combatMap'
 import { mutationError } from '~/utils/mutationError'
-import { type TabletopHeroData, useGMTabletopHeroes } from '../../-hooks/tabletopData/useTabletopHeroes'
-import { useGMTabletopHeroList } from '../../-hooks/tabletopData/useTabletopHeroList'
-import { useGMTabletopTiles } from '../../-hooks/tabletopData/useTabletopTiles'
-import { useQuerySync } from '../../-hooks/useQuerySync'
 
 type HexContextMenuProps = {
 	children: ReactNode
@@ -39,12 +39,12 @@ type HeroesProps = {
 }
 
 function Heroes({ cord }: HeroesProps) {
-	const { queryClient, campaignId } = useQuerySync()
+	const { queryClient, campaignId } = useTabletopContext()
 
-	const { data: heroList } = useGMTabletopHeroList()
+	const { data: heroList } = useTabletopHeroList()
 	const inactiveHeroes = heroList.filter(hero => !hero.tabletopCharacterId)
 
-	const { data: heroesData } = useGMTabletopHeroes()
+	const { data: heroesData } = useTabletopHeroes()
 	const unplacedHeroes = Object.values(heroesData).flatMap(hero => hero.pos ? [] : { heroId: hero.heroId, heroName: hero.heroName })
 
 	const addableHeroes = [...inactiveHeroes, ...unplacedHeroes]
@@ -70,7 +70,7 @@ function Heroes({ cord }: HeroesProps) {
 		}
 	})
 
-	const { data: tilesData } = useGMTabletopTiles()
+	const { data: tilesData } = useTabletopTiles()
 	const tile = tilesData[`${cord[0]},${cord[1]},${cord[2]}`]
 
 	return (

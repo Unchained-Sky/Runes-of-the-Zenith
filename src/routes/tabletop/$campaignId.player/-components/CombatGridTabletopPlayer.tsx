@@ -1,14 +1,14 @@
 import { Box, Text } from '@mantine/core'
 import Hex from '~/components/HoneycombGrid/Hex'
 import useHoneycombGridSize from '~/components/HoneycombGrid/useHoneycombGridSize'
+import { useTabletopMapTiles } from '~/tt/-hooks/tabletopData/useTabletopMapTiles'
+import { type TabletopTile, useTabletopTiles } from '~/tt/-hooks/tabletopData/useTabletopTiles'
 import { type CombatTile } from '~/types/gameTypes/combatMap'
-import { usePlayerTabletopMapTiles } from '../../-hooks/tabletopData/useTabletopMapTiles'
-import { type TabletopTile, usePlayerTabletopTiles } from '../../-hooks/tabletopData/useTabletopTiles'
 import CharacterIcon from './CharacterIcon'
 
 export default function CombatGridTabletopPlayer() {
-	const { data: mapTiles } = usePlayerTabletopMapTiles()
-	const { data: tilesData } = usePlayerTabletopTiles()
+	const { data: mapTiles } = useTabletopMapTiles()
+	const { data: tilesData } = useTabletopTiles()
 	const { offset, minHeight, minWidth } = useHoneycombGridSize(mapTiles)
 
 	// TODO add to GM view

@@ -11,9 +11,9 @@ import { type TabletopHeroData } from '~/routes/tabletop/-hooks/tabletopData/use
 import { type Enums, type TablesInsert } from '~/supabase/databaseTypes'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
+import { useTabletopContext } from '~/tt/-context/TabletopContext'
 import { int2 } from '~/utils/int'
 import { mutationError } from '~/utils/mutationError'
-import { useQuerySync } from '../../../../-hooks/useQuerySync'
 
 type TokenProps = {
 	tabletopCharacterId: number
@@ -106,7 +106,7 @@ type TokenEditModalProps = {
 }
 
 function TokenEditModal({ opened, tabletopCharacterId, close, tokens, characterType }: TokenEditModalProps) {
-	const { queryClient, campaignId } = useQuerySync()
+	const { queryClient, campaignId } = useTabletopContext()
 
 	const form = useForm({
 		mode: 'uncontrolled',

@@ -1,13 +1,13 @@
 import { queryOptions, useSuspenseQueries, type UseSuspenseQueryResult } from '@tanstack/react-query'
-import { getRouteApi } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { type RuneData, runeExtraDataSchema } from '~/scripts/data/runes/runeData'
 import { type Enums } from '~/supabase/databaseTypes'
 import { requireAccount } from '~/supabase/requireAccount'
+import { useTabletopContext } from '~/tt/-context/TabletopContext'
 import { typedObject } from '~/types/typedObject'
 import { TABLETOP_QUERY_STALE_TIME } from './tabletopDataOptions'
-import { useGMTabletopHeroList, usePlayerTabletopHeroList } from './useTabletopHeroList'
+import { useTabletopHeroList } from './useTabletopHeroList'
 
 const heroLoaderSchema = type({
 	tabletopCharacterId: 'number'
@@ -194,25 +194,9 @@ function combineHeroData(queries: UseSuspenseQueryResult<InternalTabletopHeroDat
 	return combine
 }
 
-export function useGMTabletopHeroes() {
-	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useLoaderData()
-	const { data: heroList } = useGMTabletopHeroList()
-
-	const queries = useSuspenseQueries({
-		queries: heroList.flatMap(hero => hero.tabletopCharacterId
-			? tabletopHeroQueryOptions(campaignId, hero.tabletopCharacterId)
-			: [])
-	})
-
-	return {
-		data: combineHeroData(queries),
-		queries
-	}
-}
-
-export function usePlayerTabletopHeroes() {
-	const { campaignId } = getRouteApi('/tabletop/$campaignId/player/').useLoaderData()
-	const { data: heroList } = usePlayerTabletopHeroList()
+export function useTabletopHeroes() {
+	const { campaignId } = useTabletopContext()
+	const { data: heroList } = useTabletopHeroList()
 
 	const queries = useSuspenseQueries({
 		queries: heroList.flatMap(hero => hero.tabletopCharacterId

@@ -5,14 +5,14 @@ import { IconPencil, IconTrash, IconX } from '@tabler/icons-react'
 import { useMutation } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
+import { useTabletopContext } from '~/routes/tabletop/-context/TabletopContext'
 import { type Enums } from '~/supabase/databaseTypes'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
+import { type TabletopEnemyData } from '~/tt-gm/-hooks/tabletopData/useTabletopEnemies'
+import { type TabletopHeroData } from '~/tt/-hooks/tabletopData/useTabletopHeroes'
 import { type CombatTileCord } from '~/types/gameTypes/combatMap'
 import { mutationError } from '~/utils/mutationError'
-import { type TabletopEnemyData } from '../../../-hooks/tabletopData/useTabletopEnemies'
-import { type TabletopHeroData } from '../../../../-hooks/tabletopData/useTabletopHeroes'
-import { useQuerySync } from '../../../../-hooks/useQuerySync'
 
 type CharacterCardProps = {
 	character: {
@@ -109,7 +109,7 @@ type EditCharacterModalProps = {
 }
 
 function EditCharacterModal({ character, openedModal, closeModal }: EditCharacterModalProps) {
-	const { queryClient, campaignId } = useQuerySync()
+	const { queryClient, campaignId } = useTabletopContext()
 
 	const form = useForm({
 		mode: 'uncontrolled',

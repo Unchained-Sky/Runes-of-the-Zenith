@@ -3,15 +3,15 @@ import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
+import { type TabletopEnemyData } from '~/tt-gm/-hooks/tabletopData/useTabletopEnemies'
+import { useTabletopContext } from '~/tt/-context/TabletopContext'
+import { type TabletopEnemyList } from '~/tt/-hooks/tabletopData/useTabletopEnemyList'
 import { mutationError } from '~/utils/mutationError'
-import { type TabletopEnemyData } from '../-hooks/tabletopData/useTabletopEnemies'
-import { type TabletopEnemyList } from '../../-hooks/tabletopData/useTabletopEnemyList'
-import { useQuerySync } from '../../-hooks/useQuerySync'
 
 const DEFAULT_INCREASE_AMOUNT = 1
 
 export function useIncreaseAggression() {
-	const { queryClient, campaignId } = useQuerySync()
+	const { queryClient, campaignId } = useTabletopContext()
 
 	return useMutation({
 		mutationFn: increaseAggressionAction,

@@ -3,21 +3,21 @@ import { useDisclosure } from '@mantine/hooks'
 import { useMutation } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
+import { useTabletopContext } from '~/routes/tabletop/-context/TabletopContext'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
+import { resetAggressionAction, resetAggressionQuerySync } from '~/tt-gm/-utils/resetAggression'
+import { startRoundAction, startRoundQuerySync } from '~/tt-gm/-utils/startRound'
+import { useTabletopEnemyList } from '~/tt/-hooks/tabletopData/useTabletopEnemyList'
+import { type TabletopRoundData } from '~/tt/-hooks/tabletopData/useTabletopRound'
 import { mutationError } from '~/utils/mutationError'
-import { resetAggressionAction, resetAggressionQuerySync } from '../../../-utils/resetAggression'
-import { startRoundAction, startRoundQuerySync } from '../../../-utils/startRound'
-import { useGMTabletopEnemyList } from '../../../../-hooks/tabletopData/useTabletopEnemyList'
-import { type TabletopRoundData } from '../../../../-hooks/tabletopData/useTabletopRound'
-import { useQuerySync } from '../../../../-hooks/useQuerySync'
 
 export default function ResetRounds() {
-	const { queryClient, campaignId } = useQuerySync()
+	const { queryClient, campaignId } = useTabletopContext()
 
 	const [opened, { open, close }] = useDisclosure(false)
 
-	const { data: enemyList } = useGMTabletopEnemyList()
+	const { data: enemyList } = useTabletopEnemyList()
 
 	const resetRounds = useMutation({
 		mutationFn: resetRoundsAction,

@@ -6,8 +6,8 @@ import { type ReactNode } from 'react'
 import { TEST_DATA } from '~/scripts/chart/damageData'
 import { type RuneData, type RuneExtraData } from '~/scripts/data/runes/runeData'
 import { type Enums } from '~/supabase/databaseTypes'
+import { useConfirmTargetStore } from '~/tt/-windows/ConfirmTargetWindow/useConfirmTargetStore'
 import { titleCase } from '~/utils/stringCase'
-import { useConfirmTargetStore } from '../../ConfirmTargetWindow/useConfirmTargetStore'
 import { useHeroWindowContext } from './HeroWindowContext'
 
 type SlotProps = {

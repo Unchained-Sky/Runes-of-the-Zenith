@@ -2,17 +2,17 @@ import { useDroppable } from '@dnd-kit/react'
 import { Box } from '@mantine/core'
 import Hex from '~/components/HoneycombGrid/Hex'
 import useHoneycombGridSize from '~/components/HoneycombGrid/useHoneycombGridSize'
+import { useTabletopMapTiles } from '~/tt/-hooks/tabletopData/useTabletopMapTiles'
+import { type TabletopTile, useTabletopTiles } from '~/tt/-hooks/tabletopData/useTabletopTiles'
+import { useConfirmTargetStore } from '~/tt/-windows/ConfirmTargetWindow/useConfirmTargetStore'
 import { type CombatTile } from '~/types/gameTypes/combatMap'
-import { useGMTabletopMapTiles } from '../../-hooks/tabletopData/useTabletopMapTiles'
-import { type TabletopTile, useGMTabletopTiles } from '../../-hooks/tabletopData/useTabletopTiles'
 import CharacterIcon from './CharacterIcon'
 import { type TileDroppable } from './DragDrop'
 import HexContextMenu from './HexContextMenu'
-import { useConfirmTargetStore } from './Windows/ConfirmTargetWindow/useConfirmTargetStore'
 
 export default function CombatGridTabletopGM() {
-	const { data: mapTiles } = useGMTabletopMapTiles()
-	const { data: tilesData } = useGMTabletopTiles()
+	const { data: mapTiles } = useTabletopMapTiles()
+	const { data: tilesData } = useTabletopTiles()
 	const { offset, minHeight, minWidth } = useHoneycombGridSize(mapTiles)
 
 	return (

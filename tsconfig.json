@@ -37,6 +37,15 @@
       ],
       "~/scripts/*": [
         "./scripts/*"
+      ],
+      "~/tt/*": [
+        "./src/routes/tabletop/*"
+      ],
+      "~/tt-gm/*": [
+        "./src/routes/tabletop/$campaignId.gm/*"
+      ],
+      "~/tt-player/*": [
+        "./src/routes/tabletop/$campaignId.player/*"
       ]
     }
   }

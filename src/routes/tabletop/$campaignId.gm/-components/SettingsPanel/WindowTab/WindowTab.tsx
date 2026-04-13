@@ -1,8 +1,8 @@
 import { Button, Group, Stack, Title } from '@mantine/core'
+import { useTabletopEnemyList } from '~/tt/-hooks/tabletopData/useTabletopEnemyList'
+import { useTabletopHeroList } from '~/tt/-hooks/tabletopData/useTabletopHeroList'
+import { useWindowsStore } from '~/tt/-windows/useWindowsStore'
 import { typedObject } from '~/types/typedObject'
-import { useGMTabletopEnemyList } from '../../../../-hooks/tabletopData/useTabletopEnemyList'
-import { useGMTabletopHeroList } from '../../../../-hooks/tabletopData/useTabletopHeroList'
-import { useWindowsStore } from '../../Windows/useWindowsStore'
 
 export default function WindowTab() {
 	const windows = useWindowsStore(state => state.opened)
@@ -33,8 +33,8 @@ export default function WindowTab() {
 }
 
 function AddCharacterWindows() {
-	const { data: heroList } = useGMTabletopHeroList()
-	const { data: enemyList } = useGMTabletopEnemyList()
+	const { data: heroList } = useTabletopHeroList()
+	const { data: enemyList } = useTabletopEnemyList()
 
 	const addCharacter = useWindowsStore(state => state.addCharacter)
 

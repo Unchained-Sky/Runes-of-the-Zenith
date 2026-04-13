@@ -1,8 +1,8 @@
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
-import { getRouteApi } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { requireAccount } from '~/supabase/requireAccount'
+import { useTabletopContext } from '~/tt/-context/TabletopContext'
 import { type CombatTile } from '~/types/gameTypes/combatMap'
 import { TABLETOP_QUERY_STALE_TIME } from './tabletopDataOptions'
 
@@ -49,12 +49,7 @@ export const tabletopMapTilesQueryOptions = (campaignId: number) => queryOptions
 	staleTime: TABLETOP_QUERY_STALE_TIME
 })
 
-export function useGMTabletopMapTiles() {
-	const { campaignId } = getRouteApi('/tabletop/$campaignId/gm/').useLoaderData()
-	return useSuspenseQuery(tabletopMapTilesQueryOptions(campaignId))
-}
-
-export function usePlayerTabletopMapTiles() {
-	const { campaignId } = getRouteApi('/tabletop/$campaignId/player/').useLoaderData()
+export function useTabletopMapTiles() {
+	const { campaignId } = useTabletopContext()
 	return useSuspenseQuery(tabletopMapTilesQueryOptions(campaignId))
 }

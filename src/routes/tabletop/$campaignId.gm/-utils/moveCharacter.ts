@@ -3,15 +3,15 @@ import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
+import { type TabletopEnemyData } from '~/tt-gm/-hooks/tabletopData/useTabletopEnemies'
+import { useTabletopContext } from '~/tt/-context/TabletopContext'
+import { type TabletopHeroData } from '~/tt/-hooks/tabletopData/useTabletopHeroes'
+import { type TabletopTile, type TabletopTiles } from '~/tt/-hooks/tabletopData/useTabletopTiles'
 import { typedObject } from '~/types/typedObject'
 import { mutationError } from '~/utils/mutationError'
-import { type TabletopEnemyData } from '../-hooks/tabletopData/useTabletopEnemies'
-import { type TabletopHeroData } from '../../-hooks/tabletopData/useTabletopHeroes'
-import { type TabletopTile, type TabletopTiles } from '../../-hooks/tabletopData/useTabletopTiles'
-import { useQuerySync } from '../../-hooks/useQuerySync'
 
 export function useMoveCharacter() {
-	const { queryClient, campaignId } = useQuerySync()
+	const { queryClient, campaignId } = useTabletopContext()
 
 	return useMutation({
 		mutationFn: moveCharacterAction,

@@ -1,8 +1,8 @@
 import { DragDropProvider } from '@dnd-kit/react'
 import { type ReactNode } from 'react'
 import { type Tables } from '~/supabase/databaseTypes'
+import { useMoveCharacter } from '~/tt-gm/-utils/moveCharacter'
 import { type CombatTileCord } from '~/types/gameTypes/combatMap'
-import { useMoveCharacter } from '../-utils/moveCharacter'
 
 type DragDropProps = {
 	children: ReactNode

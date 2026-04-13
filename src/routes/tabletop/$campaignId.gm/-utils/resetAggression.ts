@@ -3,12 +3,12 @@ import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
+import { type TabletopEnemyData } from '~/tt-gm/-hooks/tabletopData/useTabletopEnemies'
+import { useTabletopContext } from '~/tt/-context/TabletopContext'
 import { mutationError } from '~/utils/mutationError'
-import { type TabletopEnemyData } from '../-hooks/tabletopData/useTabletopEnemies'
-import { useQuerySync } from '../../-hooks/useQuerySync'
 
 export function useResetAggression() {
-	const { queryClient, campaignId } = useQuerySync()
+	const { queryClient, campaignId } = useTabletopContext()
 
 	return useMutation({
 		mutationFn: resetAggressionAction,
