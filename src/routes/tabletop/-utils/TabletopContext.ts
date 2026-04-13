@@ -4,6 +4,7 @@ import { createContext, useContext } from 'react'
 type TabletopContext = {
 	campaignId: number
 	queryClient: QueryClient
+	role: 'gm' | 'player'
 	route: '/tabletop/$campaignId/gm/' | '/tabletop/$campaignId/player/'
 }
 

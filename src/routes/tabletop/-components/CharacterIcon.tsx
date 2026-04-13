@@ -1,11 +1,12 @@
 import { useDraggable } from '@dnd-kit/react'
 import { Avatar } from '@mantine/core'
 import useHoldButton from '~/hooks/useHoldButton'
+import { type CharacterDraggable } from '~/routes/tabletop/-components/DragDrop'
 import { type Enums } from '~/supabase/databaseTypes'
-import { useGMTabletopEnemies } from '~/tt-gm/-hooks/tabletopData/useTabletopEnemies'
+import { useTabletopEnemies } from '~/tt/-hooks/tabletopData/useTabletopEnemies'
 import { useTabletopHeroes } from '~/tt/-hooks/tabletopData/useTabletopHeroes'
 import { useConfirmTargetStore } from '~/tt/-windows/ConfirmTargetWindow/useConfirmTargetStore'
-import { type CharacterDraggable } from './DragDrop'
+import { useCharacterPermission } from '../-hooks/useCharacterPermission'
 
 type CharacterIconProps = {
 	tabletopCharacterId: number
@@ -48,7 +49,7 @@ type CharacterIconEnemyProps = {
 }
 
 function CharacterIconEnemy({ tabletopCharacterId }: CharacterIconEnemyProps) {
-	const { data: enemiesData } = useGMTabletopEnemies()
+	const { data: enemiesData } = useTabletopEnemies()
 	const enemyData = enemiesData[tabletopCharacterId]
 	if (!enemyData) {
 		console.error(`Enemy not found: ${tabletopCharacterId}`)
@@ -78,10 +79,12 @@ function CharacterIconInner({ tabletopCharacterId, characterType, characterName,
 	const selectedCharacters = useConfirmTargetStore(state => state.selected?.characters) ?? []
 	const isTargetted = selectedCharacters.includes(tabletopCharacterId)
 
+	const hasPermission = useCharacterPermission(tabletopCharacterId)
+
 	const { ref, isDragging } = useDraggable({
 		id: `character-${tabletopCharacterId}`,
 		type: 'character',
-		disabled: isTargetting,
+		disabled: isTargetting || !hasPermission,
 		data: {
 			draggableType: 'CHARACTER',
 			tabletopCharacterId,
@@ -98,7 +101,7 @@ function CharacterIconInner({ tabletopCharacterId, characterType, characterName,
 	const getCursor = () => {
 		if (isDragging) return 'grabbing'
 		if (isTargettingCharacters) return 'pointer'
-		if (isTargetting) return 'default'
+		if (isTargetting || !hasPermission) return 'default'
 		return 'grab'
 	}
 

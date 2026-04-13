@@ -1,7 +1,7 @@
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
-import { useTabletopContext } from '~/routes/tabletop/-context/TabletopContext'
+import { useTabletopContext } from '~/routes/tabletop/-utils/TabletopContext'
 import { requireAccount } from '~/supabase/requireAccount'
 import { TABLETOP_QUERY_STALE_TIME } from '~/tt/-hooks/tabletopData/tabletopDataOptions'
 

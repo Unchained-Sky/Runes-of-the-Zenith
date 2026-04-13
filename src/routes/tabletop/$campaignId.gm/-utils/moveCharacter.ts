@@ -1,10 +1,10 @@
 import { useMutation } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
+import { useTabletopContext } from '~/routes/tabletop/-utils/TabletopContext'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
-import { type TabletopEnemyData } from '~/tt-gm/-hooks/tabletopData/useTabletopEnemies'
-import { useTabletopContext } from '~/tt/-context/TabletopContext'
+import { type TabletopGMEnemyData } from '~/tt-gm/-hooks/tabletopData/useTabletopEnemies'
 import { type TabletopHeroData } from '~/tt/-hooks/tabletopData/useTabletopHeroes'
 import { type TabletopTile, type TabletopTiles } from '~/tt/-hooks/tabletopData/useTabletopTiles'
 import { typedObject } from '~/types/typedObject'
@@ -47,10 +47,10 @@ export function useMoveCharacter() {
 				}
 				case 'ENEMY': {
 					void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'enemy', data.tabletopCharacterId] })
-					queryClient.setQueriesData({ queryKey: [campaignId, 'tabletop', 'enemy', data.tabletopCharacterId] }, (oldData: TabletopEnemyData) => ({
+					queryClient.setQueriesData({ queryKey: [campaignId, 'tabletop', 'enemy', data.tabletopCharacterId] }, (oldData: TabletopGMEnemyData) => ({
 						...oldData,
 						pos: data.cord
-					} satisfies TabletopEnemyData))
+					} satisfies TabletopGMEnemyData))
 					break
 				}
 			}

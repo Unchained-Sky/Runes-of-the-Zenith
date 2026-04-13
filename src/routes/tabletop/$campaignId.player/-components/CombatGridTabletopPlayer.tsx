@@ -1,10 +1,10 @@
 import { Box, Text } from '@mantine/core'
 import Hex from '~/components/HoneycombGrid/Hex'
 import useHoneycombGridSize from '~/components/HoneycombGrid/useHoneycombGridSize'
+import CharacterIcon from '~/tt/-components/CharacterIcon'
 import { useTabletopMapTiles } from '~/tt/-hooks/tabletopData/useTabletopMapTiles'
 import { type TabletopTile, useTabletopTiles } from '~/tt/-hooks/tabletopData/useTabletopTiles'
 import { type CombatTile } from '~/types/gameTypes/combatMap'
-import CharacterIcon from './CharacterIcon'
 
 export default function CombatGridTabletopPlayer() {
 	const { data: mapTiles } = useTabletopMapTiles()

@@ -1,10 +1,10 @@
 import { type QueryClient, useMutation } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
+import { useTabletopContext } from '~/routes/tabletop/-utils/TabletopContext'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
-import { type TabletopEnemyData } from '~/tt-gm/-hooks/tabletopData/useTabletopEnemies'
-import { useTabletopContext } from '~/tt/-context/TabletopContext'
+import { type TabletopGMEnemyData } from '~/tt-gm/-hooks/tabletopData/useTabletopEnemies'
 import { mutationError } from '~/utils/mutationError'
 
 export function useResetAggression() {
@@ -33,14 +33,14 @@ type ResetAggressionQuerySyncProps = {
 
 export const resetAggressionQuerySync = ({ queryClient, campaignId, tabletopCharacterId }: ResetAggressionQuerySyncProps) => {
 	void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'enemy', tabletopCharacterId] })
-	queryClient.setQueryData([campaignId, 'tabletop', 'enemy', tabletopCharacterId], (oldData: TabletopEnemyData) => {
+	queryClient.setQueryData([campaignId, 'tabletop', 'enemy', tabletopCharacterId], (oldData: TabletopGMEnemyData) => {
 		return {
 			...oldData,
 			tabletopStats: {
 				...oldData.tabletopStats,
 				currentAggression: 0
 			}
-		} satisfies TabletopEnemyData
+		} satisfies TabletopGMEnemyData
 	})
 }
 

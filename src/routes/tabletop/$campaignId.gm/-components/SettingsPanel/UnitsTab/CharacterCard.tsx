@@ -5,11 +5,11 @@ import { IconPencil, IconTrash, IconX } from '@tabler/icons-react'
 import { useMutation } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
-import { useTabletopContext } from '~/routes/tabletop/-context/TabletopContext'
+import { useTabletopContext } from '~/routes/tabletop/-utils/TabletopContext'
 import { type Enums } from '~/supabase/databaseTypes'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
-import { type TabletopEnemyData } from '~/tt-gm/-hooks/tabletopData/useTabletopEnemies'
+import { type TabletopGMEnemyData } from '~/tt-gm/-hooks/tabletopData/useTabletopEnemies'
 import { type TabletopHeroData } from '~/tt/-hooks/tabletopData/useTabletopHeroes'
 import { type CombatTileCord } from '~/types/gameTypes/combatMap'
 import { mutationError } from '~/utils/mutationError'
@@ -151,7 +151,7 @@ function EditCharacterModal({ character, openedModal, closeModal }: EditCharacte
 					break
 				case 'ENEMY':
 					void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'enemy', data.tabletopCharacterId] })
-					queryClient.setQueriesData({ queryKey: [campaignId, 'tabletop', 'enemy', data.tabletopCharacterId] }, (oldData: TabletopEnemyData) => {
+					queryClient.setQueriesData({ queryKey: [campaignId, 'tabletop', 'enemy', data.tabletopCharacterId] }, (oldData: TabletopGMEnemyData) => {
 						return {
 							...oldData,
 							tabletopStats: {
@@ -162,7 +162,7 @@ function EditCharacterModal({ character, openedModal, closeModal }: EditCharacte
 								trauma: data.values.trauma,
 								movement: data.values.currentMovement
 							}
-						} satisfies TabletopEnemyData
+						} satisfies TabletopGMEnemyData
 					})
 					break
 			}

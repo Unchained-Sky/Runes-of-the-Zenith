@@ -1,5 +1,6 @@
 import { Box, Chip, Group, Stack, Text, Title } from '@mantine/core'
-import { useTabletopHeroList } from '~/routes/tabletop/-hooks/tabletopData/useTabletopHeroList'
+import { type TabletopHeroesList, useTabletopHeroList } from '~/routes/tabletop/-hooks/tabletopData/useTabletopHeroList'
+import { useWindowsStore } from '~/routes/tabletop/-windows/useWindowsStore'
 import { useSupabase } from '~/supabase/useSupabase'
 
 export default function Sidebar() {
@@ -22,11 +23,17 @@ export default function Sidebar() {
 	)
 }
 
+type ActiveHero = TabletopHeroesList[number] & { tabletopCharacterId: number }
+
 function CharacterChips() {
 	const { data: heroList } = useTabletopHeroList()
 	const { userId } = useSupabase()
 
-	const ownedHeroes = heroList.filter(hero => hero.userId === userId)
+	const isOwnedActiveHero = (hero: TabletopHeroesList[number]): hero is ActiveHero => hero.userId === userId && !!hero.tabletopCharacterId
+	const ownedHeroes = heroList.filter(isOwnedActiveHero)
+
+	const opened = useWindowsStore(state => state.opened)
+	const toggleWindow = useWindowsStore(state => state.toggleWindow)
 
 	return (
 		<>
@@ -34,11 +41,12 @@ function CharacterChips() {
 			<Chip.Group multiple>
 				<Group>
 					{ownedHeroes.map(hero => {
-						if (!hero.tabletopCharacterId) return
 						return (
 							<Chip
 								key={hero.tabletopCharacterId}
 								value={hero.tabletopCharacterId.toString()}
+								checked={opened[`character-HERO-${hero.tabletopCharacterId}`]}
+								onChange={() => toggleWindow(`character-HERO-${hero.tabletopCharacterId}`)}
 							>
 								{hero.heroName}
 							</Chip>
@@ -51,14 +59,21 @@ function CharacterChips() {
 }
 
 function GameChips() {
+	const opened = useWindowsStore(state => state.opened)
+	const toggleWindow = useWindowsStore(state => state.toggleWindow)
+
 	return (
 		<>
 			<Text>Game</Text>
 			<Chip.Group multiple>
 				<Group>
-					<Chip value='1'>Chip 1</Chip>
-					<Chip value='2'>Chip 2</Chip>
-					<Chip value='3'>Chip 3</Chip>
+					<Chip
+						value='rounds'
+						checked={opened.round}
+						onChange={() => toggleWindow('round')}
+					>
+						Rounds
+					</Chip>
 				</Group>
 			</Chip.Group>
 		</>

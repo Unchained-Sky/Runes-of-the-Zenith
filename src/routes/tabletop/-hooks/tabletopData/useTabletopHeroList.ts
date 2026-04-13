@@ -1,8 +1,8 @@
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
+import { useTabletopContext } from '~/routes/tabletop/-utils/TabletopContext'
 import { requireAccount } from '~/supabase/requireAccount'
-import { useTabletopContext } from '~/tt/-context/TabletopContext'
 
 const heroListLoaderSchema = type({
 	campaignId: 'number'

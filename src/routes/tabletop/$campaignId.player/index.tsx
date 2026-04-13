@@ -1,6 +1,7 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { tokenQueryOptions } from '~/hooks/data/useTokenQuery'
-import { TabletopContext } from '~/tt/-context/TabletopContext'
+import { TabletopContext } from '~/routes/tabletop/-utils/TabletopContext'
+import DragDrop from '~/tt/-components/DragDrop'
 import { tabletopEnemyListQueryOptions } from '~/tt/-hooks/tabletopData/useTabletopEnemyList'
 import { tabletopHeroListQueryOptions } from '~/tt/-hooks/tabletopData/useTabletopHeroList'
 import { tabletopHeroRoundsQueryOptions } from '~/tt/-hooks/tabletopData/useTabletopHeroRounds'
@@ -65,12 +66,15 @@ function RouteComponent() {
 			value={{
 				campaignId,
 				queryClient,
+				role: 'player',
 				route: '/tabletop/$campaignId/player/'
 			}}
 		>
-			<CombatGridTabletopPlayer />
-			<Sidebar />
-			<Windows />
+			<DragDrop>
+				<CombatGridTabletopPlayer />
+				<Sidebar />
+				<Windows />
+			</DragDrop>
 		</TabletopContext>
 	)
 }

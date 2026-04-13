@@ -1,9 +1,9 @@
 import { queryOptions, useQueries } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
-import { useTabletopContext } from '~/routes/tabletop/-context/TabletopContext'
 import { TABLETOP_QUERY_STALE_TIME } from '~/routes/tabletop/-hooks/tabletopData/tabletopDataOptions'
 import { useTabletopEnemyList } from '~/routes/tabletop/-hooks/tabletopData/useTabletopEnemyList'
+import { useTabletopContext } from '~/routes/tabletop/-utils/TabletopContext'
 import { requireAccount } from '~/supabase/requireAccount'
 import { typedObject } from '~/types/typedObject'
 
@@ -65,9 +65,9 @@ const tabletopEnemyQueryOptions = (campaignId: number, tabletopCharacterId: numb
 	staleTime: TABLETOP_QUERY_STALE_TIME
 })
 
-export type TabletopEnemyData = NonNullable<Awaited<ReturnType<typeof enemyLoader>>>
-type TabletopEnemiesData = {
-	[tabletopCharacterId: number]: TabletopEnemyData
+export type TabletopPlayerEnemyData = NonNullable<Awaited<ReturnType<typeof enemyLoader>>>
+type TabletopPlayerEnemiesData = {
+	[tabletopCharacterId: number]: TabletopPlayerEnemyData
 }
 
 export function usePlayerTabletopEnemies() {
@@ -78,9 +78,9 @@ export function usePlayerTabletopEnemies() {
 	})
 
 	const dataTuple = queries
-		.map<[number, TabletopEnemiesData[number]] | null>(enemy => enemy.data ? [enemy.data.tabletopCharacterId, enemy.data] : null)
+		.map<[number, TabletopPlayerEnemiesData[number]] | null>(enemy => enemy.data ? [enemy.data.tabletopCharacterId, enemy.data] : null)
 		.filter(enemy => enemy !== null)
-	const combine: TabletopEnemiesData = typedObject.fromEntries(dataTuple)
+	const combine: TabletopPlayerEnemiesData = typedObject.fromEntries(dataTuple)
 
 	return {
 		data: combine,

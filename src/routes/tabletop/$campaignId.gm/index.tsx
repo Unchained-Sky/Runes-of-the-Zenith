@@ -1,6 +1,7 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { tokenQueryOptions } from '~/hooks/data/useTokenQuery'
-import { TabletopContext } from '~/tt/-context/TabletopContext'
+import { TabletopContext } from '~/routes/tabletop/-utils/TabletopContext'
+import DragDrop from '~/tt/-components/DragDrop'
 import { tabletopEnemyListQueryOptions } from '~/tt/-hooks/tabletopData/useTabletopEnemyList'
 import { tabletopHeroListQueryOptions } from '~/tt/-hooks/tabletopData/useTabletopHeroList'
 import { tabletopHeroRoundsQueryOptions } from '~/tt/-hooks/tabletopData/useTabletopHeroRounds'
@@ -11,7 +12,6 @@ import { tabletopTilesQueryOptions } from '~/tt/-hooks/tabletopData/useTabletopT
 import Windows from '~/tt/-windows'
 import { safeParseInt } from '~/utils/safeParseInt'
 import CombatGridTabletopGM from './-components/CombatGridTabletopGM'
-import DragDrop from './-components/DragDrop'
 import SettingsPanel from './-components/SettingsPanel'
 import { tabletopCurrentEncounterQueryOptions } from './-hooks/tabletopData/useTabletopCurrentEncounter'
 import { tabletopEncounterListQueryOptions } from './-hooks/tabletopData/useTabletopEncounterList'
@@ -77,6 +77,7 @@ function RouteComponent() {
 			value={{
 				campaignId,
 				queryClient,
+				role: 'gm',
 				route: '/tabletop/$campaignId/gm/'
 			}}
 		>

@@ -34,7 +34,8 @@ export default function RoundsWindow({ opened, onClose }: WindowProps) {
 			defaultWidth={480}
 			defaultHeight={165}
 			minWidth={360}
-			resizable='horizontal'
+			minHeight={165}
+			resizable='both'
 			title={`Round: ${roundData.round}`}
 		>
 			<Group gap='sm' align='flex-start' wrap='nowrap'>
