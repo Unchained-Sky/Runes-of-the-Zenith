@@ -37,8 +37,8 @@ type IncreaseAggressionQuerySyncProps = {
 
 export const increaseAggressionQuerySync = ({ queryClient, amount, campaignId, tabletopCharacterIds }: IncreaseAggressionQuerySyncProps) => {
 	const syncCharacter = (tabletopCharacterId: number) => {
-		void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'enemy', tabletopCharacterId] })
-		queryClient.setQueryData([campaignId, 'tabletop', 'enemy', tabletopCharacterId], (oldData: TabletopGMEnemyData) => {
+		void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop-gm', 'enemy', tabletopCharacterId] })
+		queryClient.setQueryData([campaignId, 'tabletop-gm', 'enemy', tabletopCharacterId], (oldData: TabletopGMEnemyData) => {
 			return {
 				...oldData,
 				tabletopStats: {
@@ -82,6 +82,12 @@ export const increaseAggressionAction = createServerFn({ method: 'POST' })
 			await requireGM({ campaignId: props.campaignId })
 		}
 
+		await UNSAFE_increaseAggressionAction({ data: { amount, ...props } })
+	})
+
+export const UNSAFE_increaseAggressionAction = createServerFn({ method: 'POST' })
+	.inputValidator(increaseAggressionSchema)
+	.handler(async ({ data: { amount, ...props } }) => {
 		const serviceClient = getServiceClient()
 
 		const increaseAggressionFunc = async (tabletopCharacterIds: number[]) => {

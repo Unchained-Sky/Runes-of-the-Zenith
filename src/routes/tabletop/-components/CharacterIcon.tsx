@@ -5,8 +5,8 @@ import { type CharacterDraggable } from '~/routes/tabletop/-components/DragDrop'
 import { type Enums } from '~/supabase/databaseTypes'
 import { useTabletopEnemies } from '~/tt/-hooks/tabletopData/useTabletopEnemies'
 import { useTabletopHeroes } from '~/tt/-hooks/tabletopData/useTabletopHeroes'
+import { useCharacterPermission } from '~/tt/-utils/characterPermission'
 import { useConfirmTargetStore } from '~/tt/-windows/ConfirmTargetWindow/useConfirmTargetStore'
-import { useCharacterPermission } from '../-hooks/useCharacterPermission'
 
 type CharacterIconProps = {
 	tabletopCharacterId: number

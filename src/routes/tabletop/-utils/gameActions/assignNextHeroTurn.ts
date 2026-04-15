@@ -4,11 +4,11 @@ import { type } from 'arktype'
 import { useTabletopContext } from '~/routes/tabletop/-utils/TabletopContext'
 import { type TablesUpdate } from '~/supabase/databaseTypes'
 import { getServiceClient } from '~/supabase/getServiceClient'
-import { requireGM } from '~/supabase/requireGM'
 import { type TabletopHeroData } from '~/tt/-hooks/tabletopData/useTabletopHeroes'
 import { type HeroTurn } from '~/tt/-hooks/tabletopData/useTabletopHeroRounds'
 import { mutationError } from '~/utils/mutationError'
-import { increaseAggressionAction, increaseAggressionQuerySync } from './increaseAggression'
+import { hasCharacterPermission } from '../characterPermission'
+import { increaseAggressionQuerySync, UNSAFE_increaseAggressionAction } from './increaseAggression'
 
 const findNextOrder = (array: { order: number | null }[]) => Math.max(0, ...array.flatMap(({ order }) => order ? [order] : [])) + 1
 
@@ -63,7 +63,7 @@ const assignNextHeroTurnSchema = type({
 export const assignNextHeroTurnAction = createServerFn({ method: 'POST' })
 	.inputValidator(assignNextHeroTurnSchema)
 	.handler(async ({ data: { tabletopCharacterId, turnType } }) => {
-		const { supabase, campaignId } = await requireGM({ tabletopCharacterId })
+		const { supabase, campaignId } = await hasCharacterPermission({ tabletopCharacterId })
 
 		const { data, error } = await supabase
 			.from('tabletop_hero_turn')
@@ -90,5 +90,5 @@ export const assignNextHeroTurnAction = createServerFn({ method: 'POST' })
 			if (error) throw new Error(error.message, { cause: error })
 		}
 
-		await increaseAggressionAction({ data: { campaignId } })
+		await UNSAFE_increaseAggressionAction({ data: { campaignId } })
 	})

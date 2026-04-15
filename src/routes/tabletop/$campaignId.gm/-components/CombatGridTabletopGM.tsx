@@ -1,5 +1,5 @@
 import { useDroppable } from '@dnd-kit/react'
-import { Box } from '@mantine/core'
+import { Box, Text } from '@mantine/core'
 import Hex from '~/components/HoneycombGrid/Hex'
 import useHoneycombGridSize from '~/components/HoneycombGrid/useHoneycombGridSize'
 import { type TileDroppable } from '~/routes/tabletop/-components/DragDrop'
@@ -15,6 +15,8 @@ export default function CombatGridTabletopGM() {
 	const { data: tilesData } = useTabletopTiles()
 	const { offset, minHeight, minWidth } = useHoneycombGridSize(mapTiles)
 
+	if (!mapTiles.length) return <NoEncounter />
+
 	return (
 		<Box pos='relative' w={minWidth} h={minHeight} onContextMenu={e => e.preventDefault()}>
 			{mapTiles.map(tile => {
@@ -23,6 +25,10 @@ export default function CombatGridTabletopGM() {
 			})}
 		</Box>
 	)
+}
+
+function NoEncounter() {
+	return <Text>No Encounter Loaded</Text>
 }
 
 type TileProps = {

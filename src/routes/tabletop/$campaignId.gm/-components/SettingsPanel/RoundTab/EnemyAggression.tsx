@@ -1,7 +1,7 @@
 import { Button, Group, Stack, Text, Title } from '@mantine/core'
+import { useIncreaseAggression } from '~/routes/tabletop/-utils/gameActions/increaseAggression'
+import { useResetAggression } from '~/routes/tabletop/-utils/gameActions/resetAggression'
 import { useGMTabletopEnemies } from '~/tt-gm/-hooks/tabletopData/useTabletopEnemies'
-import { useIncreaseAggression } from '~/tt-gm/-utils/increaseAggression'
-import { useResetAggression } from '~/tt-gm/-utils/resetAggression'
 
 export default function EnemyAggression() {
 	const { data: enemiesData } = useGMTabletopEnemies()

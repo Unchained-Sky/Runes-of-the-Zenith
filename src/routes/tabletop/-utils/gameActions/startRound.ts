@@ -83,7 +83,7 @@ export const startRoundAction = createServerFn({ method: 'POST' })
 			const { data: heroesList, error: heroesError } = await supabase
 				.from('tabletop_hero_turn')
 				.select(`
-					tabletop_characters (
+					tabletop_characters!inner (
 						characterId: tt_character_id
 					)
 				`)

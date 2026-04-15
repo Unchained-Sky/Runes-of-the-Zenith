@@ -3,12 +3,12 @@ import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { useTabletopContext } from '~/routes/tabletop/-utils/TabletopContext'
 import { getServiceClient } from '~/supabase/getServiceClient'
-import { requireGM } from '~/supabase/requireGM'
 import { type TabletopGMEnemyData } from '~/tt-gm/-hooks/tabletopData/useTabletopEnemies'
 import { type TabletopHeroData } from '~/tt/-hooks/tabletopData/useTabletopHeroes'
 import { type TabletopTile, type TabletopTiles } from '~/tt/-hooks/tabletopData/useTabletopTiles'
 import { typedObject } from '~/types/typedObject'
 import { mutationError } from '~/utils/mutationError'
+import { hasCharacterPermission } from '../characterPermission'
 
 export function useMoveCharacter() {
 	const { queryClient, campaignId } = useTabletopContext()
@@ -70,7 +70,7 @@ const moveCharacterActionSchema = type({
 export const moveCharacterAction = createServerFn({ method: 'POST' })
 	.inputValidator(moveCharacterActionSchema)
 	.handler(async ({ data: { cord: [q, r, s], tabletopCharacterId } }) => {
-		const { supabase, campaignId } = await requireGM({ tabletopCharacterId })
+		const { supabase, campaignId } = await hasCharacterPermission({ tabletopCharacterId })
 
 		{
 			// Check if a character is already on the tile

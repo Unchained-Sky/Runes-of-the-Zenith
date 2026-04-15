@@ -21,7 +21,7 @@ const heroRoundsLoader = createServerFn({ method: 'GET' })
 				turnType: turn_type,
 				used,
 				order,
-				tabletop_characters ()
+				tabletop_characters!inner ()
 			`)
 			.eq('tabletop_characters.campaign_id', campaignId)
 			.order('order', { ascending: true })

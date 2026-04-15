@@ -1,5 +1,5 @@
 import { Button, Stack, Title } from '@mantine/core'
-import { useStartRound } from '~/tt-gm/-utils/startRound'
+import { useStartRound } from '~/routes/tabletop/-utils/gameActions/startRound'
 import { useTabletopRound } from '~/tt/-hooks/tabletopData/useTabletopRound'
 
 export default function NewRound() {

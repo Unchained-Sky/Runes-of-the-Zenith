@@ -1,6 +1,6 @@
 import { Window } from '@gfazioli/mantine-window'
 import { Button, Group, Stack, Text } from '@mantine/core'
-import { useAssignNextHeroTurn } from '~/tt-gm/-utils/assignNextHeroTurn'
+import { useAssignNextHeroTurn } from '~/routes/tabletop/-utils/gameActions/assignNextHeroTurn'
 import { useConfirmTargetStore } from './useConfirmTargetStore'
 
 export default function ConfirmTargetWindow() {

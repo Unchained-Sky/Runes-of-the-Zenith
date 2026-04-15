@@ -32,8 +32,8 @@ type ResetAggressionQuerySyncProps = {
 }
 
 export const resetAggressionQuerySync = ({ queryClient, campaignId, tabletopCharacterId }: ResetAggressionQuerySyncProps) => {
-	void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'enemy', tabletopCharacterId] })
-	queryClient.setQueryData([campaignId, 'tabletop', 'enemy', tabletopCharacterId], (oldData: TabletopGMEnemyData) => {
+	void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop-gm', 'enemy', tabletopCharacterId] })
+	queryClient.setQueryData([campaignId, 'tabletop-gm', 'enemy', tabletopCharacterId], (oldData: TabletopGMEnemyData) => {
 		return {
 			...oldData,
 			tabletopStats: {
