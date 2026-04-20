@@ -1,4 +1,4 @@
-import { type QueryClient, useMutation } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { useTabletopContext } from '~/routes/tabletop/-utils/TabletopContext'
@@ -6,6 +6,7 @@ import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
 import { type TabletopGMEnemyData } from '~/tt-gm/-hooks/tabletopData/useTabletopEnemies'
 import { mutationError } from '~/utils/mutationError'
+import { type QuerySyncProps } from './querySync'
 
 export function useResetAggression() {
 	const { queryClient, campaignId } = useTabletopContext()
@@ -13,11 +14,7 @@ export function useResetAggression() {
 	return useMutation({
 		mutationFn: resetAggressionAction,
 		onMutate: ({ data }) => {
-			resetAggressionQuerySync({
-				queryClient,
-				campaignId,
-				tabletopCharacterId: data.tabletopCharacterId
-			})
+			resetAggressionQuerySync({ queryClient, campaignId, data })
 		},
 		onError: error => {
 			mutationError(error, 'Failed to reset aggression')
@@ -25,15 +22,11 @@ export function useResetAggression() {
 	})
 }
 
-type ResetAggressionQuerySyncProps = {
-	queryClient: QueryClient
-	campaignId: number
-	tabletopCharacterId: number
-}
+type ResetAggressionQuerySyncProps = QuerySyncProps<typeof resetAggressionSchema>
 
-export const resetAggressionQuerySync = ({ queryClient, campaignId, tabletopCharacterId }: ResetAggressionQuerySyncProps) => {
-	void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop-gm', 'enemy', tabletopCharacterId] })
-	queryClient.setQueryData([campaignId, 'tabletop-gm', 'enemy', tabletopCharacterId], (oldData: TabletopGMEnemyData) => {
+export function resetAggressionQuerySync({ queryClient, campaignId, data }: ResetAggressionQuerySyncProps) {
+	void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop-gm', 'enemy', data.tabletopCharacterId] })
+	queryClient.setQueryData([campaignId, 'tabletop-gm', 'enemy', data.tabletopCharacterId], (oldData: TabletopGMEnemyData) => {
 		return {
 			...oldData,
 			tabletopStats: {

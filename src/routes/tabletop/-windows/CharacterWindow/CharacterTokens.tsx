@@ -1,19 +1,14 @@
-import { ActionIcon, Autocomplete, Box, Button, Card, Group, Image, Modal, NumberInput, Pill, Stack, Text, ThemeIcon, Title, Tooltip } from '@mantine/core'
+import { ActionIcon, Autocomplete, Button, Card, Group, Modal, NumberInput, Stack, Text, Title } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { useDisclosure, useListState, type UseListStateHandlers } from '@mantine/hooks'
 import { IconPencil, IconPlus } from '@tabler/icons-react'
-import { useMutation } from '@tanstack/react-query'
-import { createServerFn } from '@tanstack/react-start'
-import { type } from 'arktype'
 import { useMemo, useState } from 'react'
+import TokenIcon from '~/components/TokenIcon'
 import { useTokenQuery } from '~/hooks/data/useTokenQuery'
 import { type TabletopHeroData } from '~/routes/tabletop/-hooks/tabletopData/useTabletopHeroes'
-import { useTabletopContext } from '~/routes/tabletop/-utils/TabletopContext'
-import { type Enums, type TablesInsert } from '~/supabase/databaseTypes'
-import { getServiceClient } from '~/supabase/getServiceClient'
-import { requireGM } from '~/supabase/requireGM'
+import { type Enums } from '~/supabase/databaseTypes'
 import { int2 } from '~/utils/int'
-import { mutationError } from '~/utils/mutationError'
+import { useUpdateCharacterTokens } from '../../-utils/gameActions/updateCharacterTokens'
 
 type TokenProps = {
 	tabletopCharacterId: number
@@ -52,51 +47,6 @@ export default function CharacterTokens({ tabletopCharacterId, tokens, character
 	)
 }
 
-type TokenIconProps = {
-	token: TabletopHeroData['tokens'][number]
-}
-
-const getTokenColour = (alignment: Enums<'token_alignment'>) => {
-	switch (alignment) {
-		case 'POSITIVE':
-			return 'green'
-		case 'NEUTRAL':
-			return 'yellow'
-		case 'NEGATIVE':
-			return 'red'
-	}
-}
-
-function TokenIcon({ token }: TokenIconProps) {
-	const tokensData = useTokenQuery()
-
-	const tokenData = tokensData[token.name]
-	if (!tokenData) throw new Error(`Token ${token.name} not found`)
-
-	return (
-		<Tooltip
-			key={tokenData.name}
-			label={(
-				<Box>
-					<Text fw='bold'>{tokenData.name}</Text>
-					<Text>{tokenData.extraData.description}</Text>
-				</Box>
-			)}
-		>
-			<Box pos='relative' id={`token-${token.name}`}>
-				<ThemeIcon
-					variant='light'
-					color={getTokenColour(tokenData.alignment)}
-					size='xl'
-				>
-					<Image src={`/tokenIcon/${tokenData.extraData.image}`} />
-				</ThemeIcon>
-				<Pill pos='absolute' bottom={0} right={-4}>{token.amount}</Pill>
-			</Box>
-		</Tooltip>
-	)
-}
-
 type TokenEditModalProps = {
 	opened: boolean
 	close: () => void
@@ -106,8 +56,6 @@ type TokenEditModalProps = {
 }
 
 function TokenEditModal({ opened, tabletopCharacterId, close, tokens, characterType }: TokenEditModalProps) {
-	const { queryClient, campaignId } = useTabletopContext()
-
 	const form = useForm({
 		mode: 'uncontrolled',
 		initialValues: {
@@ -115,26 +63,10 @@ function TokenEditModal({ opened, tabletopCharacterId, close, tokens, characterT
 		}
 	})
 
-	const updateHeroToken = useMutation({
-		mutationFn: updateHeroTokenAction,
-		onMutate: ({ data }) => {
-			const queryKey = [campaignId, 'tabletop', characterType.toLowerCase(), data.tabletopCharacterId]
-
-			void queryClient.cancelQueries({ queryKey })
-			queryClient.setQueriesData({ queryKey }, (oldData: TabletopHeroData) => {
-				return {
-					...oldData,
-					tokens: Object.entries(data.tokens).filter(([_name, amount]) => amount !== 0).map(([name, amount]) => ({ name, amount }))
-				} satisfies TabletopHeroData
-			})
-		},
-		onError: error => {
-			mutationError(error, 'Failed to update hero tokens')
-		}
-	})
+	const updateHeroToken = useUpdateCharacterTokens()
 
 	const handleSubmit = (values: typeof form.values) => {
-		updateHeroToken.mutate({ data: { tabletopCharacterId, tokens: values.tokens } })
+		updateHeroToken.mutate({ data: { tabletopCharacterId, characterType, tokens: values.tokens } })
 		close()
 		form.setInitialValues(values)
 	}
@@ -242,52 +174,3 @@ function AddToken({ virtualTokenList, virtualTokensHandlers }: AddTokenProps) {
 		</Group>
 	)
 }
-
-const updateHeroTokenSchema = type({
-	tabletopCharacterId: 'number',
-	tokens: {
-		'[string]': 'number'
-	}
-})
-
-const updateHeroTokenAction = createServerFn({ method: 'POST' })
-	.inputValidator(updateHeroTokenSchema)
-	.handler(async ({ data: { tabletopCharacterId, tokens } }) => {
-		await requireGM({ tabletopCharacterId })
-
-		const { upsert: upsertTokens, delete: deleteTokens } = Object.entries(tokens).reduce<{
-			upsert: { name: string, amount: number }[]
-			delete: string[]
-		}>((acc, [name, amount]) => {
-			if (amount > int2.ceil || amount < 0) throw new Error(`Amount must be between 0 and ${int2.ceil}`)
-			return {
-				upsert: amount > 0 ? [...acc.upsert, { name, amount }] : acc.upsert,
-				delete: amount === 0 ? [...acc.delete, name] : acc.delete
-			}
-		}, {
-			upsert: [],
-			delete: []
-		})
-
-		const serviceClient = getServiceClient()
-
-		{
-			const { error } = await serviceClient
-				.from('tabletop_character_token')
-				.upsert(upsertTokens.map(token => ({
-					tt_character_id: tabletopCharacterId,
-					token_name: token.name,
-					amount: token.amount
-				} satisfies TablesInsert<'tabletop_character_token'>)))
-			if (error) throw new Error(error.message, { cause: error })
-		}
-
-		{
-			const { error } = await serviceClient
-				.from('tabletop_character_token')
-				.delete()
-				.eq('tt_character_id', tabletopCharacterId)
-				.in('token_name', deleteTokens)
-			if (error) throw new Error(error.message, { cause: error })
-		}
-	})

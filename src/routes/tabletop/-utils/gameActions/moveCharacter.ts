@@ -6,9 +6,11 @@ import { getServiceClient } from '~/supabase/getServiceClient'
 import { type TabletopGMEnemyData } from '~/tt-gm/-hooks/tabletopData/useTabletopEnemies'
 import { type TabletopHeroData } from '~/tt/-hooks/tabletopData/useTabletopHeroes'
 import { type TabletopTile, type TabletopTiles } from '~/tt/-hooks/tabletopData/useTabletopTiles'
+import { characterType } from '~/types/gameTypes/character'
 import { typedObject } from '~/types/typedObject'
 import { mutationError } from '~/utils/mutationError'
 import { hasCharacterPermission } from '../characterPermission'
+import { type QuerySyncProps } from './querySync'
 
 export function useMoveCharacter() {
 	const { queryClient, campaignId } = useTabletopContext()
@@ -19,41 +21,7 @@ export function useMoveCharacter() {
 			id: 'tabletop-move-character'
 		},
 		onMutate: ({ data }) => {
-			void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'tiles', 'characters'] })
-			queryClient.setQueryData([campaignId, 'tabletop', 'tiles', 'characters'], (oldData: TabletopTiles) => {
-				const cord = `${data.cord[0]},${data.cord[1]},${data.cord[2]}` as const
-				const [oldCord] = typedObject.entries(oldData).find(([_keys, value]) => value?.tabletopCharacterId === data.tabletopCharacterId) ?? []
-				const out: TabletopTiles = {
-					...oldData,
-					[cord]: {
-						tabletopCharacterId: data.tabletopCharacterId,
-						characterType: data.characterType
-					} satisfies TabletopTile
-				}
-				if (oldCord) {
-					out[oldCord] = null
-				}
-				return out
-			})
-
-			switch (data.characterType) {
-				case 'HERO': {
-					void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'hero', data.tabletopCharacterId] })
-					queryClient.setQueriesData({ queryKey: [campaignId, 'tabletop', 'hero', data.tabletopCharacterId] }, (oldData: TabletopHeroData) => ({
-						...oldData,
-						pos: data.cord
-					} satisfies TabletopHeroData))
-					break
-				}
-				case 'ENEMY': {
-					void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'enemy', data.tabletopCharacterId] })
-					queryClient.setQueriesData({ queryKey: [campaignId, 'tabletop', 'enemy', data.tabletopCharacterId] }, (oldData: TabletopGMEnemyData) => ({
-						...oldData,
-						pos: data.cord
-					} satisfies TabletopGMEnemyData))
-					break
-				}
-			}
+			moveCharacterQuerySync({ queryClient, campaignId, data })
 		},
 		onError: error => {
 			mutationError(error, 'Failed to move character')
@@ -61,14 +29,54 @@ export function useMoveCharacter() {
 	})
 }
 
-const moveCharacterActionSchema = type({
+type MoveCharacterQuerySyncProps = QuerySyncProps<typeof moveCharacterSchema>
+
+export function moveCharacterQuerySync({ queryClient, campaignId, data }: MoveCharacterQuerySyncProps) {
+	void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'tiles', 'characters'] })
+	queryClient.setQueryData([campaignId, 'tabletop', 'tiles', 'characters'], (oldData: TabletopTiles) => {
+		const cord = `${data.cord[0]},${data.cord[1]},${data.cord[2]}` as const
+		const [oldCord] = typedObject.entries(oldData).find(([_keys, value]) => value?.tabletopCharacterId === data.tabletopCharacterId) ?? []
+		const out: TabletopTiles = {
+			...oldData,
+			[cord]: {
+				tabletopCharacterId: data.tabletopCharacterId,
+				characterType: data.characterType
+			} satisfies TabletopTile
+		}
+		if (oldCord) {
+			out[oldCord] = null
+		}
+		return out
+	})
+
+	switch (data.characterType) {
+		case 'HERO': {
+			void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'hero', data.tabletopCharacterId] })
+			queryClient.setQueriesData({ queryKey: [campaignId, 'tabletop', 'hero', data.tabletopCharacterId] }, (oldData: TabletopHeroData) => ({
+				...oldData,
+				pos: data.cord
+			} satisfies TabletopHeroData))
+			break
+		}
+		case 'ENEMY': {
+			void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'enemy', data.tabletopCharacterId] })
+			queryClient.setQueriesData({ queryKey: [campaignId, 'tabletop', 'enemy', data.tabletopCharacterId] }, (oldData: TabletopGMEnemyData) => ({
+				...oldData,
+				pos: data.cord
+			} satisfies TabletopGMEnemyData))
+			break
+		}
+	}
+}
+
+const moveCharacterSchema = type({
 	cord: ['number', 'number', 'number'],
 	tabletopCharacterId: 'number',
-	characterType: '"HERO" | "ENEMY"'
+	characterType
 })
 
 export const moveCharacterAction = createServerFn({ method: 'POST' })
-	.inputValidator(moveCharacterActionSchema)
+	.inputValidator(moveCharacterSchema)
 	.handler(async ({ data: { cord: [q, r, s], tabletopCharacterId } }) => {
 		const { supabase, campaignId } = await hasCharacterPermission({ tabletopCharacterId })
 

@@ -1,7 +1,7 @@
-import { Avatar, Group, Stack, Title } from '@mantine/core'
-import baseRunes from '~/data/baseRunes'
-import CharacterTokens from '~/tt/-windows/CharacterWindow/CharacterTokens'
-import { Action, Runes, Slot } from './HeroActions'
+import { Avatar, Group, Stack, Tabs, Title } from '@mantine/core'
+import HeroRunes from './HeroRunes'
+import HeroStats from './HeroStats'
+import HeroTokens from './HeroTokens'
 import { useHeroWindowContext } from './HeroWindowContext'
 
 export default function Hero() {
@@ -14,53 +14,23 @@ export default function Hero() {
 				<Title order={3}>{heroData.heroName}</Title>
 			</Group>
 
-			<CharacterTokens tabletopCharacterId={heroData.tabletopCharacterId} tokens={heroData.tokens} characterType='HERO' />
+			<Tabs defaultValue='stats'>
+				<Tabs.List mb='md'>
+					<Tabs.Tab value='stats'>Stats</Tabs.Tab>
+					<Tabs.Tab value='runes'>Runes</Tabs.Tab>
+				</Tabs.List>
 
-			<Stack>
-				<Slot slot='PRIMARY'>
-					<Action
-						runeData={baseRunes['Basic Attack']}
-						tooltipText='Basic Attack'
-					/>
+				<Tabs.Panel value='stats'>
+					<Stack>
+						<HeroStats />
+						<HeroTokens />
+					</Stack>
+				</Tabs.Panel>
 
-					<Action
-						runeData={baseRunes.Inspire}
-						tooltipText='Inspire'
-					/>
-
-					<Action
-						runeData={baseRunes.Rest}
-						tooltipText='Rest'
-					/>
-
-					<Title order={5}>Runes</Title>
-					<Runes runes={heroData.runes.PRIMARY} />
-				</Slot>
-
-				<Slot slot='SECONDARY'>
-					<Action
-						runeData={baseRunes.Interact}
-						tooltipText='Interact'
-					/>
-
-					<Action
-						runeData={baseRunes.Rush}
-						tooltipText='Rush'
-					/>
-
-					<Action
-						runeData={baseRunes.Item}
-						tooltipText='Use an item'
-					/>
-
-					<Title order={5}>Runes</Title>
-					<Runes runes={heroData.runes.SECONDARY} />
-				</Slot>
-
-				<Slot slot='PASSIVE'>
-					<Runes runes={heroData.runes.PASSIVE} />
-				</Slot>
-			</Stack>
+				<Tabs.Panel value='runes'>
+					<HeroRunes />
+				</Tabs.Panel>
+			</Tabs>
 		</Stack>
 	)
 }

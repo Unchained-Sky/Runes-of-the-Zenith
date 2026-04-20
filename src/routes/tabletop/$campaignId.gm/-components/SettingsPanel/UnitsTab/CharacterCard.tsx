@@ -2,17 +2,9 @@ import { ActionIcon, Avatar, Button, Card, Group, Menu, Modal, NumberInput, type
 import { isInRange, useForm } from '@mantine/form'
 import { useDisclosure } from '@mantine/hooks'
 import { IconPencil, IconTrash, IconX } from '@tabler/icons-react'
-import { useMutation } from '@tanstack/react-query'
-import { createServerFn } from '@tanstack/react-start'
-import { type } from 'arktype'
-import { useTabletopContext } from '~/routes/tabletop/-utils/TabletopContext'
+import { useUpdateCharacterStats } from '~/routes/tabletop/-utils/gameActions/updateCharacterStats'
 import { type Enums } from '~/supabase/databaseTypes'
-import { getServiceClient } from '~/supabase/getServiceClient'
-import { requireGM } from '~/supabase/requireGM'
-import { type TabletopGMEnemyData } from '~/tt-gm/-hooks/tabletopData/useTabletopEnemies'
-import { type TabletopHeroData } from '~/tt/-hooks/tabletopData/useTabletopHeroes'
 import { type CombatTileCord } from '~/types/gameTypes/combatMap'
-import { mutationError } from '~/utils/mutationError'
 
 type CharacterCardProps = {
 	character: {
@@ -109,12 +101,10 @@ type EditCharacterModalProps = {
 }
 
 function EditCharacterModal({ character, openedModal, closeModal }: EditCharacterModalProps) {
-	const { queryClient, campaignId } = useTabletopContext()
-
 	const form = useForm({
 		mode: 'uncontrolled',
 		initialValues: {
-			currentShield: 10,
+			currentShield: character.tabletopStats.shield,
 			trauma: character.tabletopStats.trauma,
 			currentHealth: character.tabletopStats.health,
 			wounds: character.tabletopStats.wounds,
@@ -129,51 +119,16 @@ function EditCharacterModal({ character, openedModal, closeModal }: EditCharacte
 		}
 	})
 
-	const updateCharacter = useMutation({
-		mutationFn: updateCharacterAction,
-		onMutate: ({ data }) => {
-			switch (character.type) {
-				case 'HERO':
-					void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'hero', data.tabletopCharacterId] })
-					queryClient.setQueriesData({ queryKey: [campaignId, 'tabletop', 'hero', data.tabletopCharacterId] }, (oldData: TabletopHeroData) => {
-						return {
-							...oldData,
-							tabletopStats: {
-								...oldData.tabletopStats,
-								health: data.values.currentHealth,
-								wounds: data.values.wounds,
-								shield: data.values.currentShield,
-								trauma: data.values.trauma,
-								movement: data.values.currentMovement
-							}
-						} satisfies TabletopHeroData
-					})
-					break
-				case 'ENEMY':
-					void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'enemy', data.tabletopCharacterId] })
-					queryClient.setQueriesData({ queryKey: [campaignId, 'tabletop', 'enemy', data.tabletopCharacterId] }, (oldData: TabletopGMEnemyData) => {
-						return {
-							...oldData,
-							tabletopStats: {
-								...oldData.tabletopStats,
-								health: data.values.currentHealth,
-								wounds: data.values.wounds,
-								shield: data.values.currentShield,
-								trauma: data.values.trauma,
-								movement: data.values.currentMovement
-							}
-						} satisfies TabletopGMEnemyData
-					})
-					break
-			}
-		},
-		onError: error => {
-			mutationError(error, 'Failed to update character')
-		}
-	})
+	const updateCharacter = useUpdateCharacterStats()
 
 	const handleSubmit = (values: typeof form.values) => {
-		updateCharacter.mutate({ data: { tabletopCharacterId: character.tabletopCharacterId, values } })
+		updateCharacter.mutate({
+			data: {
+				tabletopCharacterId: character.tabletopCharacterId,
+				values,
+				characterType: character.type
+			}
+		})
 		closeModal()
 		form.setInitialValues(values)
 	}
@@ -236,36 +191,3 @@ function EditCharacterModal({ character, openedModal, closeModal }: EditCharacte
 		</Modal>
 	)
 }
-
-const updateCharacterSchema = type({
-	tabletopCharacterId: 'number',
-	values: {
-		currentShield: 'number',
-		trauma: 'number',
-		currentHealth: 'number',
-		wounds: 'number',
-		currentMovement: 'number'
-	}
-})
-
-const updateCharacterAction = createServerFn({ method: 'POST' })
-	.inputValidator(updateCharacterSchema)
-	.handler(async ({ data: { tabletopCharacterId, values } }) => {
-		await requireGM({ tabletopCharacterId })
-
-		const { currentShield, trauma, currentHealth, wounds, currentMovement } = values
-
-		const serviceClient = getServiceClient()
-
-		const { error } = await serviceClient
-			.from('tabletop_characters')
-			.update({
-				shield: currentShield,
-				trauma,
-				health: currentHealth,
-				wounds,
-				movement: currentMovement
-			})
-			.eq('tt_character_id', tabletopCharacterId)
-		if (error) throw new Error(error.message, { cause: error })
-	})

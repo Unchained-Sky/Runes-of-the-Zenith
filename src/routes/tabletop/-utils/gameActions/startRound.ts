@@ -1,4 +1,4 @@
-import { type QueryClient, useMutation } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { useTabletopContext } from '~/routes/tabletop/-utils/TabletopContext'
@@ -9,6 +9,7 @@ import { type TabletopHeroData } from '~/tt/-hooks/tabletopData/useTabletopHeroe
 import { type HeroTurn } from '~/tt/-hooks/tabletopData/useTabletopHeroRounds'
 import { type TabletopRoundData } from '~/tt/-hooks/tabletopData/useTabletopRound'
 import { mutationError } from '~/utils/mutationError'
+import { type QuerySyncProps } from './querySync'
 
 export function useStartRound() {
 	const { queryClient, campaignId } = useTabletopContext()
@@ -24,12 +25,9 @@ export function useStartRound() {
 	})
 }
 
-type StartRoundQuerySyncProps = {
-	queryClient: QueryClient
-	campaignId: number
-}
+type StartRoundQuerySyncProps = QuerySyncProps
 
-export const startRoundQuerySync = ({ queryClient, campaignId }: StartRoundQuerySyncProps) => {
+export function startRoundQuerySync({ queryClient, campaignId }: StartRoundQuerySyncProps) {
 	void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'hero-rounds'] })
 	queryClient.setQueryData([campaignId, 'tabletop', 'hero-rounds'], (oldData: HeroTurn[]) => {
 		return oldData.map<HeroTurn>(turn => ({

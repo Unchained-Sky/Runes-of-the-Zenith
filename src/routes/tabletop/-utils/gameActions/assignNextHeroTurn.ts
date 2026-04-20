@@ -9,6 +9,7 @@ import { type HeroTurn } from '~/tt/-hooks/tabletopData/useTabletopHeroRounds'
 import { mutationError } from '~/utils/mutationError'
 import { hasCharacterPermission } from '../characterPermission'
 import { increaseAggressionQuerySync, UNSAFE_increaseAggressionAction } from './increaseAggression'
+import { type QuerySyncProps } from './querySync'
 
 const findNextOrder = (array: { order: number | null }[]) => Math.max(0, ...array.flatMap(({ order }) => order ? [order] : [])) + 1
 
@@ -18,41 +19,47 @@ export function useAssignNextHeroTurn() {
 	return useMutation({
 		mutationFn: assignNextHeroTurnAction,
 		onMutate: ({ data }) => {
-			let nextTurn: number = 0
-
-			void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'hero-rounds'] })
-			queryClient.setQueryData([campaignId, 'tabletop', 'hero-rounds'], (oldData: HeroTurn[]) => {
-				const oldDataCopy = structuredClone(oldData)
-				const turn = oldDataCopy.findIndex(turn => turn.tabletopCharacterId === data.tabletopCharacterId && turn.turnType === data.turnType)
-				if (turn === -1 || !oldDataCopy[turn]) throw new Error('Turn not found')
-				nextTurn = findNextOrder(oldDataCopy)
-				oldDataCopy[turn].used = true
-				oldDataCopy[turn].order = nextTurn
-				return oldDataCopy.sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-			})
-
-			void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'hero', data.tabletopCharacterId] })
-			queryClient.setQueriesData({ queryKey: [campaignId, 'tabletop', 'hero', data.tabletopCharacterId] }, (oldData: TabletopHeroData) => {
-				const { turn } = oldData
-				if (!turn) throw new Error('Turn not found')
-				return {
-					...oldData,
-					turn: {
-						...turn,
-						[data.turnType]: {
-							...turn[data.turnType],
-							used: true
-						}
-					}
-				} satisfies TabletopHeroData
-			})
-
-			increaseAggressionQuerySync({ queryClient, campaignId })
+			assignNextHeroTurnQuerySync({ queryClient, campaignId, data })
 		},
 		onError: error => {
 			mutationError(error, 'Failed to assign next hero turn')
 		}
 	})
+}
+
+type AssignNextTurnQuerySyncProps = QuerySyncProps<typeof assignNextHeroTurnSchema>
+
+export function assignNextHeroTurnQuerySync({ queryClient, campaignId, data }: AssignNextTurnQuerySyncProps) {
+	let nextTurn: number = 0
+
+	void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'hero-rounds'] })
+	queryClient.setQueryData([campaignId, 'tabletop', 'hero-rounds'], (oldData: HeroTurn[]) => {
+		const oldDataCopy = structuredClone(oldData)
+		const turn = oldDataCopy.findIndex(turn => turn.tabletopCharacterId === data.tabletopCharacterId && turn.turnType === data.turnType)
+		if (turn === -1 || !oldDataCopy[turn]) throw new Error('Turn not found')
+		nextTurn = findNextOrder(oldDataCopy)
+		oldDataCopy[turn].used = true
+		oldDataCopy[turn].order = nextTurn
+		return oldDataCopy.sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+	})
+
+	void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'hero', data.tabletopCharacterId] })
+	queryClient.setQueriesData({ queryKey: [campaignId, 'tabletop', 'hero', data.tabletopCharacterId] }, (oldData: TabletopHeroData) => {
+		const { turn } = oldData
+		if (!turn) throw new Error('Turn not found')
+		return {
+			...oldData,
+			turn: {
+				...turn,
+				[data.turnType]: {
+					...turn[data.turnType],
+					used: true
+				}
+			}
+		} satisfies TabletopHeroData
+	})
+
+	increaseAggressionQuerySync({ queryClient, campaignId, data: { campaignId } })
 }
 
 const assignNextHeroTurnSchema = type({
@@ -90,5 +97,5 @@ export const assignNextHeroTurnAction = createServerFn({ method: 'POST' })
 			if (error) throw new Error(error.message, { cause: error })
 		}
 
-		await UNSAFE_increaseAggressionAction({ data: { campaignId } })
+		await UNSAFE_increaseAggressionAction({ campaignId })
 	})

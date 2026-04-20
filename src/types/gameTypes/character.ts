@@ -1,3 +1,5 @@
+import { type } from 'arktype'
+
 export type Character = {
 	name: string
 	stats: {
@@ -13,3 +15,5 @@ export type Character = {
 		dexDef: number
 	}
 }
+
+export const characterType = type('"HERO" | "ENEMY"')

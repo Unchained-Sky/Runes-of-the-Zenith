@@ -45,6 +45,12 @@ function HeroWindow({ opened, onClose, tabletopCharacterId }: CharacterWindowPro
 			opened={opened}
 			onClose={onClose}
 			title={heroData.heroName}
+			draggable='header'
+			styles={{
+				header: {
+					cursor: 'move'
+				}
+			}}
 		>
 			<HeroWindowContext value={heroData}>
 				<Hero />
@@ -65,6 +71,12 @@ function EnemyWindow({ opened, onClose, tabletopCharacterId }: CharacterWindowPr
 			opened={opened}
 			onClose={onClose}
 			title={`Character: ${1 + 1}`}
+			draggable='header'
+			styles={{
+				header: {
+					cursor: 'move'
+				}
+			}}
 		>
 			<EnemyWindowContext value={enemyData}>
 				<Enemy />
