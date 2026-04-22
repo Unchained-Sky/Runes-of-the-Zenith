@@ -6,6 +6,7 @@ import { type RuneData, runeExtraDataSchema } from '~/scripts/data/runes/runeDat
 import { type Enums } from '~/supabase/databaseTypes'
 import { requireAccount } from '~/supabase/requireAccount'
 import { typedObject } from '~/types/typedObject'
+import { lingeringDataFormatter } from '../../-utils/lingeringData'
 import { TABLETOP_QUERY_STALE_TIME } from './tabletopDataOptions'
 import { useTabletopHeroList } from './useTabletopHeroList'
 
@@ -65,6 +66,12 @@ const heroLoader = createServerFn({ method: 'GET' })
 				token: tabletop_character_token (
 					name: token_name,
 					amount
+				),
+				lingering: tabletop_lingering (
+					lingeringId: linger_id,
+					decrementTime: decrement_time,
+					remainingTime: remaining_time,
+					data
 				)
 			`)
 			.eq('tt_character_id', tabletopCharacterId)
@@ -116,6 +123,8 @@ const heroLoader = createServerFn({ method: 'GET' })
 		const secondaryTurn = data.turn.find(isSecondaryTurn)
 		const turn = primaryTurn && secondaryTurn ? { PRIMARY: primaryTurn, SECONDARY: secondaryTurn } : null
 
+		const lingering = data.lingering.map(lingeringDataFormatter)
+
 		return {
 			tabletopCharacterId,
 			heroId: tabletopHero.heroId,
@@ -132,7 +141,8 @@ const heroLoader = createServerFn({ method: 'GET' })
 			runes,
 			avatarUrl,
 			turn,
-			tokens: data.token
+			tokens: data.token,
+			lingering
 		}
 	})
 
@@ -153,6 +163,7 @@ export type TabletopHeroData = Omit<InternalTabletopHeroData, 'runes'> & {
 
 type InternalTabletopHeroRuneData = Omit<RuneData, 'data'> & { data: string }
 
+// TODO run formatter on the server
 const runeExtraDataFormatter = (rune: InternalTabletopHeroRuneData) => {
 	const json = JSON.parse(rune.data)
 	const out = runeExtraDataSchema(json)

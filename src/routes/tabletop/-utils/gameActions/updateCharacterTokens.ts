@@ -17,7 +17,6 @@ export function useUpdateCharacterTokens() {
 	return useMutation({
 		mutationFn: updateCharacterTokenAction,
 		onMutate: ({ data }) => {
-			console.log('updateCharacterTokens', data)
 			updateCharacterTokensQuerySync({ queryClient, campaignId, data })
 		},
 		onError: error => {

@@ -1,6 +1,7 @@
 import { queryOptions, useQueries } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
+import { lingeringDataFormatter } from '~/routes/tabletop/-utils/lingeringData'
 import { useTabletopContext } from '~/routes/tabletop/-utils/TabletopContext'
 import { requireAccount } from '~/supabase/requireAccount'
 import { TABLETOP_QUERY_STALE_TIME } from '~/tt/-hooks/tabletopData/tabletopDataOptions'
@@ -50,6 +51,12 @@ const enemyLoader = createServerFn({ method: 'GET' })
 				token: tabletop_character_token (
 					name: token_name,
 					amount
+				),
+				lingering: tabletop_lingering (
+					lingeringId: linger_id,
+					decrementTime: decrement_time,
+					remainingTime: remaining_time,
+					data
 				)
 			`)
 			.eq('tt_character_id', tabletopCharacterId)
@@ -61,6 +68,8 @@ const enemyLoader = createServerFn({ method: 'GET' })
 
 		const { tabletopEnemy } = data
 		if (!tabletopEnemy) throw new Error('Tabletop enemy not found')
+
+		const lingering = data.lingering.map(lingeringDataFormatter)
 
 		return {
 			tabletopCharacterId,
@@ -85,7 +94,8 @@ const enemyLoader = createServerFn({ method: 'GET' })
 				currentAggression: tabletopEnemy.currentAggression
 			},
 			pos: data.tile[0] ? [data.tile[0].q, data.tile[0].r, data.tile[0].s] : null,
-			tokens: data.token
+			tokens: data.token,
+			lingering
 		}
 	})
 
