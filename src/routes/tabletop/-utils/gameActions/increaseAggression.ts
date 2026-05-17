@@ -79,7 +79,7 @@ export const increaseAggressionAction = createServerFn({ method: 'POST' })
 		await UNSAFE_increaseAggressionAction({ amount, ...props })
 	})
 
-export const UNSAFE_increaseAggressionAction = createServerOnlyFn(async ({ amount, ...props }: typeof increaseAggressionSchema.t) => {
+export const UNSAFE_increaseAggressionAction = createServerOnlyFn(async ({ amount, ...props }: typeof increaseAggressionSchema.infer) => {
 	const serviceClient = getServiceClient()
 
 	const increaseAggressionFunc = async (tabletopCharacterIds: number[]) => {

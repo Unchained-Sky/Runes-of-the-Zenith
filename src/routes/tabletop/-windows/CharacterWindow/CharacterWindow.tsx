@@ -22,7 +22,13 @@ const DEFAULT_WINDOW_PROPS = {
 	minHeight: 480,
 	maxHeight: '100vh',
 	resizable: 'both',
-	fullSizeResizeHandles: true
+	fullSizeResizeHandles: true,
+	draggable: 'header',
+	styles: {
+		header: {
+			cursor: 'move'
+		}
+	}
 } satisfies WindowProps
 
 export default function CharacterWindow(props: CharacterWindowProps) {
@@ -45,12 +51,6 @@ function HeroWindow({ opened, onClose, tabletopCharacterId }: CharacterWindowPro
 			opened={opened}
 			onClose={onClose}
 			title={heroData.heroName}
-			draggable='header'
-			styles={{
-				header: {
-					cursor: 'move'
-				}
-			}}
 		>
 			<HeroWindowContext value={heroData}>
 				<Hero />
@@ -71,12 +71,6 @@ function EnemyWindow({ opened, onClose, tabletopCharacterId }: CharacterWindowPr
 			opened={opened}
 			onClose={onClose}
 			title={`Character: ${1 + 1}`}
-			draggable='header'
-			styles={{
-				header: {
-					cursor: 'move'
-				}
-			}}
 		>
 			<EnemyWindowContext value={enemyData}>
 				<Enemy />

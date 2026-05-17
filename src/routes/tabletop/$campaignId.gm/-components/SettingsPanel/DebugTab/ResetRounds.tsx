@@ -36,7 +36,7 @@ export default function ResetRounds() {
 				resetAggressionQuerySync({
 					queryClient,
 					campaignId,
-					tabletopCharacterId
+					data: { tabletopCharacterId }
 				})
 			})
 		},

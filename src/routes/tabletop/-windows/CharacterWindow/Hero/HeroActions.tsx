@@ -3,8 +3,9 @@ import { ActionIcon, Card, Code, Collapse, Group, Stack, Text, Title, Tooltip } 
 import { useDisclosure } from '@mantine/hooks'
 import { IconChevronDown, IconFlame } from '@tabler/icons-react'
 import { type ReactNode } from 'react'
+import { useArchetypeQuery } from '~/hooks/data/useArchetypeQuery'
 import { TEST_DATA } from '~/scripts/chart/damageData'
-import { type RuneData, type RuneExtraData } from '~/scripts/data/runes/runeData'
+import { type RuneData, type RuneEffectData } from '~/scripts/data/runes/runeData'
 import { type Enums } from '~/supabase/databaseTypes'
 import { useConfirmTargetStore } from '~/tt/-windows/ConfirmTargetWindow/useConfirmTargetStore'
 import { titleCase } from '~/utils/stringCase'
@@ -71,7 +72,7 @@ export function Action({ runeData, tooltipText, inlineDescription, expandedDescr
 			<Collapse expanded={opened} ml={44}>
 				<Stack gap={0}>
 					{expandedDescription ?? <Text>{runeData.data.description}</Text>}
-					<Code>{JSON.stringify(runeData.data, null, 2)}</Code>
+					<Code>{JSON.stringify(runeData.data.effect, null, 2)}</Code>
 				</Stack>
 			</Collapse>
 		</Stack>
@@ -96,11 +97,14 @@ type RuneProps = {
 
 function Rune({ runeData }: RuneProps) {
 	const heroData = useHeroWindowContext()
-	const heroMainStats = {
+	const _heroMainStats = {
 		int: heroData.stats.int,
 		dex: heroData.stats.dex,
 		str: heroData.stats.str
 	}
+
+	const subarchetypes = useArchetypeQuery()
+	const subarchetype = subarchetypes[runeData.subarchetype]
 
 	return (
 		<Action
@@ -110,27 +114,28 @@ function Rune({ runeData }: RuneProps) {
 				<>
 					<Stack gap={0}>
 						<Text>{runeData.name}</Text>
-						<Text size='xs'>{titleCase(runeData.damageType)} / {runeData.archetype} / {runeData.subarchetype}</Text>
+						<Text size='xs'>{subarchetype.damageType} / {subarchetype.archetype} / {runeData.subarchetype}</Text>
 					</Stack>
-					<Text>{runeData.durability ? runeData.durability : '∞'}</Text>
+					<Text>{runeData.durability}</Text>
+					<Text>{runeData.data.resolve}</Text>
 				</>
 			)}
 			expandedDescription={(
 				<Stack>
-					{runeData.data.damage && (
+					{/* {runeData.effect.damage && (
 						<ActionDamageChart
-							runeMainStats={runeData.data.damage.mainStats}
-							accuracy={runeData.data.damage.accuracy}
+							runeMainStats={runeData.effect.damage.mainStats}
+							accuracy={runeData.effect.damage.accuracy}
 							heroMainStats={heroMainStats}
 						/>
-					)}
+					)} */}
 				</Stack>
 			)}
 		/>
 	)
 }
 
-type RuneExtraDataDamage = NonNullable<RuneExtraData['damage']>
+type RuneExtraDataDamage = NonNullable<RuneEffectData['damage']>
 type ActionDamageChartProps = {
 	runeMainStats: RuneExtraDataDamage['mainStats']
 	accuracy: RuneExtraDataDamage['accuracy']
@@ -141,7 +146,7 @@ type ActionDamageChartProps = {
 	}
 }
 
-function ActionDamageChart({ runeMainStats, heroMainStats }: ActionDamageChartProps) {
+function _ActionDamageChart({ runeMainStats, heroMainStats }: ActionDamageChartProps) {
 	const intDamage = runeMainStats.int ? runeMainStats.int.flat + (runeMainStats.int.scale * heroMainStats.int / 100) : 0
 	const dexDamage = runeMainStats.dex ? runeMainStats.dex.flat + (runeMainStats.dex.scale * heroMainStats.dex / 100) : 0
 	const strDamage = runeMainStats.str ? runeMainStats.str.flat + (runeMainStats.str.scale * heroMainStats.str / 100) : 0

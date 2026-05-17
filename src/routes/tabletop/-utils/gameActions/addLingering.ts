@@ -46,7 +46,7 @@ export function addLingeringQuerySyncMutate({ queryClient, campaignId, data }: A
 
 type AddLingeringQuerySyncSuccessProps = QuerySyncProps & {
 	data: Awaited<ReturnType<typeof addLingeringAction>>
-	variables: typeof addLingeringSchema.t
+	variables: typeof addLingeringSchema.infer
 }
 
 export function addLingeringQuerySyncSuccess({ queryClient, campaignId, data, variables }: AddLingeringQuerySyncSuccessProps) {

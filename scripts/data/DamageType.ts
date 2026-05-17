@@ -1,39 +1,39 @@
 type DamageTypeArchetype = {
-	intelligence: {
-		arcane: 'astral' | 'constructs' | 'sorcery'
-		elemental: 'fire' | 'water' | 'wind' | 'earth' | 'electric'
+	INTELLIGENCE: {
+		ARCANE: 'ASTRAL' | 'CONSTRUCTS' | 'SORCERY'
+		ELEMENTAL: 'FIRE' | 'WATER' | 'WIND' | 'EARTH' | 'ELECTRIC'
 	}
-	dexterity: {
-		monk: 'unarmed' | 'dodge' | 'brewmaster'
-		rogue: 'stealth' | 'toxins' | 'assailable'
+	DEXTERITY: {
+		MONK: 'UNARMED' | 'DODGE' | 'BREWMASTER'
+		ROGUE: 'STEALTH' | 'TOXINS' | 'ASSAILABLE'
 	}
-	strength: {
-		warChief: 'battleCry' | 'bloodthirst'
-		guardian: 'armour' | 'vigour'
+	STRENGTH: {
+		WAR_CHIEF: 'BATTLE_CRY' | 'BLOODTHIRST'
+		GUARDIAN: 'ARMOUR' | 'VIGOUR'
 	}
-	charisma: {
-		psychic: 'inspire' | 'trickery'
-		warlock: 'hellfire' | 'demonology' | 'bloodPact'
+	CHARISMA: {
+		PSYCHIC: 'INSPIRE' | 'TRICKERY'
+		WARLOCK: 'HELLFIRE' | 'DEMONOLOGY' | 'BLOOD_PACT'
 	}
-	willpower: {
-		celestial: 'holy' | 'unholy'
-		nature: 'plant' | 'shapeshift' | 'thorns'
+	WILLPOWER: {
+		CELESTIAL: 'HOLY' | 'UNHOLY'
+		NATURE: 'PLANT' | 'SHAPESHIFT' | 'THORNS'
 	}
-	ferocity: {
-		weaponsMaster: 'bow' | 'shortSword' | 'axe' | 'bulwark' | 'greatSword' | 'daggers' | 'chains' | 'whips'
-		beastMaster: 'terrestrial' | 'aerial' | 'aquatic'
+	FEROCITY: {
+		WEAPONS_MASTER: 'BOW' | 'SHORT_SWORD' | 'AXE' | 'BULWARK' | 'GREAT_SWORD' | 'DAGGERS' | 'CHAINS' | 'WHIPS'
+		BEAST_MASTER: 'TERRESTRIAL' | 'AERIAL' | 'AQUATIC'
 	}
-	omni: {
-		demonic: 'demonic'
-		generic: 'generic' | 'base'
+	OMNI: {
+		DEMONIC: 'DEMONIC'
+		GENERIC: 'GENERIC' | 'BASE'
 	}
 }
 
 export type DamageType<T extends keyof DamageTypeArchetype = keyof DamageTypeArchetype> = keyof DamageTypeArchetype & T
 
-export type MainDamageType = DamageType<'intelligence' | 'dexterity' | 'strength'>
-export type HybridDamageType = DamageType<'charisma' | 'willpower' | 'ferocity'>
-export type TribridDamageType = DamageType<'omni'>
+export type MainDamageType = DamageType<'INTELLIGENCE' | 'DEXTERITY' | 'STRENGTH'>
+export type HybridDamageType = DamageType<'CHARISMA' | 'WILLPOWER' | 'FEROCITY'>
+export type TribridDamageType = DamageType<'OMNI'>
 
 export type Archetype<T extends DamageType> = keyof DamageTypeArchetype[T]
 export type Subarchetype<T extends DamageType, S extends keyof DamageTypeArchetype[T]> = {

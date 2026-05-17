@@ -50,9 +50,9 @@ function Tile({ tile, tileData, offset }: TileProps) {
 		disabled: !!tileData?.characterType
 	})
 
-	const isTargettingTiles = useConfirmTargetStore(state => state.target?.selectType === 'TILE')
+	const isTargettingTiles = useConfirmTargetStore(state => state.target?.[state.currentEffectIndex]?.selectType === 'TILE')
 
-	const selectedTiles = useConfirmTargetStore(state => state.selected?.tiles) ?? []
+	const selectedTiles = useConfirmTargetStore(state => state.selected?.[state.currentEffectIndex]?.tiles) ?? []
 	const isSelected = selectedTiles.includes(cordString)
 
 	const hexClickHandler = (_event: React.MouseEvent<HTMLDivElement>) => {

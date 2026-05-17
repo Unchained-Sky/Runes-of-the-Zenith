@@ -1,75 +1,65 @@
 import { type } from 'arktype'
-import { type Archetype, type DamageType, type Subarchetype } from '../DamageType'
+import { type Enums } from '~/supabase/databaseTypes'
 import astral from './intelligence/arcane/astral'
-
-type RuneDurability = 'REINFORCED' | 'STABLE' | 'UNSTABLE' | 'FRAGILE'
-
-type RuneSlotDurability = {
-	slot: 'PRIMARY'
-	durability: RuneDurability
-} | {
-	slot: 'SECONDARY'
-	durability: RuneDurability
-} | {
-	slot: 'PASSIVE'
-	durability: null
-}
 
 const powerValues = type({
 	flat: 'number',
 	scale: 'number'
 })
 
-const mainStats = type({
-	'int': powerValues,
-	'dex?': powerValues,
-	'str?': powerValues
-}).or({
-	'int?': powerValues,
-	'dex': powerValues,
-	'str?': powerValues
-}).or({
-	'int?': powerValues,
-	'dex?': powerValues,
-	'str': powerValues
-})
-
-const targetCharacterType = type('"ENEMY" | "HERO" | "ALLY" | "ALL" | "SELF" | "NONE"') // TODO Summon?
-const targetSelectType = type('"CHARACTER" | "AREA" | "TILE" | "NONE"')
-
 const damageHealing = type({
-	mainStats,
-	resolve: 'number',
+	mainStats: type({
+		'int': powerValues,
+		'dex?': powerValues,
+		'str?': powerValues
+	}).or({
+		'int?': powerValues,
+		'dex': powerValues,
+		'str?': powerValues
+	}).or({
+		'int?': powerValues,
+		'dex?': powerValues,
+		'str': powerValues
+	}),
 	accuracy: 'number'
 })
 
-export const runeExtraDataSchema = type({
-	'description': 'string',
+export const runeEffectSchema = type({
 	'range?': 'number',
+	'aoe?': 'number',
 	'damage?': damageHealing,
 	'healing?': damageHealing,
 	'target': {
-		characterType: targetCharacterType,
-		selectType: targetSelectType,
+		// TODO add target description
+		characterType: type('"ENEMY" | "HERO" | "ALLY" | "ALL" | "SELF" | "NONE"'), // TODO Summon?,
+		selectType: type('"CHARACTER" | "AREA" | "TILE" | "NONE"'),
 		amount: 'number'
 	}
 })
-export type RuneExtraData = typeof runeExtraDataSchema.infer
+export type RuneEffectData = typeof runeEffectSchema.infer
 
 export type RuneDataInternal = {
 	name: string
 	description: string
-	data: Omit<RuneExtraData, 'description'>
-} & RuneSlotDurability
+	resolve: number
+	effect: RuneEffectData[]
+	slot: Enums<'rune_slot'>
+	durability: Enums<'rune_durability'>
+}
 
-export type RuneData<T extends DamageType = DamageType> = T extends DamageType ? {
-	damageType: Uppercase<T>
-	archetype: Archetype<T>
-	/**
-	 * The inference doesn't work perfectly here, it lists all possible subarchetypes for the damage type
-	 */
-	subarchetype: Subarchetype<T, Archetype<T>>
-} & Omit<RuneDataInternal, 'description'> & { data: RuneDataInternal['data'] & { description: string } } : never
+export const runeExtraDataSchema = type({
+	description: 'string',
+	resolve: 'number',
+	effect: runeEffectSchema.array()
+})
+
+export type RuneData = {
+	name: string
+	subarchetype: Enums<'subarchetype'>
+	slot: Enums<'rune_slot'>
+	durability: Enums<'rune_durability'>
+	data: typeof runeExtraDataSchema.infer
+}
 
 const allRunes = [
 	astral

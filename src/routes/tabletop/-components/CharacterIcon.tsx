@@ -75,9 +75,9 @@ type CharacterIconInnerProps = {
 
 function CharacterIconInner({ tabletopCharacterId, characterType, characterName, avatarUrl }: CharacterIconInnerProps) {
 	const isTargetting = useConfirmTargetStore(state => state.opened)
-	const isTargettingCharacters = useConfirmTargetStore(state => state.target?.selectType === 'CHARACTER')
-	const selectedCharacters = useConfirmTargetStore(state => state.selected?.characters) ?? []
-	const isTargetted = selectedCharacters.includes(tabletopCharacterId)
+	const isTargettingCharacters = useConfirmTargetStore(state => state.target?.[state.currentEffectIndex]?.selectType === 'CHARACTER')
+	const selectedCharacters = useConfirmTargetStore(state => state.selected?.[state.currentEffectIndex]?.characters) ?? []
+	const isTargetted = !!selectedCharacters.filter(character => character.tabletopCharacterId === tabletopCharacterId).length
 
 	const hasPermission = useCharacterPermission(tabletopCharacterId)
 
@@ -94,7 +94,7 @@ function CharacterIconInner({ tabletopCharacterId, characterType, characterName,
 
 	const mouseEvents = useHoldButton({
 		clickCallback: () => {
-			useConfirmTargetStore.getState().toggleTarget({ tabletopCharacterId })
+			useConfirmTargetStore.getState().toggleTarget({ tabletopCharacterId, characterType })
 		}
 	})
 
