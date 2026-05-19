@@ -1,6 +1,6 @@
 import { Avatar, Button, Divider, Group, Menu, Stack, Text, Title } from '@mantine/core'
+import { useGMTabletopEnemies } from '~/routes/tabletop/$campaignId.gm/-hooks/tabletopData/useGMTabletopEnemies'
 import { useAssignNextHeroTurn } from '~/routes/tabletop/-utils/gameActions/assignNextHeroTurn'
-import { useGMTabletopEnemies } from '~/tt-gm/-hooks/tabletopData/useTabletopEnemies'
 import { type TabletopHeroData, useTabletopHeroes } from '~/tt/-hooks/tabletopData/useTabletopHeroes'
 import { useTabletopHeroRounds } from '~/tt/-hooks/tabletopData/useTabletopHeroRounds'
 

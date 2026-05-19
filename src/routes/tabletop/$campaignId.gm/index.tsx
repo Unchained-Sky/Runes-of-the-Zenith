@@ -11,11 +11,11 @@ import { tabletopRoundQueryOptions } from '~/tt/-hooks/tabletopData/useTabletopR
 import { tabletopTilesQueryOptions } from '~/tt/-hooks/tabletopData/useTabletopTiles'
 import Windows from '~/tt/-windows'
 import { safeParseInt } from '~/utils/safeParseInt'
+import TabletopSubscriptions from '../-hooks/useTabletopSubscriptions'
 import CombatGridTabletopGM from './-components/CombatGridTabletopGM'
 import SettingsPanel from './-components/SettingsPanel'
-import { tabletopCurrentEncounterQueryOptions } from './-hooks/tabletopData/useTabletopCurrentEncounter'
-import { tabletopEncounterListQueryOptions } from './-hooks/tabletopData/useTabletopEncounterList'
-import useTabletopGMSubscription from './-hooks/useTabletopSubscription'
+import { tabletopCurrentEncounterQueryOptions } from './-hooks/tabletopData/useGMTabletopCurrentEncounter'
+import { tabletopEncounterListQueryOptions } from './-hooks/tabletopData/useGMTabletopEncounterList'
 
 export const Route = createFileRoute('/tabletop/$campaignId/gm/')({
 	component: RouteComponent,
@@ -70,8 +70,6 @@ function RouteComponent() {
 	const { campaignId } = Route.useLoaderData()
 	const { queryClient } = Route.useRouteContext()
 
-	useTabletopGMSubscription()
-
 	return (
 		<TabletopContext
 			value={{
@@ -81,6 +79,8 @@ function RouteComponent() {
 				route: '/tabletop/$campaignId/gm/'
 			}}
 		>
+			<TabletopSubscriptions />
+
 			<DragDrop>
 				<CombatGridTabletopGM />
 				<SettingsPanel />

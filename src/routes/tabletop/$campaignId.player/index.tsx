@@ -11,6 +11,7 @@ import { tabletopRoundQueryOptions } from '~/tt/-hooks/tabletopData/useTabletopR
 import { tabletopTilesQueryOptions } from '~/tt/-hooks/tabletopData/useTabletopTiles'
 import Windows from '~/tt/-windows'
 import { safeParseInt } from '~/utils/safeParseInt'
+import TabletopSubscriptions from '../-hooks/useTabletopSubscriptions'
 import CombatGridTabletopPlayer from './-components/CombatGridTabletopPlayer'
 import Sidebar from './-components/Sidebar'
 
@@ -70,6 +71,8 @@ function RouteComponent() {
 				route: '/tabletop/$campaignId/player/'
 			}}
 		>
+			<TabletopSubscriptions />
+
 			<DragDrop>
 				<CombatGridTabletopPlayer />
 				<Sidebar />

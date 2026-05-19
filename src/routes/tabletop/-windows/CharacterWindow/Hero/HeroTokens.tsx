@@ -1,5 +1,5 @@
 import { ActionIcon, Autocomplete, Button, Card, Group, NumberInput, Stack, Text, Title, Tooltip } from '@mantine/core'
-import { useDisclosure, useMap } from '@mantine/hooks'
+import { useDisclosure, useMap, useSet } from '@mantine/hooks'
 import { IconPencil, IconPlus, IconX } from '@tabler/icons-react'
 import { useMemo, useState } from 'react'
 import TokenIcon from '~/components/TokenIcon'
@@ -49,6 +49,7 @@ function EditToken({ close }: EditTokenProps) {
 	const updateCharacterToken = useUpdateCharacterTokens()
 
 	const virtualTokens = useMap(tokens.map(token => [token.name, token.amount]))
+	const deletedToken = useSet<string>()
 
 	return (
 		<Stack>
@@ -67,7 +68,12 @@ function EditToken({ close }: EditTokenProps) {
 							/>
 							<Tooltip label='Remove'>
 								<ActionIcon size={36} variant='light' color='red'>
-									<IconX onClick={() => virtualTokens.delete(tokenName)} />
+									<IconX
+										onClick={() => {
+											virtualTokens.delete(tokenName)
+											deletedToken.add(tokenName)
+										}}
+									/>
 								</ActionIcon>
 							</Tooltip>
 						</Group>
@@ -83,11 +89,15 @@ function EditToken({ close }: EditTokenProps) {
 					flex={1}
 					type='submit'
 					onClick={() => {
+						const tokens = Object.fromEntries(virtualTokens)
+						deletedToken.forEach(tokenName => {
+							tokens[tokenName] = 0
+						})
 						updateCharacterToken.mutate({
 							data: {
 								tabletopCharacterId,
 								characterType: 'HERO',
-								tokens: Object.fromEntries(virtualTokens)
+								tokens
 							}
 						})
 						close()

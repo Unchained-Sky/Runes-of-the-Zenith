@@ -1,6 +1,6 @@
 import { Window } from '@gfazioli/mantine-window'
 import { Avatar, Group, Stack, Text, type StackProps } from '@mantine/core'
-import { useGMTabletopEnemies } from '~/tt-gm/-hooks/tabletopData/useTabletopEnemies'
+import { useGMTabletopEnemies } from '~/routes/tabletop/$campaignId.gm/-hooks/tabletopData/useGMTabletopEnemies'
 import { useTabletopHeroes } from '~/tt/-hooks/tabletopData/useTabletopHeroes'
 import { useTabletopHeroRounds } from '~/tt/-hooks/tabletopData/useTabletopHeroRounds'
 import { useTabletopRound } from '~/tt/-hooks/tabletopData/useTabletopRound'

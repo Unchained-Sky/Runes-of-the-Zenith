@@ -1,5 +1,5 @@
-import { useGMTabletopEnemies } from '../../$campaignId.gm/-hooks/tabletopData/useTabletopEnemies'
-import { usePlayerTabletopEnemies } from '../../$campaignId.player/-hooks/tabletopData/useTabletopEnemies'
+import { useGMTabletopEnemies } from '../../$campaignId.gm/-hooks/tabletopData/useGMTabletopEnemies'
+import { usePlayerTabletopEnemies } from '../../$campaignId.player/-hooks/tabletopData/usePlayerTabletopEnemies'
 import { useTabletopContext } from '../../-utils/TabletopContext'
 
 export function useTabletopEnemies() {

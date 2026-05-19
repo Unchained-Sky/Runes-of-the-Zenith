@@ -1,6 +1,6 @@
 import { Window, type WindowProps } from '@gfazioli/mantine-window'
+import { useGMTabletopEnemies } from '~/routes/tabletop/$campaignId.gm/-hooks/tabletopData/useGMTabletopEnemies'
 import { type Enums } from '~/supabase/databaseTypes'
-import { useGMTabletopEnemies } from '~/tt-gm/-hooks/tabletopData/useTabletopEnemies'
 import { useTabletopHeroes } from '~/tt/-hooks/tabletopData/useTabletopHeroes'
 import { DEFAULT_WINDOW_PROPS, type CustomWindowProps } from '~/tt/-windows/windowHelpers'
 import Enemy from './Enemy'

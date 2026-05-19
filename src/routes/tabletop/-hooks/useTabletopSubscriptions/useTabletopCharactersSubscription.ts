@@ -1,14 +1,16 @@
-import { getRouteApi } from '@tanstack/react-router'
 import useMountEffect from '~/hooks/useMountEffect'
+import { LOG_SUBSCRIPTION_PAYLOADS } from '~/routes/tabletop/-hooks/useTabletopSubscriptions/useTabletopSubscriptions'
 import { type Tables } from '~/supabase/databaseTypes'
+import { useSupabase } from '~/supabase/useSupabase'
 import { type TabletopTiles } from '~/tt/-hooks/tabletopData/useTabletopTiles'
 import { typedObject } from '~/types/typedObject'
-import { LOG_SUBSCRIPTION_PAYLOADS, type SubscribeHookProps } from './useTabletopSubscription'
+import { useTabletopContext } from '../../-utils/TabletopContext'
 
 type TabletopCharacters = Tables<'tabletop_characters'>
 
-export default function useTabletopCharactersSubscription({ supabase, campaignId }: SubscribeHookProps) {
-	const { queryClient } = getRouteApi('/tabletop/$campaignId/gm/').useRouteContext()
+export default function useTabletopCharactersSubscription() {
+	const { supabase } = useSupabase()
+	const { queryClient, campaignId } = useTabletopContext()
 
 	useMountEffect(() => {
 		const channelName = `tabletop_characters:${campaignId}`
