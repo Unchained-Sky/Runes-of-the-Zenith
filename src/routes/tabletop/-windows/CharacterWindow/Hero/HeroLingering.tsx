@@ -73,21 +73,25 @@ function UpdateLingering() {
 	return (
 		<Stack>
 			<Divider label='Update Lingering Effect' />
-			<Table>
-				<Table.Thead>
-					<Table.Tr>
-						<Table.Th style={{ width: '100%' }}>Effect</Table.Th>
-						<Table.Th>Time Remaining</Table.Th>
-					</Table.Tr>
-				</Table.Thead>
-				<Table.Tbody>
-					{lingering.map(lingering => {
-						return (
-							<UpdateLingeringEffect key={lingering.lingeringId} lingering={lingering} />
-						)
-					})}
-				</Table.Tbody>
-			</Table>
+			{!lingering.length
+				? <Text fs='italic'>None</Text>
+				: (
+					<Table>
+						<Table.Thead>
+							<Table.Tr>
+								<Table.Th style={{ width: '100%' }}>Effect</Table.Th>
+								<Table.Th>Time Remaining</Table.Th>
+							</Table.Tr>
+						</Table.Thead>
+						<Table.Tbody>
+							{lingering.map(lingering => {
+								return (
+									<UpdateLingeringEffect key={lingering.lingeringId} lingering={lingering} />
+								)
+							})}
+						</Table.Tbody>
+					</Table>
+				)}
 		</Stack>
 	)
 }

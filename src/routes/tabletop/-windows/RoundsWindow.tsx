@@ -1,12 +1,12 @@
 import { Window } from '@gfazioli/mantine-window'
-import { Avatar, Group, Stack, type StackProps, Text } from '@mantine/core'
+import { Avatar, Group, Stack, Text, type StackProps } from '@mantine/core'
 import { useGMTabletopEnemies } from '~/tt-gm/-hooks/tabletopData/useTabletopEnemies'
 import { useTabletopHeroes } from '~/tt/-hooks/tabletopData/useTabletopHeroes'
 import { useTabletopHeroRounds } from '~/tt/-hooks/tabletopData/useTabletopHeroRounds'
 import { useTabletopRound } from '~/tt/-hooks/tabletopData/useTabletopRound'
-import { DEFAULT_WINDOW_POSITION_X, DEFAULT_WINDOW_POSITION_Y, type WindowProps } from './windowHelpers'
+import { DEFAULT_WINDOW_PROPS, type CustomWindowProps } from './windowHelpers'
 
-export default function RoundsWindow({ opened, onClose }: WindowProps) {
+export default function RoundsWindow({ opened, onClose }: CustomWindowProps) {
 	const { data: heroRounds } = useTabletopHeroRounds()
 	const usedTurns = heroRounds.filter(heroRound => heroRound.used)
 	const unusedTurnCount = heroRounds.filter(heroRound => !heroRound.used).length
@@ -26,16 +26,14 @@ export default function RoundsWindow({ opened, onClose }: WindowProps) {
 
 	return (
 		<Window
+			{...DEFAULT_WINDOW_PROPS}
 			id='round'
 			opened={opened}
 			onClose={onClose}
-			defaultX={DEFAULT_WINDOW_POSITION_X}
-			defaultY={DEFAULT_WINDOW_POSITION_Y}
 			defaultWidth={480}
 			defaultHeight={165}
 			minWidth={360}
 			minHeight={165}
-			resizable='both'
 			title={`Round: ${roundData.round}`}
 		>
 			<Group gap='sm' align='flex-start' wrap='nowrap'>

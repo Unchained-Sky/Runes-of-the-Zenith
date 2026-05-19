@@ -29,10 +29,7 @@ type CharacterIconHeroProps = {
 function CharacterIconHero({ tabletopCharacterId }: CharacterIconHeroProps) {
 	const { data: heroesData } = useTabletopHeroes()
 	const heroData = heroesData[tabletopCharacterId]
-	if (!heroData) {
-		console.error(`Hero not found: ${tabletopCharacterId}`)
-		return null
-	}
+	if (!heroData) return null
 
 	return (
 		<CharacterIconInner
@@ -51,10 +48,7 @@ type CharacterIconEnemyProps = {
 function CharacterIconEnemy({ tabletopCharacterId }: CharacterIconEnemyProps) {
 	const { data: enemiesData } = useTabletopEnemies()
 	const enemyData = enemiesData[tabletopCharacterId]
-	if (!enemyData) {
-		console.error(`Enemy not found: ${tabletopCharacterId}`)
-		return null
-	}
+	if (!enemyData) return null
 
 	return (
 		<CharacterIconInner
@@ -76,7 +70,8 @@ type CharacterIconInnerProps = {
 function CharacterIconInner({ tabletopCharacterId, characterType, characterName, avatarUrl }: CharacterIconInnerProps) {
 	const isTargetting = useConfirmTargetStore(state => state.opened)
 	const isTargettingCharacters = useConfirmTargetStore(state => state.target?.[state.currentEffectIndex]?.selectType === 'CHARACTER')
-	const selectedCharacters = useConfirmTargetStore(state => state.selected?.[state.currentEffectIndex]?.characters) ?? []
+	const currentSelected = useConfirmTargetStore(state => state.selected?.[state.currentEffectIndex])
+	const selectedCharacters = currentSelected ? ('characters' in currentSelected ? currentSelected.characters : []) : []
 	const isTargetted = !!selectedCharacters.filter(character => character.tabletopCharacterId === tabletopCharacterId).length
 
 	const hasPermission = useCharacterPermission(tabletopCharacterId)

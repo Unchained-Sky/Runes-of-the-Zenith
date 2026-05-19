@@ -1,105 +1,73 @@
-import { ActionIcon, Drawer, rem, ScrollArea, Tabs } from '@mantine/core'
-import { IconMenu2, IconX } from '@tabler/icons-react'
-import { Fragment } from 'react'
+import { Box, ScrollArea, Tabs } from '@mantine/core'
+import { useState } from 'react'
 import DebugTag from './DebugTab'
 import MapTab from './MapTab'
 import RoundTab from './RoundTab'
 import UnitsTab from './UnitsTab'
-import { useSettingsPanelStore } from './useSettingsPanelStore'
 import WindowTab from './WindowTab'
 
 export default function SettingsPanel() {
-	const {
-		activeTab,
-		closePanel,
-		openLastTab,
-		setActiveTab
-	} = useSettingsPanelStore()
+	const [activeTab, setActiveTab] = useState('units')
 
 	return (
-		<Fragment>
-			<ActionIcon
-				onClick={openLastTab}
-				pos='absolute'
-				right={rem(16)}
-				top={rem(16)}
-				size='xl'
-				variant='transparent'
-				color='dark.1'
-			>
-				<IconMenu2 size='100%' />
-			</ActionIcon>
-
-			<Drawer
-				opened={!!activeTab}
-				onClose={closePanel}
-				withOverlay={false}
-				position='right'
-				size='lg'
+		<Box
+			w={620}
+			pos='absolute'
+			top={0}
+			right={0}
+			h='100vh'
+			bg='dark.6'
+			p='md'
+		>
+			<Tabs
+				value={activeTab}
+				onChange={value => value && setActiveTab(value)}
 				styles={{
-					header: {
-						backgroundColor: 'var(--mantine-color-dark-6)'
-					},
-					content: {
-						backgroundColor: 'var(--mantine-color-dark-6)'
+					panel: {
+						paddingTop: 'var(--mantine-spacing-md)'
 					}
 				}}
-				title='Settings'
-				closeButtonProps={{
-					icon: <IconX size='100%' />
-				}}
 			>
-				<Tabs
-					value={activeTab}
-					onChange={value => value && setActiveTab(value)}
-					styles={{
-						panel: {
-							paddingTop: 'var(--mantine-spacing-md)'
-						}
-					}}
-				>
-					<Tabs.List>
-						<Tabs.Tab value='units'>
-							Units
-						</Tabs.Tab>
-						<Tabs.Tab value='round'>
-							Round
-						</Tabs.Tab>
-						<Tabs.Tab value='map'>
-							Map
-						</Tabs.Tab>
-						<Tabs.Tab value='window'>
-							Windows
-						</Tabs.Tab>
-						<Tabs.Tab value='debug'>
-							Debug
-						</Tabs.Tab>
-					</Tabs.List>
+				<Tabs.List>
+					<Tabs.Tab value='units'>
+						Units
+					</Tabs.Tab>
+					<Tabs.Tab value='round'>
+						Round
+					</Tabs.Tab>
+					<Tabs.Tab value='map'>
+						Map
+					</Tabs.Tab>
+					<Tabs.Tab value='window'>
+						Windows
+					</Tabs.Tab>
+					<Tabs.Tab value='debug'>
+						Debug
+					</Tabs.Tab>
+				</Tabs.List>
 
-					{/*
-						60px = draw header
-						36px = tab list
-						16px = top padding panels
-					*/}
-					<ScrollArea h='calc(100vh - 60px - 36px - 16px)'>
-						<Tabs.Panel value='units'>
-							<UnitsTab />
-						</Tabs.Panel>
-						<Tabs.Panel value='round'>
-							<RoundTab />
-						</Tabs.Panel>
-						<Tabs.Panel value='map'>
-							<MapTab />
-						</Tabs.Panel>
-						<Tabs.Panel value='window'>
-							<WindowTab />
-						</Tabs.Panel>
-						<Tabs.Panel value='debug'>
-							<DebugTag />
-						</Tabs.Panel>
-					</ScrollArea>
-				</Tabs>
-			</Drawer>
-		</Fragment>
+				{/*
+					36px = tab list
+					32px = padding
+				*/}
+				<ScrollArea h='calc(100vh - 36px - 32px)'>
+					<Tabs.Panel value='units'>
+						<UnitsTab />
+					</Tabs.Panel>
+					<Tabs.Panel value='round'>
+						<RoundTab />
+					</Tabs.Panel>
+					<Tabs.Panel value='map'>
+						<MapTab />
+					</Tabs.Panel>
+					<Tabs.Panel value='window'>
+						<WindowTab />
+					</Tabs.Panel>
+					<Tabs.Panel value='debug'>
+						<DebugTag />
+					</Tabs.Panel>
+				</ScrollArea>
+			</Tabs>
+		</Box>
 	)
 }
