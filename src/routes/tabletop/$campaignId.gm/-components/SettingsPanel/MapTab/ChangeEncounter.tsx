@@ -228,10 +228,12 @@ const changeEncounterAction = createServerFn({ method: 'POST' })
 					.from('tabletop_enemy')
 					.insert(
 						tilesWithEnemies.map(({ enemyId }, index) => {
+							const enemyData = enemiesData.data.find(({ enemyInfo }) => enemyInfo[0]?.enemyId === enemyId)
+							if (!enemyData) throw new Error(`No enemy data for ${enemyId}`)
 							return {
 								enemy_id: enemyId,
 								tt_character_id: characterIds[index]?.characterId ?? -1,
-								current_aggression: 0
+								current_aggression: enemyData.enemyInfo[0]?.aggression ?? 0
 							} satisfies TablesInsert<'tabletop_enemy'>
 						})
 					)

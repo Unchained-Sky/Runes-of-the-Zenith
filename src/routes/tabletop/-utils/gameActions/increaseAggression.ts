@@ -35,7 +35,7 @@ export function increaseAggressionQuerySync({ queryClient, campaignId, data }: I
 				...oldData,
 				tabletopStats: {
 					...oldData.tabletopStats,
-					currentAggression: oldData.tabletopStats.currentAggression + (data.amount ?? DEFAULT_INCREASE_AMOUNT)
+					currentAggression: Math.max(0, oldData.tabletopStats.currentAggression - (data.amount ?? DEFAULT_INCREASE_AMOUNT))
 				}
 			} satisfies TabletopGMEnemyData
 		})
@@ -96,7 +96,7 @@ export const UNSAFE_increaseAggressionAction = createServerOnlyFn(async ({ amoun
 			const { error } = await serviceClient
 				.from('tabletop_enemy')
 				.update({
-					current_aggression: currentAggression + (amount ?? DEFAULT_INCREASE_AMOUNT)
+					current_aggression: Math.max(0, currentAggression - (amount ?? DEFAULT_INCREASE_AMOUNT))
 				})
 				.eq('tt_character_id', tabletopCharacterId)
 			if (error) throw new Error(error.message, { cause: error })

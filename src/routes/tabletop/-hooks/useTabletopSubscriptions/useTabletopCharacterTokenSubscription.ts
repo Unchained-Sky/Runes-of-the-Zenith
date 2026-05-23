@@ -86,7 +86,7 @@ export default function useTabletopCharacterTokenSubscription() {
 					}
 				}
 			})
-			.subscribe(status => console.log(`tabletop_character_token:${campaignId} ${status}`))
+			.subscribe(status => console.log(`${channelName} ${status}`))
 
 		return () => {
 			const channel = supabase.channel(channelName)

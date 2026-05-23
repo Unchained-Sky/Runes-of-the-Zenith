@@ -117,6 +117,9 @@ export function useGMTabletopEnemies() {
 		queries: tabletopCharacterIds.map(tabletopCharacterId => tabletopEnemyQueryOptions(campaignId, tabletopCharacterId))
 	})
 
+	const { role } = useTabletopContext()
+	if (role !== 'gm') throw new Error('Role is not GM')
+
 	const dataTuple = queries
 		.map<[number, TabletopGMEnemiesData[number]] | null>(enemy => enemy.data ? [enemy.data.tabletopCharacterId, enemy.data] : null)
 		.filter(enemy => enemy !== null)

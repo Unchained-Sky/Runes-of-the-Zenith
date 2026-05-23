@@ -77,6 +77,9 @@ export function usePlayerTabletopEnemies() {
 		queries: tabletopCharacterIds.map(tabletopCharacterId => tabletopEnemyQueryOptions(campaignId, tabletopCharacterId))
 	})
 
+	const { role } = useTabletopContext()
+	if (role !== 'player') throw new Error('Role is not player')
+
 	const dataTuple = queries
 		.map<[number, TabletopPlayerEnemiesData[number]] | null>(enemy => enemy.data ? [enemy.data.tabletopCharacterId, enemy.data] : null)
 		.filter(enemy => enemy !== null)

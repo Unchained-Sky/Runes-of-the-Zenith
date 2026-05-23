@@ -31,7 +31,7 @@ export function resetAggressionQuerySync({ queryClient, campaignId, data }: Rese
 			...oldData,
 			tabletopStats: {
 				...oldData.tabletopStats,
-				currentAggression: 0
+				currentAggression: oldData.stats.aggression
 			}
 		} satisfies TabletopGMEnemyData
 	})
@@ -44,15 +44,31 @@ const resetAggressionSchema = type({
 export const resetAggressionAction = createServerFn({ method: 'POST' })
 	.inputValidator(resetAggressionSchema)
 	.handler(async ({ data: { tabletopCharacterId } }) => {
-		await requireGM({ tabletopCharacterId })
+		const { supabase } = await requireGM({ tabletopCharacterId })
+
+		const { data, error } = await supabase
+			.from('enemy_info')
+			.select(`
+				aggression,
+				tabletopEnemy: tabletop_enemy (
+					tabletopCharacterId: tt_character_id
+				)
+			`)
+			.eq('tabletop_enemy.tt_character_id', tabletopCharacterId)
+			.limit(1)
+			.single()
+		if (error) throw new Error(error.message, { cause: error })
 
 		const serviceClient = getServiceClient()
 
-		const { error } = await serviceClient
-			.from('tabletop_enemy')
-			.update({
-				current_aggression: 0
-			})
-			.eq('tt_character_id', tabletopCharacterId)
-		if (error) throw new Error(error.message, { cause: error })
+		{
+			const { error } = await serviceClient
+				.from('tabletop_enemy')
+				.update({
+					current_aggression: data.aggression
+				})
+				.eq('tt_character_id', tabletopCharacterId)
+				.limit(1)
+			if (error) throw new Error(error.message, { cause: error })
+		}
 	})

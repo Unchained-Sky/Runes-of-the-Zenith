@@ -1,5 +1,5 @@
 import { Avatar, Button, Divider, Group, Menu, Stack, Text, Title } from '@mantine/core'
-import { useGMTabletopEnemies } from '~/routes/tabletop/$campaignId.gm/-hooks/tabletopData/useGMTabletopEnemies'
+import { useTabletopEnemies } from '~/routes/tabletop/-hooks/tabletopData/useTabletopEnemies'
 import { useAssignNextHeroTurn } from '~/routes/tabletop/-utils/gameActions/assignNextHeroTurn'
 import { type TabletopHeroData, useTabletopHeroes } from '~/tt/-hooks/tabletopData/useTabletopHeroes'
 import { useTabletopHeroRounds } from '~/tt/-hooks/tabletopData/useTabletopHeroRounds'
@@ -11,12 +11,12 @@ export default function TurnOrder() {
 
 	const { data: heroesData } = useTabletopHeroes()
 
-	const { data: enemiesData } = useGMTabletopEnemies()
+	const { data: enemiesData } = useTabletopEnemies()
 	const enemiesOrder = Object.values(enemiesData).reduce<Record<number, number[]>>((prev, enemyData) => {
-		const aggressionLeft = Math.max(enemyData.stats.aggression - enemyData.tabletopStats.currentAggression, 0)
+		const { currentAggression } = enemyData.tabletopStats
 		return {
 			...prev,
-			[aggressionLeft]: prev[aggressionLeft] ? [...prev[aggressionLeft], enemyData.tabletopCharacterId] : [enemyData.tabletopCharacterId]
+			[currentAggression]: prev[currentAggression] ? [...prev[currentAggression], enemyData.tabletopCharacterId] : [enemyData.tabletopCharacterId]
 		}
 	}, {})
 

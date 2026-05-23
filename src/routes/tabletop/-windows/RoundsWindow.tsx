@@ -1,9 +1,9 @@
 import { Window } from '@gfazioli/mantine-window'
 import { Avatar, Group, Stack, Text, type StackProps } from '@mantine/core'
-import { useGMTabletopEnemies } from '~/routes/tabletop/$campaignId.gm/-hooks/tabletopData/useGMTabletopEnemies'
 import { useTabletopHeroes } from '~/tt/-hooks/tabletopData/useTabletopHeroes'
 import { useTabletopHeroRounds } from '~/tt/-hooks/tabletopData/useTabletopHeroRounds'
 import { useTabletopRound } from '~/tt/-hooks/tabletopData/useTabletopRound'
+import { useTabletopEnemies } from '../-hooks/tabletopData/useTabletopEnemies'
 import { DEFAULT_WINDOW_PROPS, type CustomWindowProps } from './windowHelpers'
 
 export default function RoundsWindow({ opened, onClose }: CustomWindowProps) {
@@ -13,12 +13,12 @@ export default function RoundsWindow({ opened, onClose }: CustomWindowProps) {
 
 	const { data: heroesData } = useTabletopHeroes()
 
-	const { data: enemiesData } = useGMTabletopEnemies()
+	const { data: enemiesData } = useTabletopEnemies()
 	const enemiesOrder = Object.values(enemiesData).reduce<Record<number, number[]>>((prev, enemyData) => {
-		const aggressionLeft = Math.max(enemyData.stats.aggression - enemyData.tabletopStats.currentAggression, 0)
+		const { currentAggression } = enemyData.tabletopStats
 		return {
 			...prev,
-			[aggressionLeft]: prev[aggressionLeft] ? [...prev[aggressionLeft], enemyData.tabletopCharacterId] : [enemyData.tabletopCharacterId]
+			[currentAggression]: prev[currentAggression] ? [...prev[currentAggression], enemyData.tabletopCharacterId] : [enemyData.tabletopCharacterId]
 		}
 	}, {})
 

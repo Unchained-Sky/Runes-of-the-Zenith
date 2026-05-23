@@ -73,5 +73,10 @@ export const tabletopEncounterListQueryOptions = (campaignId: number) => queryOp
 
 export function useGMTabletopEncounterList() {
 	const { campaignId } = useTabletopContext()
-	return useSuspenseQuery(tabletopEncounterListQueryOptions(campaignId))
+	const query = useSuspenseQuery(tabletopEncounterListQueryOptions(campaignId))
+
+	const { role } = useTabletopContext()
+	if (role !== 'gm') throw new Error('Role is not GM')
+
+	return query
 }

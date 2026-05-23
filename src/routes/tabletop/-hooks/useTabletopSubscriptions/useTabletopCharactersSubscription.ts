@@ -2,15 +2,15 @@ import useMountEffect from '~/hooks/useMountEffect'
 import { LOG_SUBSCRIPTION_PAYLOADS } from '~/routes/tabletop/-hooks/useTabletopSubscriptions/useTabletopSubscriptions'
 import { type Tables } from '~/supabase/databaseTypes'
 import { useSupabase } from '~/supabase/useSupabase'
-import { type TabletopTiles } from '~/tt/-hooks/tabletopData/useTabletopTiles'
-import { typedObject } from '~/types/typedObject'
+import { type TabletopGMEnemyData } from '../../$campaignId.gm/-hooks/tabletopData/useGMTabletopEnemies'
 import { useTabletopContext } from '../../-utils/TabletopContext'
-
-type TabletopCharacters = Tables<'tabletop_characters'>
+import { type TabletopEnemyList } from '../tabletopData/useTabletopEnemyList'
+import { type TabletopHeroData } from '../tabletopData/useTabletopHeroes'
+import { type TabletopHeroesList } from '../tabletopData/useTabletopHeroList'
 
 export default function useTabletopCharactersSubscription() {
 	const { supabase } = useSupabase()
-	const { queryClient, campaignId } = useTabletopContext()
+	const { queryClient, campaignId, role } = useTabletopContext()
 
 	useMountEffect(() => {
 		const channelName = `tabletop_characters:${campaignId}`
@@ -25,34 +25,83 @@ export default function useTabletopCharactersSubscription() {
 
 				switch (payload.eventType) {
 					case 'INSERT': {
-						void queryClient.invalidateQueries({ queryKey: [campaignId, 'tabletop', 'tiles'] })
+						const insertData = payload.new as Tables<'tabletop_characters'>
+						void queryClient.invalidateQueries({ queryKey: [campaignId, 'tabletop', `${insertData.character_type.toLowerCase()}-list`] })
 						break
 					}
 					case 'UPDATE': {
-						void queryClient.invalidateQueries({ queryKey: [campaignId, 'tabletop', 'tiles'] })
+						const updateData = payload.new as Tables<'tabletop_characters'>
+
+						const queryKey = [campaignId, 'tabletop', updateData.character_type.toLowerCase(), updateData.tt_character_id]
+						void queryClient.invalidateQueries({ queryKey })
+
+						switch (updateData.character_type) {
+							case 'HERO': {
+								queryClient.setQueriesData({ queryKey }, (oldData: TabletopHeroData) => {
+									return {
+										...oldData,
+										tabletopStats: {
+											health: updateData.health,
+											wounds: updateData.wounds,
+											shield: updateData.shield,
+											trauma: updateData.trauma,
+											movement: updateData.movement
+										}
+									} satisfies TabletopHeroData
+								})
+								break
+							}
+							case 'ENEMY': {
+								if (role !== 'gm') return
+								queryClient.setQueriesData({ queryKey }, (oldData: TabletopGMEnemyData) => {
+									return {
+										...oldData,
+										tabletopStats: {
+											...oldData.tabletopStats,
+											health: updateData.health,
+											wounds: updateData.wounds,
+											shield: updateData.shield,
+											trauma: updateData.trauma,
+											movement: updateData.movement
+										}
+									} satisfies TabletopGMEnemyData
+								})
+								break
+							}
+						}
+
 						break
 					}
 					case 'DELETE': {
-						const { tt_character_id } = payload.old as TabletopCharacters
-
-						const tilesCache = queryClient.getQueryData<TabletopTiles>([campaignId, 'tabletop', 'tiles', 'characters']) ?? {}
-						const tilesArray = typedObject.entries(tilesCache)
-						const tileIndex = tilesArray.findIndex(([_cord, tile]) => tile && tile.characterType === 'HERO' && tile.tabletopCharacterId === tt_character_id)
-						const tileData = tilesArray[tileIndex]
-						if (tileData) {
-							void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'tiles', 'characters'] })
-							queryClient.setQueryData([campaignId, 'tabletop', 'tiles', 'characters'], (oldData: TabletopTiles) => {
-								return {
-									...oldData,
-									[tileData[0]]: null
-								}
-							})
+						const deleteData = payload.old as Tables<'tabletop_characters'>
+						switch (deleteData.character_type) {
+							case 'HERO': {
+								const queryKey = [campaignId, 'tabletop', 'hero-list']
+								void queryClient.invalidateQueries({ queryKey })
+								queryClient.setQueriesData({ queryKey }, (oldData: TabletopHeroesList) => {
+									return oldData.map(hero => hero.heroId !== deleteData.tt_character_id
+										? hero
+										: {
+											...hero,
+											tabletopCharacterId: null
+										} satisfies TabletopHeroesList[number])
+								})
+								break
+							}
+							case 'ENEMY': {
+								const queryKey = [campaignId, 'tabletop', 'enemy-list']
+								void queryClient.invalidateQueries({ queryKey })
+								queryClient.setQueriesData({ queryKey }, (oldData: TabletopEnemyList) => {
+									return oldData.filter(tabletopCharacterId => tabletopCharacterId !== deleteData.tt_character_id)
+								})
+								break
+							}
 						}
 						break
 					}
 				}
 			})
-			.subscribe(status => console.log(`tabletop_characters:${campaignId} ${status}`))
+			.subscribe(status => console.log(`${channelName} ${status}`))
 
 		return () => {
 			const channel = supabase.channel(channelName)
