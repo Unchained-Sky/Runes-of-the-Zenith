@@ -3,14 +3,16 @@ import { LOG_SUBSCRIPTION_PAYLOADS } from '~/routes/tabletop/-hooks/useTabletopS
 import { useTabletopContext } from '~/routes/tabletop/-utils/TabletopContext'
 import { type Tables } from '~/supabase/databaseTypes'
 import { useSupabase } from '~/supabase/useSupabase'
-import { type TabletopTile, type TabletopTiles } from '~/tt/-hooks/tabletopData/useTabletopTiles'
-import { typedObject } from '~/types/typedObject'
+import useCharacterLookup from '../../-utils/useCharacterLookup'
+import { type TabletopTiles } from '../tabletopData/useTabletopTiles'
 
 type TabletopTilesTable = Omit<Tables<'tabletop_tiles'>, 'tt_character_id'> & { tt_character_id?: number | null }
 
 export default function useTabletopTilesSubscription() {
 	const { supabase } = useSupabase()
 	const { queryClient, campaignId } = useTabletopContext()
+
+	const characterLookup = useCharacterLookup()
 
 	useMountEffect(() => {
 		const channelName = `tabletop_tiles:${campaignId}`
@@ -24,69 +26,43 @@ export default function useTabletopTilesSubscription() {
 				if (LOG_SUBSCRIPTION_PAYLOADS) console.log(payload)
 
 				switch (payload.eventType) {
-					case 'INSERT': {
-						const { tt_character_id: tabletopCharacterId, q, r, s } = payload.new as TabletopTilesTable
-						if (!tabletopCharacterId) break
-
-						void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'tiles', 'characters'] })
-						queryClient.setQueryData([campaignId, 'tabletop', 'tiles', 'characters'], (oldData: TabletopTiles) => {
-							const [oldCord, oldCordData] = typedObject.entries(oldData)
-								.find(([_keys, value]) => value?.tabletopCharacterId === tabletopCharacterId) ?? []
-							if (!oldCord || !oldCordData) {
-								void queryClient.invalidateQueries({ queryKey: [campaignId, 'tabletop', 'tiles'] })
-								return oldData
-							}
-
-							const cord = `${q},${r},${s}` as const
-							return {
-								...oldData,
-								[oldCord]: null,
-								[cord]: {
-									tabletopCharacterId,
-									characterType: oldCordData.characterType
-								} satisfies TabletopTile
-							}
-						})
-						break
-					}
+					case 'INSERT':
 					case 'UPDATE': {
-						const { tt_character_id: tabletopCharacterId, q, r, s } = payload.new as TabletopTilesTable
+						const upsertData = payload.new as Tables<'tabletop_tiles'>
 
-						void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'tiles', 'characters'] })
-						queryClient.setQueryData([campaignId, 'tabletop', 'tiles', 'characters'], (oldData: TabletopTiles) => {
-							const cord = `${q},${r},${s}` as const
-
-							if (!tabletopCharacterId) {
-								return {
-									...oldData,
-									[cord]: null
-								}
-							}
-
-							const [oldCord, oldCordData] = typedObject.entries(oldData)
-								.find(([_keys, value]) => value?.tabletopCharacterId === tabletopCharacterId) ?? []
-							if (!oldCord || !oldCordData) {
-								void queryClient.invalidateQueries({ queryKey: [campaignId, 'tabletop', 'tiles'] })
-								return oldData
-							}
-
+						const queryKey = [campaignId, 'tabletop', 'tiles', 'characters']
+						void queryClient.cancelQueries({ queryKey })
+						queryClient.setQueryData(queryKey, (oldData: TabletopTiles) => {
+							const cords = `${upsertData.q},${upsertData.r},${upsertData.s}` as const
 							return {
 								...oldData,
-								[`${q},${r},${s}`]: {
-									tabletopCharacterId,
-									characterType: oldCordData.characterType
-								}
-							}
+								[cords]: upsertData.tt_character_id
+									? {
+										tabletopCharacterId: upsertData.tt_character_id,
+										characterType: characterLookup(upsertData.tt_character_id)
+									}
+									: null
+							} satisfies TabletopTiles
 						})
 						break
 					}
 					case 'DELETE': {
-						void queryClient.invalidateQueries({ queryKey: [campaignId, 'tabletop', 'tiles'] })
+						const deleteData = payload.old as TabletopTilesTable
+
+						const queryKey = [campaignId, 'tabletop', 'tiles', 'characters']
+						void queryClient.cancelQueries({ queryKey })
+						queryClient.setQueryData(queryKey, (oldData: TabletopTiles) => {
+							const cords = `${deleteData.q},${deleteData.r},${deleteData.s}` as const
+							return {
+								...oldData,
+								[cords]: null
+							} satisfies TabletopTiles
+						})
 						break
 					}
 				}
 			})
-			.subscribe(status => console.log(`tabletop_tiles:${campaignId} ${status}`))
+			.subscribe(status => console.log(`${channelName} ${status}`))
 
 		return () => {
 			const channel = supabase.channel(channelName)

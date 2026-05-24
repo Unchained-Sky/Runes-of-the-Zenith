@@ -5,6 +5,7 @@ import useTabletopHeroesSubscription from './useTabletopHeroesSubscription'
 import useTabletopHeroTurnSubscription from './useTabletopHeroTurnSubscription'
 import useTabletopInfoSubscription from './useTabletopInfoSubscription'
 import useTabletopLingeringSubscription from './useTabletopLingeringSubscription'
+import useTabletopTilesSubscription from './useTabletopTilesSubscription'
 
 export const LOG_SUBSCRIPTION_PAYLOADS = process.env.NODE_ENV === 'development'
 
@@ -16,6 +17,7 @@ export default function TabletopSubscriptions() {
 	useTabletopHeroesSubscription()
 	useTabletopInfoSubscription()
 	useTabletopLingeringSubscription()
+	useTabletopTilesSubscription()
 
 	return null
 }
