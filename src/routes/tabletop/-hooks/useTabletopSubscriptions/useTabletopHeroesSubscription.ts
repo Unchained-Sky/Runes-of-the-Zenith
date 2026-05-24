@@ -1,14 +1,11 @@
 import useMountEffect from '~/hooks/useMountEffect'
 import { LOG_SUBSCRIPTION_PAYLOADS } from '~/routes/tabletop/-hooks/useTabletopSubscriptions/useTabletopSubscriptions'
 import { useTabletopContext } from '~/routes/tabletop/-utils/TabletopContext'
-import { type Tables } from '~/supabase/databaseTypes'
 import { useSupabase } from '~/supabase/useSupabase'
-
-type TabletopHeroesTable = Tables<'tabletop_heroes'>
 
 export default function useTabletopHeroesSubscription() {
 	const { supabase } = useSupabase()
-	const { queryClient, campaignId } = useTabletopContext()
+	const { queryClient: _queryClient, campaignId } = useTabletopContext()
 
 	useMountEffect(() => {
 		const channelName = `tabletop_heroes:${campaignId}`
@@ -23,45 +20,17 @@ export default function useTabletopHeroesSubscription() {
 
 				switch (payload.eventType) {
 					case 'INSERT': {
-						const { tt_character_id: tabletopCharacterId } = payload.new as TabletopHeroesTable
-						void queryClient.invalidateQueries({ queryKey: [campaignId, 'tabletop', 'hero', tabletopCharacterId] })
-						void queryClient.invalidateQueries({ queryKey: [campaignId, 'tabletop', 'tiles'] })
 						break
 					}
 					case 'UPDATE': {
-						const { hero_id: _ } = payload.new as TabletopHeroesTable
 						break
-
-						// const heroesCache = queryClient.getQueryData(['tabletop', 'heroes', campaignId]) as TabletopHeroesCache
-						// const updatedHeroName = heroesCache[hero_id]?.heroName
-						// if (!updatedHeroName) {
-						// 	void queryClient.invalidateQueries({ queryKey: ['tabletop', 'heroes', campaignId] })
-						// 	break
-						// }
-
-						// queryClient.setQueryData(['tabletop', 'heroes', campaignId], (oldData: TabletopHeroesCache) => {
-						// 	return {
-						// 		...oldData,
-						// 		[hero_id]: {
-						// 			heroId: hero_id,
-						// 			heroName: updatedHeroName
-						// 			// tabletopHero: tabletopHeroData
-						// 		}
-						// 		// } satisfies TabletopHeroesCache[string]
-						// 	}
-						// })
-						// break
 					}
 					case 'DELETE': {
-						const { tt_character_id: tabletopCharacterId } = payload.old as TabletopHeroesTable
-						queryClient.setQueriesData({ queryKey: [campaignId, 'tabletop', 'hero', tabletopCharacterId] }, () => {
-							return null
-						})
 						break
 					}
 				}
 			})
-			.subscribe(status => console.log(`tabletop_heroes:${campaignId} ${status}`))
+			.subscribe(status => console.log(`${channelName} ${status}`))
 
 		return () => {
 			const channel = supabase.channel(channelName)

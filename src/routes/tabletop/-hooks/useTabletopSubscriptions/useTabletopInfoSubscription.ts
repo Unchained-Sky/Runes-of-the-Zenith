@@ -1,7 +1,9 @@
 import useMountEffect from '~/hooks/useMountEffect'
 import { LOG_SUBSCRIPTION_PAYLOADS } from '~/routes/tabletop/-hooks/useTabletopSubscriptions/useTabletopSubscriptions'
 import { useTabletopContext } from '~/routes/tabletop/-utils/TabletopContext'
+import { type Tables } from '~/supabase/databaseTypes'
 import { useSupabase } from '~/supabase/useSupabase'
+import { type TabletopRoundData } from '../tabletopData/useTabletopRound'
 
 export default function useTabletopInfoSubscription() {
 	const { supabase } = useSupabase()
@@ -19,21 +21,27 @@ export default function useTabletopInfoSubscription() {
 				if (LOG_SUBSCRIPTION_PAYLOADS) console.log(payload)
 
 				switch (payload.eventType) {
-					case 'INSERT':
+					case 'INSERT': {
+						break
+					}
 					case 'UPDATE': {
-						void queryClient.invalidateQueries({ queryKey: [campaignId, 'tabletop', 'tiles'] })
-						void queryClient.invalidateQueries({ queryKey: [campaignId, 'tabletop', 'encounter-name'] })
-						void queryClient.invalidateQueries({ queryKey: [campaignId, 'tabletop', 'enemy'] })
+						const updateData = payload.new as Tables<'tabletop_info'>
+						const queryKey = [campaignId, 'tabletop', 'round']
+						void queryClient.cancelQueries({ queryKey })
+						queryClient.setQueryData(queryKey, (oldData: TabletopRoundData) => {
+							return {
+								...oldData,
+								round: updateData.round
+							}
+						})
 						break
 					}
 					case 'DELETE': {
-						void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'tiles'] })
-						queryClient.setQueryData([campaignId, 'tabletop', 'tiles'], [])
 						break
 					}
 				}
 			})
-			.subscribe(status => console.log(`tabletop_info:${campaignId} ${status}`))
+			.subscribe(status => console.log(`${channelName} ${status}`))
 
 		return () => {
 			const channel = supabase.channel(channelName)
