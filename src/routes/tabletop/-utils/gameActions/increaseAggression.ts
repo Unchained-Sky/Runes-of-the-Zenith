@@ -7,6 +7,7 @@ import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
 import { type TabletopEnemyList } from '~/tt/-hooks/tabletopData/useTabletopEnemyList'
 import { mutationError } from '~/utils/mutationError'
+import { type TabletopPlayerEnemyData } from '../../$campaignId.player/-hooks/tabletopData/usePlayerTabletopEnemies'
 import { type QuerySyncProps } from './querySync'
 
 const DEFAULT_INCREASE_AMOUNT = 1
@@ -29,15 +30,17 @@ type IncreaseAggressionQuerySyncProps = QuerySyncProps<typeof increaseAggression
 
 export function increaseAggressionQuerySync({ queryClient, campaignId, data }: IncreaseAggressionQuerySyncProps) {
 	const syncCharacter = (tabletopCharacterId: number) => {
-		void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop-gm', 'enemy', tabletopCharacterId] })
-		queryClient.setQueryData([campaignId, 'tabletop-gm', 'enemy', tabletopCharacterId], (oldData: TabletopGMEnemyData) => {
+		const isGm = queryClient.getQueryData([campaignId, 'tabletop-gm', 'enemy', tabletopCharacterId])
+		const queryKey = isGm ? [campaignId, 'tabletop-gm', 'enemy', tabletopCharacterId] : [campaignId, 'tabletop-player', 'enemy', tabletopCharacterId]
+		void queryClient.cancelQueries({ queryKey })
+		queryClient.setQueryData(queryKey, (oldData: TabletopGMEnemyData | TabletopPlayerEnemyData) => {
 			return {
 				...oldData,
 				tabletopStats: {
 					...oldData.tabletopStats,
 					currentAggression: Math.max(0, oldData.tabletopStats.currentAggression - (data.amount ?? DEFAULT_INCREASE_AMOUNT))
 				}
-			} satisfies TabletopGMEnemyData
+			} satisfies TabletopGMEnemyData | TabletopPlayerEnemyData
 		})
 	}
 

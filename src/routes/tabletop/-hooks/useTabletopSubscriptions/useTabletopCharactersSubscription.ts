@@ -26,14 +26,14 @@ export default function useTabletopCharactersSubscription() {
 				switch (payload.eventType) {
 					case 'INSERT': {
 						const insertData = payload.new as Tables<'tabletop_characters'>
-						void queryClient.invalidateQueries({ queryKey: [campaignId, 'tabletop', `${insertData.character_type.toLowerCase()}-list`] })
+						void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', `${insertData.character_type.toLowerCase()}-list`] })
 						break
 					}
 					case 'UPDATE': {
 						const updateData = payload.new as Tables<'tabletop_characters'>
 
 						const queryKey = [campaignId, 'tabletop', updateData.character_type.toLowerCase(), updateData.tt_character_id]
-						void queryClient.invalidateQueries({ queryKey })
+						void queryClient.cancelQueries({ queryKey })
 
 						switch (updateData.character_type) {
 							case 'HERO': {
@@ -69,7 +69,6 @@ export default function useTabletopCharactersSubscription() {
 								break
 							}
 						}
-
 						break
 					}
 					case 'DELETE': {
@@ -77,7 +76,7 @@ export default function useTabletopCharactersSubscription() {
 						switch (deleteData.character_type) {
 							case 'HERO': {
 								const queryKey = [campaignId, 'tabletop', 'hero-list']
-								void queryClient.invalidateQueries({ queryKey })
+								void queryClient.cancelQueries({ queryKey })
 								queryClient.setQueriesData({ queryKey }, (oldData: TabletopHeroesList) => {
 									return oldData.map(hero => hero.heroId !== deleteData.tt_character_id
 										? hero
@@ -90,7 +89,7 @@ export default function useTabletopCharactersSubscription() {
 							}
 							case 'ENEMY': {
 								const queryKey = [campaignId, 'tabletop', 'enemy-list']
-								void queryClient.invalidateQueries({ queryKey })
+								void queryClient.cancelQueries({ queryKey })
 								queryClient.setQueriesData({ queryKey }, (oldData: TabletopEnemyList) => {
 									return oldData.filter(tabletopCharacterId => tabletopCharacterId !== deleteData.tt_character_id)
 								})

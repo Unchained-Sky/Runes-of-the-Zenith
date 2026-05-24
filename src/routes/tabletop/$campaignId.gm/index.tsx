@@ -4,7 +4,6 @@ import { TabletopContext } from '~/routes/tabletop/-utils/TabletopContext'
 import DragDrop from '~/tt/-components/DragDrop'
 import { tabletopEnemyListQueryOptions } from '~/tt/-hooks/tabletopData/useTabletopEnemyList'
 import { tabletopHeroListQueryOptions } from '~/tt/-hooks/tabletopData/useTabletopHeroList'
-import { tabletopHeroRoundsQueryOptions } from '~/tt/-hooks/tabletopData/useTabletopHeroRounds'
 import { tabletopMapTilesQueryOptions } from '~/tt/-hooks/tabletopData/useTabletopMapTiles'
 import { tabletopNameQueryOptions } from '~/tt/-hooks/tabletopData/useTabletopName'
 import { tabletopRoundQueryOptions } from '~/tt/-hooks/tabletopData/useTabletopRound'
@@ -31,7 +30,6 @@ export const Route = createFileRoute('/tabletop/$campaignId/gm/')({
 			encounterList,
 			heroList,
 			enemyList,
-			heroRounds,
 			round,
 			tokens
 		] = await Promise.all([
@@ -42,7 +40,6 @@ export const Route = createFileRoute('/tabletop/$campaignId/gm/')({
 			context.queryClient.ensureQueryData(tabletopEncounterListQueryOptions(campaignId)),
 			context.queryClient.ensureQueryData(tabletopHeroListQueryOptions(campaignId)),
 			context.queryClient.ensureQueryData(tabletopEnemyListQueryOptions(campaignId)),
-			context.queryClient.ensureQueryData(tabletopHeroRoundsQueryOptions(campaignId)),
 			context.queryClient.ensureQueryData(tabletopRoundQueryOptions(campaignId)),
 			context.queryClient.ensureQueryData(tokenQueryOptions)
 		])
@@ -56,7 +53,6 @@ export const Route = createFileRoute('/tabletop/$campaignId/gm/')({
 			encounterList,
 			heroList,
 			enemyList,
-			heroRounds,
 			round,
 			tokens
 		}

@@ -5,7 +5,6 @@ import { useTabletopContext } from '~/routes/tabletop/-utils/TabletopContext'
 import { type TablesUpdate } from '~/supabase/databaseTypes'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { type TabletopHeroData } from '~/tt/-hooks/tabletopData/useTabletopHeroes'
-import { type HeroTurn } from '~/tt/-hooks/tabletopData/useTabletopHeroRounds'
 import { mutationError } from '~/utils/mutationError'
 import { hasCharacterPermission } from '../characterPermission'
 import { increaseAggressionQuerySync, UNSAFE_increaseAggressionAction } from './increaseAggression'
@@ -30,23 +29,9 @@ export function useAssignNextHeroTurn() {
 type AssignNextTurnQuerySyncProps = QuerySyncProps<typeof assignNextHeroTurnSchema>
 
 export function assignNextHeroTurnQuerySync({ queryClient, campaignId, data }: AssignNextTurnQuerySyncProps) {
-	let nextTurn: number = 0
-
-	void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'hero-rounds'] })
-	queryClient.setQueryData([campaignId, 'tabletop', 'hero-rounds'], (oldData: HeroTurn[]) => {
-		const oldDataCopy = structuredClone(oldData)
-		const turn = oldDataCopy.findIndex(turn => turn.tabletopCharacterId === data.tabletopCharacterId && turn.turnType === data.turnType)
-		if (turn === -1 || !oldDataCopy[turn]) throw new Error('Turn not found')
-		nextTurn = findNextOrder(oldDataCopy)
-		oldDataCopy[turn].used = true
-		oldDataCopy[turn].order = nextTurn
-		return oldDataCopy.sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-	})
-
 	void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'hero', data.tabletopCharacterId] })
 	queryClient.setQueriesData({ queryKey: [campaignId, 'tabletop', 'hero', data.tabletopCharacterId] }, (oldData: TabletopHeroData) => {
 		const { turn } = oldData
-		if (!turn) throw new Error('Turn not found')
 		return {
 			...oldData,
 			turn: {

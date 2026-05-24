@@ -6,7 +6,6 @@ import { type TablesInsert } from '~/supabase/databaseTypes'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
 import { type TabletopHeroData } from '~/tt/-hooks/tabletopData/useTabletopHeroes'
-import { type HeroTurn } from '~/tt/-hooks/tabletopData/useTabletopHeroRounds'
 import { type TabletopRoundData } from '~/tt/-hooks/tabletopData/useTabletopRound'
 import { mutationError } from '~/utils/mutationError'
 import { type QuerySyncProps } from './querySync'
@@ -28,16 +27,6 @@ export function useStartRound() {
 type StartRoundQuerySyncProps = QuerySyncProps
 
 export function startRoundQuerySync({ queryClient, campaignId }: StartRoundQuerySyncProps) {
-	void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'hero-rounds'] })
-	queryClient.setQueryData([campaignId, 'tabletop', 'hero-rounds'], (oldData: HeroTurn[]) => {
-		return oldData.map<HeroTurn>(turn => ({
-			used: false,
-			order: null,
-			tabletopCharacterId: turn.tabletopCharacterId,
-			turnType: turn.turnType
-		}))
-	})
-
 	void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'hero'] })
 	queryClient.setQueriesData({ queryKey: [campaignId, 'tabletop', 'hero'] }, (oldData: TabletopHeroData) => {
 		return {

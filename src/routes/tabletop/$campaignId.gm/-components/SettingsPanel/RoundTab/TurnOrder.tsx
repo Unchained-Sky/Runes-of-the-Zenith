@@ -1,24 +1,13 @@
 import { Avatar, Button, Divider, Group, Menu, Stack, Text, Title } from '@mantine/core'
 import { useTabletopEnemies } from '~/routes/tabletop/-hooks/tabletopData/useTabletopEnemies'
+import { useTabletopRounds } from '~/routes/tabletop/-hooks/useTabletopRounds'
 import { useAssignNextHeroTurn } from '~/routes/tabletop/-utils/gameActions/assignNextHeroTurn'
 import { type TabletopHeroData, useTabletopHeroes } from '~/tt/-hooks/tabletopData/useTabletopHeroes'
-import { useTabletopHeroRounds } from '~/tt/-hooks/tabletopData/useTabletopHeroRounds'
 
 export default function TurnOrder() {
-	const { data: heroRounds } = useTabletopHeroRounds()
-	const usedTurns = heroRounds.filter(heroRound => heroRound.used)
-	const unusedTurnCount = heroRounds.filter(heroRound => !heroRound.used).length
-
+	const { hero: { usedTurns, unusedTurnCount }, enemies: enemiesOrder } = useTabletopRounds()
 	const { data: heroesData } = useTabletopHeroes()
-
 	const { data: enemiesData } = useTabletopEnemies()
-	const enemiesOrder = Object.values(enemiesData).reduce<Record<number, number[]>>((prev, enemyData) => {
-		const { currentAggression } = enemyData.tabletopStats
-		return {
-			...prev,
-			[currentAggression]: prev[currentAggression] ? [...prev[currentAggression], enemyData.tabletopCharacterId] : [enemyData.tabletopCharacterId]
-		}
-	}, {})
 
 	return (
 		<Stack align='flex-start'>
@@ -77,7 +66,7 @@ function UnusedTurn() {
 
 function AssignNextTurn() {
 	const { data: heroesData } = useTabletopHeroes()
-	const { data: heroRounds } = useTabletopHeroRounds()
+	const { hero: { heroRounds } } = useTabletopRounds()
 
 	const assignNextHeroTurn = useAssignNextHeroTurn()
 

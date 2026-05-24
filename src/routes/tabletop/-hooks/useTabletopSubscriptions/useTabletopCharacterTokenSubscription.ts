@@ -30,7 +30,7 @@ export default function useTabletopCharacterTokenSubscription() {
 						const characterType = characterLookup(insertData.tt_character_id)
 
 						const queryKey = [campaignId, 'tabletop', characterType.toLowerCase(), insertData.tt_character_id]
-						void queryClient.invalidateQueries({ queryKey })
+						void queryClient.cancelQueries({ queryKey })
 
 						if (characterType === 'ENEMY' && role !== 'gm') return
 
@@ -50,7 +50,7 @@ export default function useTabletopCharacterTokenSubscription() {
 						const characterType = characterLookup(updateData.tt_character_id)
 
 						const queryKey = [campaignId, 'tabletop', characterType.toLowerCase(), updateData.tt_character_id]
-						void queryClient.invalidateQueries({ queryKey })
+						void queryClient.cancelQueries({ queryKey })
 
 						if (characterType === 'ENEMY' && role !== 'gm') return
 
@@ -72,7 +72,7 @@ export default function useTabletopCharacterTokenSubscription() {
 						const characterType = characterLookup(deleteData.tt_character_id)
 
 						const queryKey = [campaignId, 'tabletop', characterType.toLowerCase(), deleteData.tt_character_id]
-						void queryClient.invalidateQueries({ queryKey })
+						void queryClient.cancelQueries({ queryKey })
 
 						if (characterType === 'ENEMY' && role !== 'gm') return
 

@@ -47,7 +47,7 @@ export function Action({ runeData, tooltipText, inlineDescription, expandedDescr
 
 	const [opened, { toggle }] = useDisclosure(false)
 
-	const usedTurn = runeData.slot === 'PASSIVE' ? false : (heroData.turn?.[runeData.slot].used ?? false)
+	const usedTurn = runeData.slot === 'PASSIVE' ? false : heroData.turn[runeData.slot].used
 
 	return (
 		<Stack>
