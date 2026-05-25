@@ -90,7 +90,7 @@ function ConfirmButton() {
 }
 
 function TargetList() {
-	const { runeData, currentEffectIndex, selected } = useConfirmTargetStore()
+	const { runeData, currentEffectIndex, selected, tabletopCharacterId } = useConfirmTargetStore()
 
 	if (!runeData) return
 
@@ -111,13 +111,53 @@ function TargetList() {
 				</Text>
 				<List>
 					{Array.from({ length: textCount }).map((_, i) => {
-						const isOver = i >= targetCount
+						const warnings = []
+
+						if (i >= targetCount) {
+							warnings.push('Too many targets')
+						}
 
 						const characters = currentSelected ? ('characters' in currentSelected ? currentSelected.characters : null) : null
-						if (target.selectType === 'CHARACTER') return <CharacterLine key={i} character={characters?.[i]} isOver={isOver} />
+						if (target.selectType === 'CHARACTER') {
+							const targettedCharacter = characters?.[i]
+
+							if (targettedCharacter) {
+								switch (target.characterType) {
+									case 'HERO': {
+										if (targettedCharacter.characterType !== 'HERO') {
+											warnings.push('Not a hero')
+										}
+										break
+									}
+									case 'ENEMY': {
+										if (targettedCharacter.characterType !== 'ENEMY') {
+											warnings.push('Not an enemy')
+										}
+										break
+									}
+									case 'ALLY': {
+										if (targettedCharacter.characterType !== 'HERO') {
+											warnings.push('Not an hero')
+										}
+										if (targettedCharacter.tabletopCharacterId === tabletopCharacterId) {
+											warnings.push('Cannot target self')
+										}
+										break
+									}
+									case 'SELF': {
+										if (targettedCharacter.tabletopCharacterId !== tabletopCharacterId) {
+											warnings.push('Cannot target others')
+										}
+										break
+									}
+								}
+							}
+
+							return <CharacterLine key={i} character={targettedCharacter} warning={warnings} />
+						}
 
 						const tiles = currentSelected ? ('tiles' in currentSelected ? currentSelected.tiles : null) : null
-						if (target.selectType === 'TILE') return <TilesLine key={i} tile={tiles?.[i]} isOver={isOver} />
+						if (target.selectType === 'TILE') return <TilesLine key={i} tile={tiles?.[i]} warning={warnings} />
 
 						return null
 					})}
@@ -129,12 +169,12 @@ function TargetList() {
 
 type CharacterLineProps = {
 	character?: CharacterLineCharacterProps['character']
-	isOver: boolean
+	warning: string[]
 }
 
-function CharacterLine({ character, isOver }: CharacterLineProps) {
+function CharacterLine({ character, warning }: CharacterLineProps) {
 	return character
-		? <CharacterLineCharacter character={character} isOver={isOver} />
+		? <CharacterLineCharacter character={character} warning={warning} />
 		: (
 			<List.Item>
 				<Text span>________</Text>
@@ -147,10 +187,10 @@ type CharacterLineCharacterProps = {
 		tabletopCharacterId: number
 		characterType: Enums<'character_type'>
 	}
-	isOver: boolean
+	warning: string[]
 }
 
-function CharacterLineCharacter({ character, isOver }: CharacterLineCharacterProps) {
+function CharacterLineCharacter({ character, warning }: CharacterLineCharacterProps) {
 	const { data: heroesData } = useTabletopHeroes()
 	const { data: enemiesData } = useTabletopEnemies()
 
@@ -168,20 +208,20 @@ function CharacterLineCharacter({ character, isOver }: CharacterLineCharacterPro
 
 	return (
 		<List.Item>
-			<Text c={isOver ? 'red' : 'gray'}>{getName()}</Text>
+			<Text c={warning.length ? 'red' : 'gray'}>{getName()} {warning.length ? `(${warning.join(', ')})` : ''}</Text>
 		</List.Item>
 	)
 }
 
 type TilesLineProps = {
 	tile?: CombatTileCordString
-	isOver: boolean
+	warning: string[]
 }
 
-function TilesLine({ tile, isOver }: TilesLineProps) {
+function TilesLine({ tile, warning }: TilesLineProps) {
 	return (
 		<List.Item>
-			<Text span c={isOver ? 'red' : 'gray'}>{tile ?? '________'}</Text>
+			<Text span c={warning.length ? 'red' : 'gray'}>{tile ?? '________'} {warning.length ? `(${warning.join(', ')})` : ''}</Text>
 		</List.Item>
 	)
 }

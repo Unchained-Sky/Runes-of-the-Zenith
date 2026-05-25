@@ -10,40 +10,22 @@ export default function HeroRunes() {
 		<Stack>
 			<Stack>
 				<Slot slot='PRIMARY'>
-					<Action
-						runeData={baseRunes['Basic Attack']}
-						tooltipText='Basic Attack'
-					/>
+					<Action runeData={baseRunes['Basic Attack']} />
 
-					<Action
-						runeData={baseRunes.Inspire}
-						tooltipText='Inspire'
-					/>
+					<Action runeData={baseRunes.Inspire} />
 
-					<Action
-						runeData={baseRunes.Rest}
-						tooltipText='Rest'
-					/>
+					<Action runeData={baseRunes.Rest} />
 
 					<Title order={5}>Runes</Title>
 					<Runes runes={heroData.runes.PRIMARY} />
 				</Slot>
 
 				<Slot slot='SECONDARY'>
-					<Action
-						runeData={baseRunes.Interact}
-						tooltipText='Interact'
-					/>
+					<Action runeData={baseRunes.Interact} />
 
-					<Action
-						runeData={baseRunes.Rush}
-						tooltipText='Rush'
-					/>
+					<Action runeData={baseRunes.Rush} />
 
-					<Action
-						runeData={baseRunes.Item}
-						tooltipText='Use an item'
-					/>
+					<Action runeData={baseRunes.Item} />
 
 					<Title order={5}>Runes</Title>
 					<Runes runes={heroData.runes.SECONDARY} />

@@ -14,9 +14,9 @@ type CharacterWindowProps = {
 } & CustomWindowProps
 
 const CHARACTER_WINDOW_PROPS = {
-	defaultWidth: 560,
+	defaultWidth: 520,
 	defaultHeight: 640,
-	minWidth: 480,
+	minWidth: 520,
 	minHeight: 480,
 	...DEFAULT_WINDOW_PROPS
 } satisfies WindowProps

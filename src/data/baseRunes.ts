@@ -5,7 +5,7 @@ import { typedObject } from '~/types/typedObject'
 const baseRunes = [
 	{
 		name: 'Basic Attack',
-		description: 'Basic Attack',
+		description: 'Basic Attack an enemy',
 		slot: 'PRIMARY',
 		durability: 'REINFORCED',
 		resolve: 0,
@@ -24,10 +24,10 @@ const baseRunes = [
 	},
 	{
 		name: 'Inspire',
-		description: 'Inspire',
+		description: 'Inspire an ally on the ground back up',
 		slot: 'PRIMARY',
 		durability: 'REINFORCED',
-		resolve: 0,
+		resolve: 4,
 		effect: [{
 			range: 1,
 			target: { characterType: 'ALLY', selectType: 'CHARACTER', amount: 1 }
@@ -35,7 +35,7 @@ const baseRunes = [
 	},
 	{
 		name: 'Rest',
-		description: 'Rest',
+		description: 'Repair two unstable runes',
 		slot: 'PRIMARY',
 		durability: 'REINFORCED',
 		resolve: 0,
@@ -45,7 +45,7 @@ const baseRunes = [
 	},
 	{
 		name: 'Interact',
-		description: 'Interact',
+		description: 'Interact with a tile',
 		slot: 'SECONDARY',
 		durability: 'REINFORCED',
 		resolve: 0,
@@ -56,7 +56,7 @@ const baseRunes = [
 	},
 	{
 		name: 'Rush',
-		description: 'Rush',
+		description: 'Gain movement equal to your movement stat',
 		slot: 'SECONDARY',
 		durability: 'REINFORCED',
 		resolve: 0,
@@ -66,7 +66,7 @@ const baseRunes = [
 	},
 	{
 		name: 'Item',
-		description: 'Item',
+		description: 'Consume an item or swap your active weapon',
 		slot: 'SECONDARY',
 		durability: 'REINFORCED',
 		resolve: 0,
