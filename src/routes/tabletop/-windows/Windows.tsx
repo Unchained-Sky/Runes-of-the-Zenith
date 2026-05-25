@@ -2,6 +2,7 @@ import { typedSplit } from '~/types/split'
 import { typedObject } from '~/types/typedObject'
 import CharacterWindow from './CharacterWindow'
 import ConfirmTargetWindow from './ConfirmTargetWindow'
+import DamageSimulationWindow from './DamageSimulationWindow'
 import RoundsWindow from './RoundsWindow'
 import { useWindowsStore } from './useWindowsStore'
 
@@ -17,6 +18,7 @@ export default function Windows() {
 			<ConfirmTargetWindow />
 
 			<RoundsWindow opened={opened.round} onClose={() => toggleWindow('round')} />
+			<DamageSimulationWindow opened={opened.damageSimulation} onClose={() => toggleWindow('damageSimulation')} />
 
 			{characters.map(character => {
 				const [_, characterType, tabletopCharacterId] = typedSplit(character, '-')

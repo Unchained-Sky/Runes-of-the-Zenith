@@ -89,6 +89,13 @@ function GameChips() {
 					>
 						Rounds
 					</Chip>
+					<Chip
+						value='damageSimulation'
+						checked={opened.damageSimulation}
+						onChange={() => toggleWindow('damageSimulation')}
+					>
+						Damage Simulation
+					</Chip>
 				</Group>
 			</Chip.Group>
 		</>

@@ -1,11 +1,9 @@
-import { LineChart } from '@mantine/charts'
 import { ActionIcon, Card, Code, Collapse, Group, Stack, Text, Title, Tooltip } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { IconChevronDown, IconFlame } from '@tabler/icons-react'
 import { type ReactNode } from 'react'
 import { useArchetypeQuery } from '~/hooks/data/useArchetypeQuery'
-import { TEST_DATA } from '~/scripts/chart/damageData'
-import { type RuneData, type RuneEffectData } from '~/scripts/data/runes/runeData'
+import { type RuneData } from '~/scripts/data/runes/runeData'
 import { type Enums } from '~/supabase/databaseTypes'
 import { useConfirmTargetStore } from '~/tt/-windows/ConfirmTargetWindow/useConfirmTargetStore'
 import { titleCase } from '~/utils/stringCase'
@@ -96,13 +94,6 @@ type RuneProps = {
 }
 
 function Rune({ runeData }: RuneProps) {
-	const heroData = useHeroWindowContext()
-	const _heroMainStats = {
-		int: heroData.stats.int,
-		dex: heroData.stats.dex,
-		str: heroData.stats.str
-	}
-
 	const subarchetypes = useArchetypeQuery()
 	const subarchetype = subarchetypes[runeData.subarchetype]
 
@@ -122,74 +113,9 @@ function Rune({ runeData }: RuneProps) {
 			)}
 			expandedDescription={(
 				<Stack>
-					{/* {runeData.effect.damage && (
-						<ActionDamageChart
-							runeMainStats={runeData.effect.damage.mainStats}
-							accuracy={runeData.effect.damage.accuracy}
-							heroMainStats={heroMainStats}
-						/>
-					)} */}
+					{}
 				</Stack>
 			)}
-		/>
-	)
-}
-
-type RuneExtraDataDamage = NonNullable<RuneEffectData['damage']>
-type ActionDamageChartProps = {
-	runeMainStats: RuneExtraDataDamage['mainStats']
-	accuracy: RuneExtraDataDamage['accuracy']
-	heroMainStats: {
-		int: number
-		dex: number
-		str: number
-	}
-}
-
-function _ActionDamageChart({ runeMainStats, heroMainStats }: ActionDamageChartProps) {
-	const intDamage = runeMainStats.int ? runeMainStats.int.flat + (runeMainStats.int.scale * heroMainStats.int / 100) : 0
-	const dexDamage = runeMainStats.dex ? runeMainStats.dex.flat + (runeMainStats.dex.scale * heroMainStats.dex / 100) : 0
-	const strDamage = runeMainStats.str ? runeMainStats.str.flat + (runeMainStats.str.scale * heroMainStats.str / 100) : 0
-	const maxHit = intDamage + dexDamage + strDamage
-
-	const damageData: Record<number, { damage: number, Average: number, Squishy: number, Tanky: number }> = {}
-	const exampleMin = TEST_DATA[0]?.damage ?? 0
-	const exampleMax = TEST_DATA[TEST_DATA.length - 1]?.damage ?? 0
-	const diff = exampleMax + exampleMin - maxHit
-	TEST_DATA.forEach(({ damage, percentage }, i) => {
-		const hit = Math.round((100 - (100 / (exampleMax / diff))) / 100 * damage)
-		damageData[hit] = {
-			damage: hit,
-			Average: percentage,
-			Squishy: TEST_DATA[i - ~~(TEST_DATA.length / 3)]?.percentage ?? 0,
-			Tanky: TEST_DATA[i + ~~(TEST_DATA.length / 3)]?.percentage ?? 0
-		}
-	})
-
-	return (
-		<LineChart
-			h={300}
-			data={Object.values(damageData)}
-			dataKey='damage'
-			series={[
-				{ name: 'Squishy', color: 'green' },
-				{ name: 'Average', color: 'blue' },
-				{ name: 'Tanky', color: 'red' }
-			]}
-			withLegend={true}
-			withTooltip={false}
-			dotProps={{ r: 0 }}
-			activeDotProps={{ r: 0 }}
-			strokeWidth={3}
-			xAxisLabel='Damage Dealt'
-			yAxisLabel='Percent Chance'
-			yAxisProps={{ domain: [0, 4] }}
-			referenceLines={[
-				{ x: ~~(maxHit / 1.2), label: 'Average Hit', stroke: 'green', strokeWidth: 2, strokeDasharray: '3 3' },
-				{ x: ~~(maxHit / 2), label: 'Average Hit', stroke: 'blue', strokeWidth: 2, strokeDasharray: '3 3' },
-				{ x: ~~(maxHit / 6), label: 'Average Hit', stroke: 'red', strokeWidth: 2, strokeDasharray: '3 3' }
-			]}
-			valueFormatter={value => `${value}%`}
 		/>
 	)
 }

@@ -5,6 +5,7 @@ import { createActionName, type DevTools, type Slice } from '~/types/storeTypes'
 
 type WindowName =
 	| 'round'
+	| 'damageSimulation'
 	| `character-${Enums<'character_type'>}-${number}`
 
 type WindowsState = {
@@ -13,7 +14,8 @@ type WindowsState = {
 
 const windowState = {
 	opened: {
-		round: false
+		round: false,
+		damageSimulation: false
 	}
 } satisfies WindowsState
 

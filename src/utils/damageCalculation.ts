@@ -1,11 +1,11 @@
 import { type AtLeastOne } from '~/types/atLeastOne'
+import { normalDistributionSkew, roundToPrecision } from './maths'
 
 type DamageCalculationData = {
 	attackerStats: {
 		int: number
 		dex: number
 		str: number
-		// TODO include crit chance
 		critChance: number
 	}
 	defenderStats: {
@@ -19,7 +19,6 @@ type DamageCalculationData = {
 			dex: [flat: number, scale: number]
 			str: [flat: number, scale: number]
 		}>
-		// TODO skew accuracy
 		accuracy: number
 	}
 }
@@ -34,30 +33,22 @@ export function damageCalculation(data: DamageCalculationData) {
 	const intDamage = getDamageAmount(data, 'int')
 	const dexDamage = getDamageAmount(data, 'dex')
 	const strDamage = getDamageAmount(data, 'str')
-	const maxHit = intDamage + dexDamage + strDamage
 
-	const intDef = data.attack.damageType.int ? data.defenderStats.intDef * (intDamage / maxHit) : 0
-	const dexDef = data.attack.damageType.dex ? data.defenderStats.dexDef * (dexDamage / maxHit) : 0
-	const strDef = data.attack.damageType.str ? data.defenderStats.strDef * (strDamage / maxHit) : 0
+	const critChance = data.attackerStats.critChance % 100
+	const critLevel = ~~(data.attackerStats.critChance / 100) + 1
+	const didCrit = ~~(Math.random() * 100) < critChance
+	const critMultiplier = didCrit ? 1 + (critLevel * 0.5) : 1
+
+	const maxUnmitigatedHit = (intDamage + dexDamage + strDamage) * critMultiplier
+
+	const intDef = data.attack.damageType.int ? data.defenderStats.intDef * (intDamage / maxUnmitigatedHit) : 0
+	const dexDef = data.attack.damageType.dex ? data.defenderStats.dexDef * (dexDamage / maxUnmitigatedHit) : 0
+	const strDef = data.attack.damageType.str ? data.defenderStats.strDef * (strDamage / maxUnmitigatedHit) : 0
 	const totalDefence = roundToPrecision(intDef + dexDef + strDef)
 
-	// TODO add real diminishing returns to defence
-	const mean = maxHit - (totalDefence / 1.5)
+	const maxHit = (150 * maxUnmitigatedHit) / (150 + totalDefence)
 
-	return generateGaussianRandom(maxHit, mean)
-}
+	const accuracySkew = (data.attack.accuracy - 105) / -52
 
-export function generateGaussianRandom(max: number, mean: number, min = 0, stddev = 12) {
-	let u = 0, v = 0
-	while (u === 0) u = Math.random()
-	while (v === 0) v = Math.random()
-	const z = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v)
-	const out = z * stddev + mean
-	if (out < min || out > max) return generateGaussianRandom(max, mean, min, stddev)
-	return roundToPrecision(out)
-}
-
-const roundToPrecision = (x: number, precision = 1) => {
-	const y = +x + (precision / 2)
-	return y - (y % precision)
+	return normalDistributionSkew(0, maxHit, accuracySkew)
 }

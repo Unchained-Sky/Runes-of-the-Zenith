@@ -1,7 +1,6 @@
 import { Box, Chip, Group, Stack, Text, Title } from '@mantine/core'
-import { type TabletopHeroesList, useTabletopHeroList } from '~/routes/tabletop/-hooks/tabletopData/useTabletopHeroList'
+import useOwnedHeroes from '~/routes/tabletop/-hooks/useOwnedHeroes'
 import { useWindowsStore } from '~/routes/tabletop/-windows/useWindowsStore'
-import { useSupabase } from '~/supabase/useSupabase'
 
 export default function Sidebar() {
 	return (
@@ -23,14 +22,8 @@ export default function Sidebar() {
 	)
 }
 
-type ActiveHero = TabletopHeroesList[number] & { tabletopCharacterId: number }
-
 function CharacterChips() {
-	const { data: heroList } = useTabletopHeroList()
-	const { userId } = useSupabase()
-
-	const isOwnedActiveHero = (hero: TabletopHeroesList[number]): hero is ActiveHero => hero.userId === userId && !!hero.tabletopCharacterId
-	const ownedHeroes = heroList.filter(isOwnedActiveHero)
+	const ownedHeroes = useOwnedHeroes()
 
 	const opened = useWindowsStore(state => state.opened)
 	const toggleWindow = useWindowsStore(state => state.toggleWindow)
@@ -73,6 +66,13 @@ function GameChips() {
 						onChange={() => toggleWindow('round')}
 					>
 						Rounds
+					</Chip>
+					<Chip
+						value='damageSimulation'
+						checked={opened.damageSimulation}
+						onChange={() => toggleWindow('damageSimulation')}
+					>
+						Damage Simulation
 					</Chip>
 				</Group>
 			</Chip.Group>
