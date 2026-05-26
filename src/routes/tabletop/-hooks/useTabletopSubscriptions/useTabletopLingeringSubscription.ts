@@ -2,17 +2,15 @@ import useMountEffect from '~/hooks/useMountEffect'
 import { type Tables } from '~/supabase/databaseTypes'
 import { useSupabase } from '~/supabase/useSupabase'
 import { type TabletopGMEnemyData } from '../../$campaignId.gm/-hooks/tabletopData/useGMTabletopEnemies'
+import getCharacterQueryKey from '../../-utils/getCharacterQueryKey'
 import { lingeringDataFormatter } from '../../-utils/lingeringData'
 import { useTabletopContext } from '../../-utils/TabletopContext'
-import useCharacterLookup from '../../-utils/useCharacterLookup'
 import { type TabletopHeroData } from '../tabletopData/useTabletopHeroes'
 import { LOG_SUBSCRIPTION_PAYLOADS } from './useTabletopSubscriptions'
 
 export default function useTabletopLingeringSubscription() {
 	const { supabase } = useSupabase()
 	const { queryClient, campaignId, role } = useTabletopContext()
-
-	const characterLookup = useCharacterLookup()
 
 	useMountEffect(() => {
 		const channelName = `tabletop_lingering:${campaignId}`
@@ -28,9 +26,8 @@ export default function useTabletopLingeringSubscription() {
 				switch (payload.eventType) {
 					case 'INSERT': {
 						const insertData = payload.new as Tables<'tabletop_lingering'>
-						const characterType = characterLookup(insertData.tt_character_id)
 
-						const queryKey = [campaignId, 'tabletop', characterType.toLowerCase(), insertData.tt_character_id]
+						const { queryKey, characterType } = getCharacterQueryKey({ queryClient, campaignId, tabletopCharacterId: insertData.tt_character_id })
 						void queryClient.cancelQueries({ queryKey })
 
 						if (characterType === 'ENEMY' && role !== 'gm') return
@@ -54,9 +51,8 @@ export default function useTabletopLingeringSubscription() {
 					}
 					case 'UPDATE': {
 						const updateData = payload.new as Tables<'tabletop_lingering'>
-						const characterType = characterLookup(updateData.tt_character_id)
 
-						const queryKey = [campaignId, 'tabletop', characterType.toLowerCase(), updateData.tt_character_id]
+						const { queryKey, characterType } = getCharacterQueryKey({ queryClient, campaignId, tabletopCharacterId: updateData.tt_character_id })
 						void queryClient.cancelQueries({ queryKey })
 
 						if (characterType === 'ENEMY' && role !== 'gm') return
@@ -76,9 +72,8 @@ export default function useTabletopLingeringSubscription() {
 					}
 					case 'DELETE': {
 						const deleteData = payload.old as Tables<'tabletop_lingering'>
-						const characterType = characterLookup(deleteData.tt_character_id)
 
-						const queryKey = [campaignId, 'tabletop', characterType.toLowerCase(), deleteData.tt_character_id]
+						const { queryKey, characterType } = getCharacterQueryKey({ queryClient, campaignId, tabletopCharacterId: deleteData.tt_character_id })
 						void queryClient.cancelQueries({ queryKey })
 
 						if (characterType === 'ENEMY' && role !== 'gm') return

@@ -3,15 +3,13 @@ import { type Tables } from '~/supabase/databaseTypes'
 import { useSupabase } from '~/supabase/useSupabase'
 import { type TabletopGMEnemyData } from '../../$campaignId.gm/-hooks/tabletopData/useGMTabletopEnemies'
 import { useTabletopContext } from '../../-utils/TabletopContext'
-import useCharacterLookup from '../../-utils/useCharacterLookup'
+import getCharacterQueryKey from '../../-utils/getCharacterQueryKey'
 import { type TabletopHeroData } from '../tabletopData/useTabletopHeroes'
 import { LOG_SUBSCRIPTION_PAYLOADS } from './useTabletopSubscriptions'
 
 export default function useTabletopCharacterTokenSubscription() {
 	const { supabase } = useSupabase()
 	const { queryClient, campaignId, role } = useTabletopContext()
-
-	const characterLookup = useCharacterLookup()
 
 	useMountEffect(() => {
 		const channelName = `tabletop_character_token:${campaignId}`
@@ -27,9 +25,8 @@ export default function useTabletopCharacterTokenSubscription() {
 				switch (payload.eventType) {
 					case 'INSERT': {
 						const insertData = payload.new as Tables<'tabletop_character_token'>
-						const characterType = characterLookup(insertData.tt_character_id)
 
-						const queryKey = [campaignId, 'tabletop', characterType.toLowerCase(), insertData.tt_character_id]
+						const { queryKey, characterType } = getCharacterQueryKey({ queryClient, campaignId, tabletopCharacterId: insertData.tt_character_id })
 						void queryClient.cancelQueries({ queryKey })
 
 						if (characterType === 'ENEMY' && role !== 'gm') return
@@ -47,9 +44,8 @@ export default function useTabletopCharacterTokenSubscription() {
 					}
 					case 'UPDATE': {
 						const updateData = payload.new as Tables<'tabletop_character_token'>
-						const characterType = characterLookup(updateData.tt_character_id)
 
-						const queryKey = [campaignId, 'tabletop', characterType.toLowerCase(), updateData.tt_character_id]
+						const { queryKey, characterType } = getCharacterQueryKey({ queryClient, campaignId, tabletopCharacterId: updateData.tt_character_id })
 						void queryClient.cancelQueries({ queryKey })
 
 						if (characterType === 'ENEMY' && role !== 'gm') return
@@ -69,9 +65,8 @@ export default function useTabletopCharacterTokenSubscription() {
 					}
 					case 'DELETE': {
 						const deleteData = payload.old as Tables<'tabletop_character_token'>
-						const characterType = characterLookup(deleteData.tt_character_id)
 
-						const queryKey = [campaignId, 'tabletop', characterType.toLowerCase(), deleteData.tt_character_id]
+						const { queryKey, characterType } = getCharacterQueryKey({ queryClient, campaignId, tabletopCharacterId: deleteData.tt_character_id })
 						void queryClient.cancelQueries({ queryKey })
 
 						if (characterType === 'ENEMY' && role !== 'gm') return

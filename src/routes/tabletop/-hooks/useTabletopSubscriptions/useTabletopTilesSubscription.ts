@@ -3,7 +3,7 @@ import { LOG_SUBSCRIPTION_PAYLOADS } from '~/routes/tabletop/-hooks/useTabletopS
 import { useTabletopContext } from '~/routes/tabletop/-utils/TabletopContext'
 import { type Tables } from '~/supabase/databaseTypes'
 import { useSupabase } from '~/supabase/useSupabase'
-import useCharacterLookup from '../../-utils/useCharacterLookup'
+import { queryCharacterLookup } from '../../-utils/characterLookup'
 import { type TabletopTiles } from '../tabletopData/useTabletopTiles'
 
 type TabletopTilesTable = Omit<Tables<'tabletop_tiles'>, 'tt_character_id'> & { tt_character_id?: number | null }
@@ -11,8 +11,6 @@ type TabletopTilesTable = Omit<Tables<'tabletop_tiles'>, 'tt_character_id'> & { 
 export default function useTabletopTilesSubscription() {
 	const { supabase } = useSupabase()
 	const { queryClient, campaignId } = useTabletopContext()
-
-	const characterLookup = useCharacterLookup()
 
 	useMountEffect(() => {
 		const channelName = `tabletop_tiles:${campaignId}`
@@ -39,7 +37,7 @@ export default function useTabletopTilesSubscription() {
 								[cords]: upsertData.tt_character_id
 									? {
 										tabletopCharacterId: upsertData.tt_character_id,
-										characterType: characterLookup(upsertData.tt_character_id)
+										characterType: queryCharacterLookup({ queryClient, campaignId, tabletopCharacterId: upsertData.tt_character_id })
 									}
 									: null
 							} satisfies TabletopTiles

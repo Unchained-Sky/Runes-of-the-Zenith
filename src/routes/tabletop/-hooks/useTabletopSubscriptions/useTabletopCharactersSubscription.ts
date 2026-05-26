@@ -3,6 +3,7 @@ import { LOG_SUBSCRIPTION_PAYLOADS } from '~/routes/tabletop/-hooks/useTabletopS
 import { type Tables } from '~/supabase/databaseTypes'
 import { useSupabase } from '~/supabase/useSupabase'
 import { type TabletopGMEnemyData } from '../../$campaignId.gm/-hooks/tabletopData/useGMTabletopEnemies'
+import getCharacterQueryKey from '../../-utils/getCharacterQueryKey'
 import { useTabletopContext } from '../../-utils/TabletopContext'
 import { type TabletopEnemyList } from '../tabletopData/useTabletopEnemyList'
 import { type TabletopHeroData } from '../tabletopData/useTabletopHeroes'
@@ -26,13 +27,14 @@ export default function useTabletopCharactersSubscription() {
 				switch (payload.eventType) {
 					case 'INSERT': {
 						const insertData = payload.new as Tables<'tabletop_characters'>
-						void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', `${insertData.character_type.toLowerCase()}-list`] })
+						const { queryKey } = getCharacterQueryKey({ queryClient, campaignId, tabletopCharacterId: insertData.tt_character_id })
+						void queryClient.invalidateQueries({ queryKey })
 						break
 					}
 					case 'UPDATE': {
 						const updateData = payload.new as Tables<'tabletop_characters'>
 
-						const queryKey = [campaignId, 'tabletop', updateData.character_type.toLowerCase(), updateData.tt_character_id]
+						const { queryKey } = getCharacterQueryKey({ queryClient, campaignId, tabletopCharacterId: updateData.tt_character_id })
 						void queryClient.cancelQueries({ queryKey })
 
 						switch (updateData.character_type) {

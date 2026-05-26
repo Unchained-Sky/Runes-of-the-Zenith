@@ -1,122 +1,120 @@
-import { ActionIcon, Autocomplete, Button, Card, Group, Modal, NumberInput, Stack, Text, Title } from '@mantine/core'
-import { useForm } from '@mantine/form'
-import { useDisclosure, useListState, type UseListStateHandlers } from '@mantine/hooks'
-import { IconPencil, IconPlus } from '@tabler/icons-react'
+import { ActionIcon, Autocomplete, Button, Card, Group, NumberInput, Stack, Text, Title, Tooltip } from '@mantine/core'
+import { useDisclosure, useMap, useSet } from '@mantine/hooks'
+import { IconPencil, IconPlus, IconX } from '@tabler/icons-react'
 import { useMemo, useState } from 'react'
 import TokenIcon from '~/components/TokenIcon'
 import { useTokenQuery } from '~/hooks/data/useTokenQuery'
-import { type TabletopHeroData } from '~/routes/tabletop/-hooks/tabletopData/useTabletopHeroes'
+import { useUpdateCharacterTokens } from '~/routes/tabletop/-utils/gameActions/updateCharacterTokens'
 import { type Enums } from '~/supabase/databaseTypes'
 import { int2 } from '~/utils/int'
-import { useUpdateCharacterTokens } from '../../-utils/gameActions/updateCharacterTokens'
+import useCharacterWindowContext from './useCharacterWindowContext'
 
-type TokenProps = {
-	tabletopCharacterId: number
-	tokens: TabletopHeroData['tokens']
-	characterType: Enums<'character_type'>
-}
-
-export default function CharacterTokens({ tabletopCharacterId, tokens, characterType }: TokenProps) {
-	const [opened, { open, close }] = useDisclosure(false)
+export default function CharacterTokens() {
+	const [isEditing, { toggle, close }] = useDisclosure(false)
 
 	return (
-		<>
-			<Card component={Stack} bg='dark.5'>
+		<Card component={Stack} bg='dark.5'>
+			<Group>
 				<Title order={4}>Tokens</Title>
-				<Group>
-					{tokens.map(token => {
-						return <TokenIcon key={token.name} token={token} />
-					})}
-
-					{tokens.length === 0 && <Text fs='italic'>None</Text>}
-
-					<ActionIcon variant='transparent' onClick={open}>
-						<IconPencil />
-					</ActionIcon>
-				</Group>
-			</Card>
-
-			<TokenEditModal
-				opened={opened}
-				close={close}
-				tabletopCharacterId={tabletopCharacterId}
-				tokens={tokens}
-				characterType={characterType}
-			/>
-		</>
+				<ActionIcon variant='subtle'>
+					<IconPencil onClick={toggle} />
+				</ActionIcon>
+			</Group>
+			{isEditing ? <EditToken close={close} /> : <TokenDisplay />}
+		</Card>
 	)
 }
 
-type TokenEditModalProps = {
-	opened: boolean
-	close: () => void
-	tabletopCharacterId: number
-	tokens: TabletopHeroData['tokens']
-	characterType: Enums<'character_type'>
-}
-
-function TokenEditModal({ opened, tabletopCharacterId, close, tokens, characterType }: TokenEditModalProps) {
-	const form = useForm({
-		mode: 'uncontrolled',
-		initialValues: {
-			tokens: Object.fromEntries(tokens.map(token => [token.name, token.amount]))
-		}
-	})
-
-	const updateHeroToken = useUpdateCharacterTokens()
-
-	const handleSubmit = (values: typeof form.values) => {
-		updateHeroToken.mutate({ data: { tabletopCharacterId, characterType, tokens: values.tokens } })
-		close()
-		form.setInitialValues(values)
-	}
-
-	const [virtualTokens, virtualTokensHandlers] = useListState(tokens)
-	const virtualTokenList = virtualTokens.map(token => token.name)
+function TokenDisplay() {
+	const { tokens } = useCharacterWindowContext()
 
 	return (
-		<Modal
-			opened={opened}
-			onClose={close}
-			onExitTransitionEnd={form.reset}
-			title='Edit tokens'
-		>
-			<form onSubmit={form.onSubmit(handleSubmit)}>
-				<Stack gap='xl'>
-					<Stack gap='sm'>
-						{virtualTokens.map(token => {
-							return (
-								<Group key={token.name} align='flex-end'>
-									<TokenIcon token={token} />
-									<NumberInput
-										min={0}
-										max={int2.ceil}
-										label={token.name}
-										{...form.getInputProps(`tokens.${token.name}`)}
+		<Group>
+			{tokens.map(token => {
+				return <TokenIcon key={token.name} token={token} />
+			})}
+			{tokens.length === 0 && <Text fs='italic'>None</Text>}
+		</Group>
+	)
+}
+
+type EditTokenProps = {
+	close: () => void
+}
+
+function EditToken({ close }: EditTokenProps) {
+	const { tokens, tabletopCharacterId, characterType } = useCharacterWindowContext()
+	const currentTokens = useMemo(() => Object.fromEntries(tokens.map(token => [token.name, token.amount] as const)), [tokens])
+
+	const updateCharacterToken = useUpdateCharacterTokens()
+
+	const virtualTokens = useMap(tokens.map(token => [token.name, token.amount]))
+	const deletedToken = useSet<string>()
+
+	return (
+		<Stack>
+			<Stack gap='sm'>
+				{Array.from(virtualTokens.entries()).map(([tokenName, tokenAmount]) => {
+					return (
+						<Group key={tokenName} align='flex-end'>
+							<TokenIcon token={{ name: tokenName, amount: currentTokens[tokenName] ?? 0 }} />
+							<NumberInput
+								min={0}
+								max={int2.ceil}
+								label={tokenName}
+								flex={1}
+								defaultValue={tokenAmount}
+								onChange={event => virtualTokens.set(tokenName, +event)}
+							/>
+							<Tooltip label='Remove'>
+								<ActionIcon size={36} variant='light' color='red'>
+									<IconX
+										onClick={() => {
+											virtualTokens.delete(tokenName)
+											deletedToken.add(tokenName)
+										}}
 									/>
-								</Group>
-							)
-						})}
-					</Stack>
+								</ActionIcon>
+							</Tooltip>
+						</Group>
+					)
+				})}
+			</Stack>
 
-					<AddToken virtualTokenList={virtualTokenList} virtualTokensHandlers={virtualTokensHandlers} />
+			<AddToken virtualTokens={virtualTokens} />
 
-					<Group>
-						<Button variant='default' onClick={close}>Cancel</Button>
-						<Button flex={1} color='green' type='submit'>Update</Button>
-					</Group>
-				</Stack>
-			</form>
-		</Modal>
+			<Group>
+				<Button variant='default' onClick={close}>Cancel</Button>
+				<Button
+					flex={1}
+					type='submit'
+					onClick={() => {
+						const tokens = Object.fromEntries(virtualTokens)
+						deletedToken.forEach(tokenName => {
+							tokens[tokenName] = 0
+						})
+						updateCharacterToken.mutate({
+							data: {
+								tabletopCharacterId,
+								characterType,
+								tokens
+							}
+						})
+						close()
+					}}
+				>
+					Update
+				</Button>
+			</Group>
+		</Stack>
 	)
 }
 
 type AddTokenProps = {
-	virtualTokenList: string[]
-	virtualTokensHandlers: UseListStateHandlers<{ name: string, amount: number }>
+	virtualTokens: Map<string, number>
 }
 
-function AddToken({ virtualTokenList, virtualTokensHandlers }: AddTokenProps) {
+function AddToken({ virtualTokens }: AddTokenProps) {
 	const tokensData = useTokenQuery()
 
 	const tokenName = useMemo(() => Object.keys(tokensData), [tokensData])
@@ -131,7 +129,7 @@ function AddToken({ virtualTokenList, virtualTokensHandlers }: AddTokenProps) {
 		for (const tokenData of Object.values(tokensData)) {
 			out[tokenData.alignment].push({
 				value: tokenData.name,
-				disabled: virtualTokenList.includes(tokenData.name)
+				disabled: !!virtualTokens.get(tokenData.name)
 			})
 		}
 
@@ -140,15 +138,17 @@ function AddToken({ virtualTokenList, virtualTokensHandlers }: AddTokenProps) {
 			{ group: 'Neutral', items: out.NEUTRAL },
 			{ group: 'Negative', items: out.NEGATIVE }
 		]
-	}, [tokensData, virtualTokenList])
+	}, [tokensData, virtualTokens])
 
 	const [addTokenText, setAddTokenText] = useState('')
+
+	const canAdd = !tokenName.includes(addTokenText)
 
 	return (
 		<Group align='flex-end'>
 			<Autocomplete
 				clearable
-				label='Add token'
+				label='Add Token'
 				placeholder='Token Name'
 				value={addTokenText}
 				onChange={setAddTokenText}
@@ -161,16 +161,18 @@ function AddToken({ virtualTokenList, virtualTokensHandlers }: AddTokenProps) {
 				}}
 				flex={1}
 			/>
-			<ActionIcon
-				size={36}
-				disabled={!tokenName.includes(addTokenText)}
-				onClick={() => {
-					virtualTokensHandlers.append({ name: addTokenText, amount: 0 })
-					setAddTokenText('')
-				}}
-			>
-				<IconPlus />
-			</ActionIcon>
+			<Tooltip label={`Add ${addTokenText}`} disabled={canAdd}>
+				<ActionIcon
+					size={36}
+					disabled={canAdd}
+					onClick={() => {
+						virtualTokens.set(addTokenText, 1)
+						setAddTokenText('')
+					}}
+				>
+					<IconPlus />
+				</ActionIcon>
+			</Tooltip>
 		</Group>
 	)
 }

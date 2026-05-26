@@ -1,5 +1,5 @@
 import { Stack, Title } from '@mantine/core'
-import CharacterTokens from '~/tt/-windows/CharacterWindow/CharacterTokens'
+import CharacterTokens from '../CharacterTokens'
 import { useEnemyWindowContext } from './EnemyWindowContext'
 
 export default function Enemy() {
@@ -9,7 +9,7 @@ export default function Enemy() {
 		<Stack>
 			<Title order={3}>{enemyData.enemyName}</Title>
 
-			<CharacterTokens tabletopCharacterId={enemyData.tabletopCharacterId} tokens={enemyData.tokens} characterType='ENEMY' />
+			<CharacterTokens />
 		</Stack>
 	)
 }

@@ -6,8 +6,10 @@ import { getServiceClient } from '~/supabase/getServiceClient'
 import { characterType } from '~/types/gameTypes/character'
 import { int2 } from '~/utils/int'
 import { mutationError } from '~/utils/mutationError'
+import { type TabletopGMEnemyData } from '../../$campaignId.gm/-hooks/tabletopData/useGMTabletopEnemies'
 import { type TabletopHeroData } from '../../-hooks/tabletopData/useTabletopHeroes'
 import { hasCharacterPermission } from '../characterPermission'
+import getCharacterQueryKey from '../getCharacterQueryKey'
 import { useTabletopContext } from '../TabletopContext'
 import { type QuerySyncProps } from './querySync'
 
@@ -28,12 +30,12 @@ export function useUpdateCharacterTokens() {
 type UpdateCharacterTokensQuerySyncProps = QuerySyncProps<typeof updateCharacterTokenSchema>
 
 export function updateCharacterTokensQuerySync({ queryClient, campaignId, data }: UpdateCharacterTokensQuerySyncProps) {
-	const queryKey = [campaignId, 'tabletop', data.characterType.toLowerCase(), data.tabletopCharacterId]
-	queryClient.setQueriesData({ queryKey }, (oldData: TabletopHeroData) => {
+	const { queryKey } = getCharacterQueryKey({ queryClient, campaignId, tabletopCharacterId: data.tabletopCharacterId })
+	queryClient.setQueriesData({ queryKey }, (oldData: TabletopHeroData | TabletopGMEnemyData) => {
 		return {
 			...oldData,
 			tokens: Object.entries(data.tokens).filter(([_name, amount]) => amount !== 0).map(([name, amount]) => ({ name, amount }))
-		} satisfies TabletopHeroData
+		} satisfies TabletopHeroData | TabletopGMEnemyData
 	})
 }
 
