@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { getServiceClient } from '~/supabase/getServiceClient'
@@ -7,16 +7,16 @@ import { mutationError } from '~/utils/mutationError'
 import { type TabletopGMEnemyData } from '../../$campaignId.gm/-hooks/tabletopData/useGMTabletopEnemies'
 import { type TabletopHeroData } from '../../-hooks/tabletopData/useTabletopHeroes'
 import { hasCharacterPermission } from '../characterPermission'
-import { useTabletopContext } from '../TabletopContext'
+import getQueryKey from '../getQueryKey'
 import { type QuerySyncProps } from './querySync'
 
 export function useUpdateCharacterStats() {
-	const { queryClient, campaignId } = useTabletopContext()
+	const queryClient = useQueryClient()
 
 	return useMutation({
 		mutationFn: updateCharacterAction,
 		onMutate: ({ data }) => {
-			updateCharacterStatsQuerySync({ queryClient, campaignId, data })
+			updateCharacterStatsQuerySync({ queryClient, data })
 		},
 		onError: error => {
 			mutationError(error, 'Failed to update character stats')
@@ -26,11 +26,12 @@ export function useUpdateCharacterStats() {
 
 type UpdateCharacterStatsQuerySyncProps = QuerySyncProps<typeof updateCharacterSchema>
 
-export function updateCharacterStatsQuerySync({ queryClient, campaignId, data }: UpdateCharacterStatsQuerySyncProps) {
+export function updateCharacterStatsQuerySync({ queryClient, data }: UpdateCharacterStatsQuerySyncProps) {
 	switch (data.characterType) {
-		case 'HERO':
-			void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'hero', data.tabletopCharacterId] })
-			queryClient.setQueriesData({ queryKey: [campaignId, 'tabletop', 'hero', data.tabletopCharacterId] }, (oldData: TabletopHeroData) => {
+		case 'HERO': {
+			const queryKey = getQueryKey({ type: 'hero', data: { tabletopCharacterId: data.tabletopCharacterId } })
+			void queryClient.cancelQueries({ queryKey })
+			queryClient.setQueriesData({ queryKey }, (oldData: TabletopHeroData) => {
 				return {
 					...oldData,
 					tabletopStats: {
@@ -44,9 +45,11 @@ export function updateCharacterStatsQuerySync({ queryClient, campaignId, data }:
 				} satisfies TabletopHeroData
 			})
 			break
-		case 'ENEMY':
-			void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'enemy', data.tabletopCharacterId] })
-			queryClient.setQueriesData({ queryKey: [campaignId, 'tabletop', 'enemy', data.tabletopCharacterId] }, (oldData: TabletopGMEnemyData) => {
+		}
+		case 'ENEMY': {
+			const queryKey = getQueryKey({ type: 'enemy', data: { tabletopCharacterId: data.tabletopCharacterId } })
+			void queryClient.cancelQueries({ queryKey })
+			queryClient.setQueriesData({ queryKey }, (oldData: TabletopGMEnemyData) => {
 				return {
 					...oldData,
 					tabletopStats: {
@@ -60,6 +63,7 @@ export function updateCharacterStatsQuerySync({ queryClient, campaignId, data }:
 				} satisfies TabletopGMEnemyData
 			})
 			break
+		}
 	}
 }
 

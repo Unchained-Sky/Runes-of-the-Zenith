@@ -1,7 +1,7 @@
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
-import { useTabletopContext } from '~/routes/tabletop/-utils/TabletopContext'
+import { useTabletopEnvironmentStore } from '~/routes/tabletop/-hooks/useTabletopEnvironmentStore'
 import { requireAccount } from '~/supabase/requireAccount'
 import { TABLETOP_QUERY_STALE_TIME } from '~/tt/-hooks/tabletopData/tabletopDataOptions'
 
@@ -36,10 +36,9 @@ export const tabletopCurrentEncounterQueryOptions = (campaignId: number) => quer
 })
 
 export function useGMTabletopCurrentEncounter() {
-	const { campaignId } = useTabletopContext()
+	const { campaignId, role } = useTabletopEnvironmentStore()
 	const query = useSuspenseQuery(tabletopCurrentEncounterQueryOptions(campaignId))
 
-	const { role } = useTabletopContext()
 	if (role !== 'gm') throw new Error('Role is not GM')
 
 	return query

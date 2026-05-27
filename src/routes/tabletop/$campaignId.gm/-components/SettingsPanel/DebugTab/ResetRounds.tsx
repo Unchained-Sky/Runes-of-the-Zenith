@@ -1,11 +1,12 @@
 import { Button, Group, Modal, Stack, Text } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
+import { useTabletopEnvironmentStore } from '~/routes/tabletop/-hooks/useTabletopEnvironmentStore'
 import { resetAggressionAction, resetAggressionQuerySync } from '~/routes/tabletop/-utils/gameActions/resetAggression'
 import { startRoundAction, startRoundQuerySync } from '~/routes/tabletop/-utils/gameActions/startRound'
-import { useTabletopContext } from '~/routes/tabletop/-utils/TabletopContext'
+import getQueryKey from '~/routes/tabletop/-utils/getQueryKey'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
 import { useTabletopEnemyList } from '~/tt/-hooks/tabletopData/useTabletopEnemyList'
@@ -13,7 +14,8 @@ import { type TabletopRoundData } from '~/tt/-hooks/tabletopData/useTabletopRoun
 import { mutationError } from '~/utils/mutationError'
 
 export default function ResetRounds() {
-	const { queryClient, campaignId } = useTabletopContext()
+	const { campaignId } = useTabletopEnvironmentStore()
+	const queryClient = useQueryClient()
 
 	const [opened, { open, close }] = useDisclosure(false)
 
@@ -22,20 +24,20 @@ export default function ResetRounds() {
 	const resetRounds = useMutation({
 		mutationFn: resetRoundsAction,
 		onMutate: () => {
-			void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'round'] })
-			queryClient.setQueryData([campaignId, 'tabletop', 'round'], (oldData: TabletopRoundData) => {
+			const queryKey = getQueryKey({ type: 'round' })
+			void queryClient.cancelQueries({ queryKey })
+			queryClient.setQueryData(queryKey, (oldData: TabletopRoundData) => {
 				return {
 					...oldData,
 					round: 0
 				} satisfies TabletopRoundData
 			})
 
-			startRoundQuerySync({ queryClient, campaignId })
+			startRoundQuerySync({ queryClient })
 
 			enemyList.forEach(tabletopCharacterId => {
 				resetAggressionQuerySync({
 					queryClient,
-					campaignId,
 					data: { tabletopCharacterId }
 				})
 			})

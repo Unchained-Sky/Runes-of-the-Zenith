@@ -1,10 +1,9 @@
 import { Menu } from '@mantine/core'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { Fragment, type ReactNode } from 'react'
 import ContextMenu from '~/components/ContextMenu'
-import { useTabletopContext } from '~/routes/tabletop/-utils/TabletopContext'
 import { type TablesInsert } from '~/supabase/databaseTypes'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
@@ -13,6 +12,7 @@ import { useTabletopHeroList } from '~/tt/-hooks/tabletopData/useTabletopHeroLis
 import { useTabletopTiles } from '~/tt/-hooks/tabletopData/useTabletopTiles'
 import { type CombatTileCord } from '~/types/gameTypes/combatMap'
 import { mutationError } from '~/utils/mutationError'
+import getQueryKey from '../../-utils/getQueryKey'
 
 type HexContextMenuProps = {
 	children: ReactNode
@@ -39,7 +39,7 @@ type HeroesProps = {
 }
 
 function Heroes({ cord }: HeroesProps) {
-	const { queryClient, campaignId } = useTabletopContext()
+	const queryClient = useQueryClient()
 
 	const { data: heroList } = useTabletopHeroList()
 	const inactiveHeroes = heroList.filter(hero => !hero.tabletopCharacterId)
@@ -56,8 +56,9 @@ function Heroes({ cord }: HeroesProps) {
 
 			const heroData = Object.values(heroesData).find(hero => hero.heroId === heroId)
 			if (heroData) {
-				void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'hero', heroData.tabletopCharacterId] })
-				queryClient.setQueriesData({ queryKey: [campaignId, 'tabletop', 'hero', heroData.tabletopCharacterId] }, (oldData: TabletopHeroData) => {
+				const queryKey = getQueryKey({ type: 'hero', data: { tabletopCharacterId: heroData.tabletopCharacterId } })
+				void queryClient.cancelQueries({ queryKey })
+				queryClient.setQueriesData({ queryKey }, (oldData: TabletopHeroData) => {
 					return {
 						...oldData,
 						pos: cord

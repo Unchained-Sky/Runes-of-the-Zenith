@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { type TablesInsert } from '~/supabase/databaseTypes'
@@ -7,20 +7,20 @@ import { characterType } from '~/types/gameTypes/character'
 import { mutationError } from '~/utils/mutationError'
 import { type TabletopHeroData } from '../../-hooks/tabletopData/useTabletopHeroes'
 import { hasCharacterPermission } from '../characterPermission'
+import getQueryKey from '../getQueryKey'
 import { lingeringExtraData } from '../lingeringData'
-import { useTabletopContext } from '../TabletopContext'
 import { type QuerySyncProps } from './querySync'
 
 export function useAddLingering() {
-	const { queryClient, campaignId } = useTabletopContext()
+	const queryClient = useQueryClient()
 
 	return useMutation({
 		mutationFn: addLingeringAction,
 		onMutate: ({ data }) => {
-			addLingeringQuerySyncMutate({ queryClient, campaignId, data })
+			addLingeringQuerySyncMutate({ queryClient, data })
 		},
 		onSuccess: (data, variables) => {
-			addLingeringQuerySyncSuccess({ queryClient, campaignId, data, variables: variables.data })
+			addLingeringQuerySyncSuccess({ queryClient, data, variables: variables.data })
 		},
 		onError: error => {
 			mutationError(error, 'Failed to add lingering')
@@ -30,8 +30,8 @@ export function useAddLingering() {
 
 type AddLingeringQuerySyncMutateProps = QuerySyncProps<typeof addLingeringSchema>
 
-export function addLingeringQuerySyncMutate({ queryClient, campaignId, data }: AddLingeringQuerySyncMutateProps) {
-	const queryKey = [campaignId, 'tabletop', data.characterType.toLowerCase(), data.tabletopCharacterId]
+export function addLingeringQuerySyncMutate({ queryClient, data }: AddLingeringQuerySyncMutateProps) {
+	const queryKey = getQueryKey({ type: 'character', data: { tabletopCharacterId: data.tabletopCharacterId, queryClient } })
 	queryClient.setQueriesData({ queryKey }, (oldData: TabletopHeroData) => {
 		const lingeringEffects = structuredClone(oldData.lingering)
 		data.lingeringEffects.forEach((lingering, i) => {
@@ -49,8 +49,8 @@ type AddLingeringQuerySyncSuccessProps = QuerySyncProps & {
 	variables: typeof addLingeringSchema.infer
 }
 
-export function addLingeringQuerySyncSuccess({ queryClient, campaignId, data, variables }: AddLingeringQuerySyncSuccessProps) {
-	const queryKey = [campaignId, 'tabletop', variables.characterType.toLowerCase(), variables.tabletopCharacterId]
+export function addLingeringQuerySyncSuccess({ queryClient, data, variables }: AddLingeringQuerySyncSuccessProps) {
+	const queryKey = getQueryKey({ type: 'character', data: { tabletopCharacterId: variables.tabletopCharacterId, queryClient } })
 	queryClient.setQueriesData({ queryKey }, (oldData: TabletopHeroData) => {
 		let lingeringEffects = structuredClone(oldData.lingering)
 		lingeringEffects = lingeringEffects.filter(l => l.lingeringId > 0)

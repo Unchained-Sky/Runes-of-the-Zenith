@@ -2,10 +2,10 @@ import { createServerOnlyFn } from '@tanstack/react-start'
 import { requireAccount } from '~/supabase/requireAccount'
 import { useSupabase } from '~/supabase/useSupabase'
 import { useTabletopHeroList } from '~/tt/-hooks/tabletopData/useTabletopHeroList'
-import { useTabletopContext } from './TabletopContext'
+import { useTabletopEnvironmentStore } from '../-hooks/useTabletopEnvironmentStore'
 
 export function useCharacterPermission(tabletopCharacterId: number) {
-	const { role } = useTabletopContext()
+	const { role } = useTabletopEnvironmentStore()
 
 	const { userId } = useSupabase()
 	const { data: heroList } = useTabletopHeroList()

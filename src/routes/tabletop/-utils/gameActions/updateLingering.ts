@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { type TablesUpdate } from '~/supabase/databaseTypes'
@@ -7,16 +7,16 @@ import { characterType } from '~/types/gameTypes/character'
 import { mutationError } from '~/utils/mutationError'
 import { type TabletopHeroData } from '../../-hooks/tabletopData/useTabletopHeroes'
 import { hasCharacterPermission } from '../characterPermission'
-import { useTabletopContext } from '../TabletopContext'
+import getQueryKey from '../getQueryKey'
 import { type QuerySyncProps } from './querySync'
 
 export function useUpdateLingering() {
-	const { queryClient, campaignId } = useTabletopContext()
+	const queryClient = useQueryClient()
 
 	return useMutation({
 		mutationFn: updateLingeringAction,
 		onMutate: ({ data }) => {
-			updateLingeringQuerySync({ queryClient, campaignId, data })
+			updateLingeringQuerySync({ queryClient, data })
 		},
 		onError: error => {
 			mutationError(error, 'Failed to update lingering')
@@ -26,8 +26,8 @@ export function useUpdateLingering() {
 
 type UpdateLingeringQuerySyncProps = QuerySyncProps<typeof updateLingeringSchema>
 
-export function updateLingeringQuerySync({ queryClient, campaignId, data }: UpdateLingeringQuerySyncProps) {
-	const queryKey = [campaignId, 'tabletop', data.characterType.toLowerCase(), data.tabletopCharacterId]
+export function updateLingeringQuerySync({ queryClient, data }: UpdateLingeringQuerySyncProps) {
+	const queryKey = getQueryKey({ type: 'character', data: { tabletopCharacterId: data.tabletopCharacterId, queryClient } })
 	queryClient.setQueriesData({ queryKey }, (oldData: TabletopHeroData) => {
 		const lingeringEffects = structuredClone(oldData.lingering)
 		data.lingeringEffects.forEach(lingering => {

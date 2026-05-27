@@ -1,6 +1,5 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { tokenQueryOptions } from '~/hooks/data/useTokenQuery'
-import { TabletopContext } from '~/routes/tabletop/-utils/TabletopContext'
 import DragDrop from '~/tt/-components/DragDrop'
 import { tabletopEnemyListQueryOptions } from '~/tt/-hooks/tabletopData/useTabletopEnemyList'
 import { tabletopHeroListQueryOptions } from '~/tt/-hooks/tabletopData/useTabletopHeroList'
@@ -10,7 +9,8 @@ import { tabletopRoundQueryOptions } from '~/tt/-hooks/tabletopData/useTabletopR
 import { tabletopTilesQueryOptions } from '~/tt/-hooks/tabletopData/useTabletopTiles'
 import Windows from '~/tt/-windows'
 import { safeParseInt } from '~/utils/safeParseInt'
-import TabletopSubscriptions from '../-hooks/useTabletopSubscriptions'
+import { useTabletopEnvironmentStore } from '../-hooks/useTabletopEnvironmentStore'
+import useTabletopSubscriptions from '../-hooks/useTabletopSubscriptions'
 import CombatGridTabletopPlayer from './-components/CombatGridTabletopPlayer'
 import Sidebar from './-components/Sidebar'
 
@@ -56,24 +56,15 @@ export const Route = createFileRoute('/tabletop/$campaignId/player/')({
 
 function RouteComponent() {
 	const { campaignId } = Route.useLoaderData()
-	const { queryClient } = Route.useRouteContext()
+	useTabletopEnvironmentStore(state => state.setup)({ campaignId, role: 'player', route: '/tabletop/$campaignId/player/' })
+
+	useTabletopSubscriptions(campaignId)
 
 	return (
-		<TabletopContext
-			value={{
-				campaignId,
-				queryClient,
-				role: 'player',
-				route: '/tabletop/$campaignId/player/'
-			}}
-		>
-			<TabletopSubscriptions />
-
-			<DragDrop>
-				<CombatGridTabletopPlayer />
-				<Sidebar />
-				<Windows />
-			</DragDrop>
-		</TabletopContext>
+		<DragDrop>
+			<CombatGridTabletopPlayer />
+			<Sidebar />
+			<Windows />
+		</DragDrop>
 	)
 }

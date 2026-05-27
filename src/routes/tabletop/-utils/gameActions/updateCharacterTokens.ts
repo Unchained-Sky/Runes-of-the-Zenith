@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { type TablesInsert } from '~/supabase/databaseTypes'
@@ -9,17 +9,16 @@ import { mutationError } from '~/utils/mutationError'
 import { type TabletopGMEnemyData } from '../../$campaignId.gm/-hooks/tabletopData/useGMTabletopEnemies'
 import { type TabletopHeroData } from '../../-hooks/tabletopData/useTabletopHeroes'
 import { hasCharacterPermission } from '../characterPermission'
-import getCharacterQueryKey from '../getCharacterQueryKey'
-import { useTabletopContext } from '../TabletopContext'
+import getQueryKey from '../getQueryKey'
 import { type QuerySyncProps } from './querySync'
 
 export function useUpdateCharacterTokens() {
-	const { queryClient, campaignId } = useTabletopContext()
+	const queryClient = useQueryClient()
 
 	return useMutation({
 		mutationFn: updateCharacterTokenAction,
 		onMutate: ({ data }) => {
-			updateCharacterTokensQuerySync({ queryClient, campaignId, data })
+			updateCharacterTokensQuerySync({ queryClient, data })
 		},
 		onError: error => {
 			mutationError(error, 'Failed to update hero tokens')
@@ -29,8 +28,9 @@ export function useUpdateCharacterTokens() {
 
 type UpdateCharacterTokensQuerySyncProps = QuerySyncProps<typeof updateCharacterTokenSchema>
 
-export function updateCharacterTokensQuerySync({ queryClient, campaignId, data }: UpdateCharacterTokensQuerySyncProps) {
-	const { queryKey } = getCharacterQueryKey({ queryClient, campaignId, tabletopCharacterId: data.tabletopCharacterId })
+export function updateCharacterTokensQuerySync({ queryClient, data }: UpdateCharacterTokensQuerySyncProps) {
+	const { queryKey } = getQueryKey({ type: 'character', data: { tabletopCharacterId: data.tabletopCharacterId, queryClient } })
+	void queryClient.cancelQueries({ queryKey })
 	queryClient.setQueriesData({ queryKey }, (oldData: TabletopHeroData | TabletopGMEnemyData) => {
 		return {
 			...oldData,

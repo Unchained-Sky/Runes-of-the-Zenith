@@ -1,22 +1,22 @@
+import { useQueryClient } from '@tanstack/react-query'
 import useMountEffect from '~/hooks/useMountEffect'
-import { LOG_SUBSCRIPTION_PAYLOADS } from '~/routes/tabletop/-hooks/useTabletopSubscriptions/useTabletopSubscriptions'
-import { useTabletopContext } from '~/routes/tabletop/-utils/TabletopContext'
+import { LOG_SUBSCRIPTION_PAYLOADS, LOG_SUBSCRIPTION_STATUS, type TabletopSubscriptionProps } from '~/routes/tabletop/-hooks/useTabletopSubscriptions/useTabletopSubscriptions'
 import { type Tables } from '~/supabase/databaseTypes'
 import { useSupabase } from '~/supabase/useSupabase'
+import getQueryKey from '../../-utils/getQueryKey'
 import { type TabletopRoundData } from '../tabletopData/useTabletopRound'
 
-export default function useTabletopInfoSubscription() {
+export default function useTabletopInfoSubscription({ channelName, table }: TabletopSubscriptionProps) {
 	const { supabase } = useSupabase()
-	const { queryClient, campaignId } = useTabletopContext()
+	const queryClient = useQueryClient()
 
 	useMountEffect(() => {
-		const channelName = `tabletop_info:${campaignId}`
-		supabase
+		const channel = supabase
 			.channel(channelName)
 			.on('postgres_changes', {
 				event: '*',
 				schema: 'public',
-				table: 'tabletop_info'
+				table
 			}, payload => {
 				if (LOG_SUBSCRIPTION_PAYLOADS) console.log(payload)
 
@@ -26,7 +26,7 @@ export default function useTabletopInfoSubscription() {
 					}
 					case 'UPDATE': {
 						const updateData = payload.new as Tables<'tabletop_info'>
-						const queryKey = [campaignId, 'tabletop', 'round']
+						const queryKey = getQueryKey({ type: 'round' })
 						void queryClient.cancelQueries({ queryKey })
 						queryClient.setQueryData(queryKey, (oldData: TabletopRoundData) => {
 							return {
@@ -41,11 +41,8 @@ export default function useTabletopInfoSubscription() {
 					}
 				}
 			})
-			.subscribe(status => console.log(`${channelName} ${status}`))
+			.subscribe(status => LOG_SUBSCRIPTION_STATUS && console.log(`${channelName} ${status}`))
 
-		return () => {
-			const channel = supabase.channel(channelName)
-			void supabase.removeChannel(channel)
-		}
+		return () => void supabase.removeChannel(channel)
 	})
 }

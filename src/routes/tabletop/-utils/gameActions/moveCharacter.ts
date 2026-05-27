@@ -1,19 +1,20 @@
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { type TabletopGMEnemyData } from '~/routes/tabletop/$campaignId.gm/-hooks/tabletopData/useGMTabletopEnemies'
-import { useTabletopContext } from '~/routes/tabletop/-utils/TabletopContext'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { type TabletopHeroData } from '~/tt/-hooks/tabletopData/useTabletopHeroes'
 import { type TabletopTile, type TabletopTiles } from '~/tt/-hooks/tabletopData/useTabletopTiles'
 import { characterType } from '~/types/gameTypes/character'
 import { typedObject } from '~/types/typedObject'
 import { mutationError } from '~/utils/mutationError'
+import { type TabletopPlayerEnemyData } from '../../$campaignId.player/-hooks/tabletopData/usePlayerTabletopEnemies'
 import { hasCharacterPermission } from '../characterPermission'
+import getQueryKey from '../getQueryKey'
 import { type QuerySyncProps } from './querySync'
 
 export function useMoveCharacter() {
-	const { queryClient, campaignId } = useTabletopContext()
+	const queryClient = useQueryClient()
 
 	return useMutation({
 		mutationFn: moveCharacterAction,
@@ -21,7 +22,7 @@ export function useMoveCharacter() {
 			id: 'tabletop-move-character'
 		},
 		onMutate: ({ data }) => {
-			moveCharacterQuerySync({ queryClient, campaignId, data })
+			moveCharacterQuerySync({ queryClient, data })
 		},
 		onError: error => {
 			mutationError(error, 'Failed to move character')
@@ -31,41 +32,36 @@ export function useMoveCharacter() {
 
 type MoveCharacterQuerySyncProps = QuerySyncProps<typeof moveCharacterSchema>
 
-export function moveCharacterQuerySync({ queryClient, campaignId, data }: MoveCharacterQuerySyncProps) {
-	void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'tiles', 'characters'] })
-	queryClient.setQueryData([campaignId, 'tabletop', 'tiles', 'characters'], (oldData: TabletopTiles) => {
-		const cord = `${data.cord[0]},${data.cord[1]},${data.cord[2]}` as const
-		const [oldCord] = typedObject.entries(oldData).find(([_keys, value]) => value?.tabletopCharacterId === data.tabletopCharacterId) ?? []
-		const out: TabletopTiles = {
-			...oldData,
-			[cord]: {
-				tabletopCharacterId: data.tabletopCharacterId,
-				characterType: data.characterType
-			} satisfies TabletopTile
-		}
-		if (oldCord) {
-			out[oldCord] = null
-		}
-		return out
-	})
+export function moveCharacterQuerySync({ queryClient, data }: MoveCharacterQuerySyncProps) {
+	{
+		const queryKey = getQueryKey({ type: 'tiles-character' })
+		void queryClient.cancelQueries({ queryKey })
+		queryClient.setQueryData(queryKey, (oldData: TabletopTiles) => {
+			const cord = `${data.cord[0]},${data.cord[1]},${data.cord[2]}` as const
+			const [oldCord] = typedObject.entries(oldData).find(([_keys, value]) => value?.tabletopCharacterId === data.tabletopCharacterId) ?? []
+			const out: TabletopTiles = {
+				...oldData,
+				[cord]: {
+					tabletopCharacterId: data.tabletopCharacterId,
+					characterType: data.characterType
+				} satisfies TabletopTile
+			}
+			if (oldCord) {
+				out[oldCord] = null
+			}
+			return out
+		})
+	}
 
-	switch (data.characterType) {
-		case 'HERO': {
-			void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'hero', data.tabletopCharacterId] })
-			queryClient.setQueriesData({ queryKey: [campaignId, 'tabletop', 'hero', data.tabletopCharacterId] }, (oldData: TabletopHeroData) => ({
+	{
+		const { queryKey } = getQueryKey({ type: 'character', data: { tabletopCharacterId: data.tabletopCharacterId, queryClient } })
+		void queryClient.cancelQueries({ queryKey })
+		queryClient.setQueriesData({ queryKey }, (oldData: TabletopHeroData | TabletopPlayerEnemyData | TabletopGMEnemyData) => {
+			return {
 				...oldData,
 				pos: data.cord
-			} satisfies TabletopHeroData))
-			break
-		}
-		case 'ENEMY': {
-			void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'enemy', data.tabletopCharacterId] })
-			queryClient.setQueriesData({ queryKey: [campaignId, 'tabletop', 'enemy', data.tabletopCharacterId] }, (oldData: TabletopGMEnemyData) => ({
-				...oldData,
-				pos: data.cord
-			} satisfies TabletopGMEnemyData))
-			break
-		}
+			} satisfies TabletopHeroData | TabletopPlayerEnemyData | TabletopGMEnemyData
+		})
 	}
 }
 

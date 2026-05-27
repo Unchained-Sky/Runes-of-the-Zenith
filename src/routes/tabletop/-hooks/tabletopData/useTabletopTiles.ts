@@ -1,9 +1,9 @@
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
-import { useTabletopContext } from '~/routes/tabletop/-utils/TabletopContext'
 import { requireAccount } from '~/supabase/requireAccount'
 import { typedObject } from '~/types/typedObject'
+import { useTabletopEnvironmentStore } from '../useTabletopEnvironmentStore'
 import { TABLETOP_QUERY_STALE_TIME } from './tabletopDataOptions'
 
 const tilesLoaderSchema = type({
@@ -50,6 +50,6 @@ export const tabletopTilesQueryOptions = (campaignId: number) => queryOptions({
 })
 
 export function useTabletopTiles() {
-	const { campaignId } = useTabletopContext()
+	const { campaignId } = useTabletopEnvironmentStore()
 	return useSuspenseQuery(tabletopTilesQueryOptions(campaignId))
 }

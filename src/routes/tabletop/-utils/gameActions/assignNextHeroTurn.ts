@@ -1,24 +1,25 @@
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
-import { useTabletopContext } from '~/routes/tabletop/-utils/TabletopContext'
 import { type TablesUpdate } from '~/supabase/databaseTypes'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { type TabletopHeroData } from '~/tt/-hooks/tabletopData/useTabletopHeroes'
 import { mutationError } from '~/utils/mutationError'
+import { useTabletopEnvironmentStore } from '../../-hooks/useTabletopEnvironmentStore'
 import { hasCharacterPermission } from '../characterPermission'
+import getQueryKey from '../getQueryKey'
 import { increaseAggressionQuerySync, UNSAFE_increaseAggressionAction } from './increaseAggression'
 import { type QuerySyncProps } from './querySync'
 
 const findNextOrder = (array: { order: number | null }[]) => Math.max(0, ...array.flatMap(({ order }) => order ? [order] : [])) + 1
 
 export function useAssignNextHeroTurn() {
-	const { queryClient, campaignId } = useTabletopContext()
+	const queryClient = useQueryClient()
 
 	return useMutation({
 		mutationFn: assignNextHeroTurnAction,
 		onMutate: ({ data }) => {
-			assignNextHeroTurnQuerySync({ queryClient, campaignId, data })
+			assignNextHeroTurnQuerySync({ queryClient, data })
 		},
 		onError: error => {
 			mutationError(error, 'Failed to assign next hero turn')
@@ -28,9 +29,10 @@ export function useAssignNextHeroTurn() {
 
 type AssignNextTurnQuerySyncProps = QuerySyncProps<typeof assignNextHeroTurnSchema>
 
-export function assignNextHeroTurnQuerySync({ queryClient, campaignId, data }: AssignNextTurnQuerySyncProps) {
-	void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'hero', data.tabletopCharacterId] })
-	queryClient.setQueriesData({ queryKey: [campaignId, 'tabletop', 'hero', data.tabletopCharacterId] }, (oldData: TabletopHeroData) => {
+export function assignNextHeroTurnQuerySync({ queryClient, data }: AssignNextTurnQuerySyncProps) {
+	const queryKey = getQueryKey({ type: 'hero', data: { tabletopCharacterId: data.tabletopCharacterId } })
+	void queryClient.cancelQueries({ queryKey })
+	queryClient.setQueriesData({ queryKey }, (oldData: TabletopHeroData) => {
 		const { turn } = oldData
 		return {
 			...oldData,
@@ -44,7 +46,8 @@ export function assignNextHeroTurnQuerySync({ queryClient, campaignId, data }: A
 		} satisfies TabletopHeroData
 	})
 
-	increaseAggressionQuerySync({ queryClient, campaignId, data: { campaignId } })
+	const { campaignId } = useTabletopEnvironmentStore.getState()
+	increaseAggressionQuerySync({ queryClient, data: { campaignId } })
 }
 
 const assignNextHeroTurnSchema = type({

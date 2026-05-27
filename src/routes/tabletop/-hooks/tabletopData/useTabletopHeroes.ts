@@ -1,13 +1,13 @@
 import { queryOptions, useSuspenseQueries } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
-import { useTabletopContext } from '~/routes/tabletop/-utils/TabletopContext'
 import { type RuneData, runeExtraDataSchema } from '~/scripts/data/runes/runeData'
 import { type Enums, type Json, type TablesInsert } from '~/supabase/databaseTypes'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireAccount } from '~/supabase/requireAccount'
 import { typedObject } from '~/types/typedObject'
 import { lingeringDataFormatter } from '../../-utils/lingeringData'
+import { useTabletopEnvironmentStore } from '../useTabletopEnvironmentStore'
 import { TABLETOP_QUERY_STALE_TIME } from './tabletopDataOptions'
 import { useTabletopHeroList } from './useTabletopHeroList'
 
@@ -228,7 +228,7 @@ interface UnusedHeroTurn extends HeroTurnFallback {
 }
 
 export function useTabletopHeroes() {
-	const { campaignId } = useTabletopContext()
+	const { campaignId } = useTabletopEnvironmentStore()
 	const { data: heroList } = useTabletopHeroList()
 
 	const queries = useSuspenseQueries({

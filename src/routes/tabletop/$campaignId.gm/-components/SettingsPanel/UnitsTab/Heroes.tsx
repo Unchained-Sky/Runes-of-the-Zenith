@@ -1,8 +1,8 @@
 import { SimpleGrid, Title } from '@mantine/core'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
-import { useTabletopContext } from '~/routes/tabletop/-utils/TabletopContext'
+import getQueryKey from '~/routes/tabletop/-utils/getQueryKey'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
 import { useTabletopHeroes } from '~/tt/-hooks/tabletopData/useTabletopHeroes'
@@ -11,7 +11,7 @@ import { mutationError } from '~/utils/mutationError'
 import CharacterCard from './CharacterCard'
 
 export default function Heroes() {
-	const { queryClient, campaignId } = useTabletopContext()
+	const queryClient = useQueryClient()
 
 	const { data: heroesData } = useTabletopHeroes()
 
@@ -20,24 +20,30 @@ export default function Heroes() {
 		onMutate: ({ data }) => {
 			const { tabletopCharacterId } = data
 
-			void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'hero-list'] })
-			queryClient.setQueriesData({ queryKey: [campaignId, 'tabletop', 'hero-list'] }, (oldData: TabletopHeroesList) => {
-				const newData = structuredClone(oldData)
-				for (let i = 0; i < newData.length; i++) {
-					const hero = newData[i]
-					if (hero?.tabletopCharacterId === tabletopCharacterId) {
-						newData[i] = {
-							...hero,
-							tabletopCharacterId: null
+			{
+				const queryKey = getQueryKey({ type: 'hero-list' })
+				void queryClient.cancelQueries({ queryKey })
+				queryClient.setQueriesData({ queryKey }, (oldData: TabletopHeroesList) => {
+					const newData = structuredClone(oldData)
+					for (let i = 0; i < newData.length; i++) {
+						const hero = newData[i]
+						if (hero?.tabletopCharacterId === tabletopCharacterId) {
+							newData[i] = {
+								...hero,
+								tabletopCharacterId: null
+							}
+							break
 						}
-						break
 					}
-				}
-				return newData satisfies TabletopHeroesList
-			})
+					return newData satisfies TabletopHeroesList
+				})
+			}
 
-			void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'hero', tabletopCharacterId] })
-			queryClient.removeQueries({ queryKey: [campaignId, 'tabletop', 'hero', tabletopCharacterId] })
+			{
+				const queryKey = getQueryKey({ type: 'hero', data: { tabletopCharacterId } })
+				void queryClient.cancelQueries({ queryKey })
+				queryClient.removeQueries({ queryKey })
+			}
 		},
 		onError: error => {
 			mutationError(error, 'Failed to remove hero')

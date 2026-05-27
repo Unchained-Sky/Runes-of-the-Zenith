@@ -1,19 +1,19 @@
 import { Button, Card, Group, Modal, Stack, Text, Title, useModalsStack } from '@mantine/core'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { useState } from 'react'
 import { useGMTabletopCurrentEncounter } from '~/routes/tabletop/$campaignId.gm/-hooks/tabletopData/useGMTabletopCurrentEncounter'
 import { useGMTabletopEncounterList } from '~/routes/tabletop/$campaignId.gm/-hooks/tabletopData/useGMTabletopEncounterList'
+import { useTabletopEnvironmentStore } from '~/routes/tabletop/-hooks/useTabletopEnvironmentStore'
 import { startRoundAction, startRoundQuerySync } from '~/routes/tabletop/-utils/gameActions/startRound'
-import { useTabletopContext } from '~/routes/tabletop/-utils/TabletopContext'
 import { type TablesInsert, type TablesUpdate } from '~/supabase/databaseTypes'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
 import { mutationError } from '~/utils/mutationError'
 
 export default function ChangeEncounter() {
-	const { queryClient, campaignId } = useTabletopContext()
+	const queryClient = useQueryClient()
 
 	const { data: currentEncounterName } = useGMTabletopCurrentEncounter()
 	const { data: encounterData } = useGMTabletopEncounterList()
@@ -35,7 +35,7 @@ export default function ChangeEncounter() {
 	const changeEncounter = useMutation({
 		mutationFn: changeEncounterAction,
 		onMutate: () => {
-			startRoundQuerySync({ queryClient, campaignId })
+			startRoundQuerySync({ queryClient })
 		},
 		onError: error => {
 			mutationError(error, 'Failed to change the encounter')
@@ -46,6 +46,7 @@ export default function ChangeEncounter() {
 		if (!selectedEncounter) return
 		// TODO clear state like rune targetting
 		handleCleanupModal()
+		const { campaignId } = useTabletopEnvironmentStore.getState()
 		changeEncounter.mutate({ data: { campaignId, encounterId: selectedEncounter } })
 	}
 

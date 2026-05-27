@@ -9,9 +9,9 @@ import { lingeringDecrementTime } from '~/routes/tabletop/-utils/lingeringData'
 import { type Enums } from '~/supabase/databaseTypes'
 import { typedObject } from '~/types/typedObject'
 import { int2 } from '~/utils/int'
-import { useHeroWindowContext } from './HeroWindowContext'
+import useCharacterWindowContext from './useCharacterWindowContext'
 
-export default function HeroLingering() {
+export default function CharacterLingering() {
 	const [isEditing, { toggle, close }] = useDisclosure(false)
 
 	return (
@@ -28,7 +28,7 @@ export default function HeroLingering() {
 }
 
 function LingeringDisplay() {
-	const { lingering } = useHeroWindowContext()
+	const { lingering } = useCharacterWindowContext()
 
 	return lingering.length
 		? (
@@ -68,7 +68,7 @@ function EditLingering({ close }: EditLingeringProps) {
 }
 
 function UpdateLingering() {
-	const { lingering } = useHeroWindowContext()
+	const { lingering } = useCharacterWindowContext()
 
 	return (
 		<Stack>
@@ -101,7 +101,7 @@ type UpdateLingeringEffectProps = {
 }
 
 function UpdateLingeringEffect({ lingering }: UpdateLingeringEffectProps) {
-	const { tabletopCharacterId } = useHeroWindowContext()
+	const { tabletopCharacterId, characterType } = useCharacterWindowContext()
 
 	const [value, setValue] = useState(lingering.remainingTime)
 
@@ -118,7 +118,7 @@ function UpdateLingeringEffect({ lingering }: UpdateLingeringEffectProps) {
 							updateLingering.mutate({
 								data: {
 									tabletopCharacterId,
-									characterType: 'HERO',
+									characterType,
 									lingeringEffects: [
 										{
 											lingeringId: lingering.lingeringId,
@@ -162,7 +162,7 @@ type AddLingeringProps = {
 }
 
 function AddLingering({ close }: AddLingeringProps) {
-	const { tabletopCharacterId } = useHeroWindowContext()
+	const { tabletopCharacterId } = useCharacterWindowContext()
 
 	const addLingering = useAddLingering()
 

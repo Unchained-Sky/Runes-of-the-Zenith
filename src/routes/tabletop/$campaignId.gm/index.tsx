@@ -1,6 +1,5 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { tokenQueryOptions } from '~/hooks/data/useTokenQuery'
-import { TabletopContext } from '~/routes/tabletop/-utils/TabletopContext'
 import DragDrop from '~/tt/-components/DragDrop'
 import { tabletopEnemyListQueryOptions } from '~/tt/-hooks/tabletopData/useTabletopEnemyList'
 import { tabletopHeroListQueryOptions } from '~/tt/-hooks/tabletopData/useTabletopHeroList'
@@ -8,13 +7,14 @@ import { tabletopMapTilesQueryOptions } from '~/tt/-hooks/tabletopData/useTablet
 import { tabletopNameQueryOptions } from '~/tt/-hooks/tabletopData/useTabletopName'
 import { tabletopRoundQueryOptions } from '~/tt/-hooks/tabletopData/useTabletopRound'
 import { tabletopTilesQueryOptions } from '~/tt/-hooks/tabletopData/useTabletopTiles'
-import Windows from '~/tt/-windows'
 import { safeParseInt } from '~/utils/safeParseInt'
-import TabletopSubscriptions from '../-hooks/useTabletopSubscriptions'
+import { useTabletopEnvironmentStore } from '../-hooks/useTabletopEnvironmentStore'
+import Windows from '../-windows'
 import CombatGridTabletopGM from './-components/CombatGridTabletopGM'
 import SettingsPanel from './-components/SettingsPanel'
 import { tabletopCurrentEncounterQueryOptions } from './-hooks/tabletopData/useGMTabletopCurrentEncounter'
 import { tabletopEncounterListQueryOptions } from './-hooks/tabletopData/useGMTabletopEncounterList'
+import useTabletopSubscriptions from '../-hooks/useTabletopSubscriptions'
 
 export const Route = createFileRoute('/tabletop/$campaignId/gm/')({
 	component: RouteComponent,
@@ -64,24 +64,15 @@ export const Route = createFileRoute('/tabletop/$campaignId/gm/')({
 
 function RouteComponent() {
 	const { campaignId } = Route.useLoaderData()
-	const { queryClient } = Route.useRouteContext()
+	useTabletopEnvironmentStore(state => state.setup)({ campaignId, role: 'gm', route: '/tabletop/$campaignId/gm/' })
+
+	useTabletopSubscriptions(campaignId)
 
 	return (
-		<TabletopContext
-			value={{
-				campaignId,
-				queryClient,
-				role: 'gm',
-				route: '/tabletop/$campaignId/gm/'
-			}}
-		>
-			<TabletopSubscriptions />
-
-			<DragDrop>
-				<CombatGridTabletopGM />
-				<SettingsPanel />
-				<Windows />
-			</DragDrop>
-		</TabletopContext>
+		<DragDrop>
+			<CombatGridTabletopGM />
+			<SettingsPanel />
+			<Windows />
+		</DragDrop>
 	)
 }

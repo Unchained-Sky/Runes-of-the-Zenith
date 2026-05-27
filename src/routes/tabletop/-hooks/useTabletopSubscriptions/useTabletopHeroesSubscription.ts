@@ -1,20 +1,17 @@
 import useMountEffect from '~/hooks/useMountEffect'
-import { LOG_SUBSCRIPTION_PAYLOADS } from '~/routes/tabletop/-hooks/useTabletopSubscriptions/useTabletopSubscriptions'
-import { useTabletopContext } from '~/routes/tabletop/-utils/TabletopContext'
+import { LOG_SUBSCRIPTION_PAYLOADS, LOG_SUBSCRIPTION_STATUS, type TabletopSubscriptionProps } from '~/routes/tabletop/-hooks/useTabletopSubscriptions/useTabletopSubscriptions'
 import { useSupabase } from '~/supabase/useSupabase'
 
-export default function useTabletopHeroesSubscription() {
+export default function useTabletopHeroesSubscription({ channelName, table }: TabletopSubscriptionProps) {
 	const { supabase } = useSupabase()
-	const { queryClient: _queryClient, campaignId } = useTabletopContext()
 
 	useMountEffect(() => {
-		const channelName = `tabletop_heroes:${campaignId}`
-		supabase
+		const channel = supabase
 			.channel(channelName)
 			.on('postgres_changes', {
 				event: '*',
 				schema: 'public',
-				table: 'tabletop_heroes'
+				table
 			}, payload => {
 				if (LOG_SUBSCRIPTION_PAYLOADS) console.log(payload)
 
@@ -30,11 +27,8 @@ export default function useTabletopHeroesSubscription() {
 					}
 				}
 			})
-			.subscribe(status => console.log(`${channelName} ${status}`))
+			.subscribe(status => LOG_SUBSCRIPTION_STATUS && console.log(`${channelName} ${status}`))
 
-		return () => {
-			const channel = supabase.channel(channelName)
-			void supabase.removeChannel(channel)
-		}
+		return () => void supabase.removeChannel(channel)
 	})
 }

@@ -3,9 +3,9 @@ import { isInRange, useForm } from '@mantine/form'
 import { useDisclosure } from '@mantine/hooks'
 import { IconPencil } from '@tabler/icons-react'
 import { useUpdateCharacterStats } from '~/routes/tabletop/-utils/gameActions/updateCharacterStats'
-import { useHeroWindowContext } from './HeroWindowContext'
+import useCharacterWindowContext from './useCharacterWindowContext'
 
-export default function HeroStats() {
+export default function CharacterStats() {
 	const [isEditing, { toggle, close }] = useDisclosure(false)
 
 	return (
@@ -22,8 +22,8 @@ export default function HeroStats() {
 }
 
 function StatsDisplay() {
-	const heroData = useHeroWindowContext()
-	const { stats, tabletopStats, pos } = heroData
+	const characterData = useCharacterWindowContext()
+	const { stats, tabletopStats, pos } = characterData
 
 	return (
 		<Stack gap={2}>
@@ -59,23 +59,23 @@ type EditStatsProps = {
 }
 
 function EditStats({ close }: EditStatsProps) {
-	const heroData = useHeroWindowContext()
+	const characterData = useCharacterWindowContext()
 
 	const form = useForm({
 		mode: 'uncontrolled',
 		initialValues: {
-			currentShield: heroData.tabletopStats.shield,
-			trauma: heroData.tabletopStats.trauma,
-			currentHealth: heroData.tabletopStats.health,
-			wounds: heroData.tabletopStats.wounds,
-			currentMovement: heroData.tabletopStats.movement
+			currentShield: characterData.tabletopStats.shield,
+			trauma: characterData.tabletopStats.trauma,
+			currentHealth: characterData.tabletopStats.health,
+			wounds: characterData.tabletopStats.wounds,
+			currentMovement: characterData.tabletopStats.movement
 		},
 		validate: {
-			currentShield: isInRange({ min: 0, max: heroData.stats.maxShield }, 'Shield must be between 0 and max shield'),
-			trauma: isInRange({ min: 0, max: heroData.stats.maxShield }, 'Trauma must be between 0 and max shield'),
-			currentHealth: isInRange({ min: 0, max: heroData.stats.maxHealth }, 'Health must be between 0 and max health'),
-			wounds: isInRange({ min: 0, max: heroData.stats.maxHealth }, 'Wounds must be between 0 and max health'),
-			currentMovement: isInRange({ min: 0, max: heroData.stats.maxMovement }, 'Movement must be between 0 and max movement')
+			currentShield: isInRange({ min: 0, max: characterData.stats.maxShield }, 'Shield must be between 0 and max shield'),
+			trauma: isInRange({ min: 0, max: characterData.stats.maxShield }, 'Trauma must be between 0 and max shield'),
+			currentHealth: isInRange({ min: 0, max: characterData.stats.maxHealth }, 'Health must be between 0 and max health'),
+			wounds: isInRange({ min: 0, max: characterData.stats.maxHealth }, 'Wounds must be between 0 and max health'),
+			currentMovement: isInRange({ min: 0, max: characterData.stats.maxMovement }, 'Movement must be between 0 and max movement')
 		}
 	})
 
@@ -84,9 +84,9 @@ function EditStats({ close }: EditStatsProps) {
 	const handleSubmit = (values: typeof form.values) => {
 		updateCharacter.mutate({
 			data: {
-				tabletopCharacterId: heroData.tabletopCharacterId,
+				tabletopCharacterId: characterData.tabletopCharacterId,
 				values,
-				characterType: 'HERO'
+				characterType: characterData.characterType
 			}
 		})
 		close()
@@ -102,35 +102,35 @@ function EditStats({ close }: EditStatsProps) {
 						<NumberInput
 							label='Shield Durability'
 							key={form.key('currentShield')}
-							max={heroData.stats.maxShield}
+							max={characterData.stats.maxShield}
 							{...form.getInputProps('currentShield')}
 							{...numberInputProps}
 						/>
 						<NumberInput
 							label='Trauma'
 							key={form.key('trauma')}
-							max={heroData.stats.maxShield}
+							max={characterData.stats.maxShield}
 							{...form.getInputProps('trauma')}
 							{...numberInputProps}
 						/>
-						<NumberInput label='Max Shield' value={heroData.stats.maxShield} disabled />
+						<NumberInput label='Max Shield' value={characterData.stats.maxShield} disabled />
 					</Group>
 					<Group grow align='flex-start'>
 						<NumberInput
 							label='Current Health'
 							key={form.key('currentHealth')}
-							max={heroData.stats.maxHealth}
+							max={characterData.stats.maxHealth}
 							{...form.getInputProps('currentHealth')}
 							{...numberInputProps}
 						/>
 						<NumberInput
 							label='Wounds'
 							key={form.key('wounds')}
-							max={heroData.stats.maxHealth}
+							max={characterData.stats.maxHealth}
 							{...form.getInputProps('wounds')}
 							{...numberInputProps}
 						/>
-						<NumberInput label='Max Health' value={heroData.stats.maxHealth} disabled />
+						<NumberInput label='Max Health' value={characterData.stats.maxHealth} disabled />
 					</Group>
 					<Group>
 						<Button variant='default' onClick={close}>Cancel</Button>

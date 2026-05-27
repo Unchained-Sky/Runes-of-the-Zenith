@@ -1,8 +1,8 @@
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
-import { useTabletopContext } from '~/routes/tabletop/-utils/TabletopContext'
 import { requireAccount } from '~/supabase/requireAccount'
+import { useTabletopEnvironmentStore } from '../useTabletopEnvironmentStore'
 import { TABLETOP_QUERY_STALE_TIME } from './tabletopDataOptions'
 
 const enemyListLoaderSchema = type({
@@ -33,6 +33,6 @@ export const tabletopEnemyListQueryOptions = (campaignId: number) => queryOption
 })
 
 export function useTabletopEnemyList() {
-	const { campaignId } = useTabletopContext()
+	const { campaignId } = useTabletopEnvironmentStore()
 	return useSuspenseQuery(tabletopEnemyListQueryOptions(campaignId))
 }

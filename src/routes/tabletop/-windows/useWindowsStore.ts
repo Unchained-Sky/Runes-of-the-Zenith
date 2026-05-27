@@ -19,13 +19,13 @@ const windowState = {
 	}
 } satisfies WindowsState
 
-type WindowsAction = {
+type WindowsActions = {
 	toggleWindow: (windowName: WindowName) => void
 }
 
-const actionName = createActionName<WindowsAction>('windows')
+const actionName = createActionName<WindowsActions>('windows')
 
-const createWindowActions: Slice<WindowsStore, WindowsAction, [DevTools]> = (set, _get) => ({
+const createWindowActions: Slice<WindowsStore, WindowsActions, [DevTools]> = (set, _get) => ({
 	toggleWindow: windowName => {
 		set(state => ({
 			opened: {
@@ -36,7 +36,7 @@ const createWindowActions: Slice<WindowsStore, WindowsAction, [DevTools]> = (set
 	}
 })
 
-type WindowsStore = WindowsState & WindowsAction
+type WindowsStore = WindowsState & WindowsActions
 
 export const useWindowsStore = create<WindowsStore>()(
 	devtools(

@@ -1,6 +1,7 @@
 import { type QueryClient } from '@tanstack/react-query'
 import { type TabletopEnemyList, useTabletopEnemyList } from '../-hooks/tabletopData/useTabletopEnemyList'
 import { type TabletopHeroesList, useTabletopHeroList } from '../-hooks/tabletopData/useTabletopHeroList'
+import { useTabletopEnvironmentStore } from '../-hooks/useTabletopEnvironmentStore'
 
 export function useCharacterLookup() {
 	const { data: heroList } = useTabletopHeroList()
@@ -19,11 +20,12 @@ export function useCharacterLookup() {
 
 type QueryCharacterLookupProps = {
 	queryClient: QueryClient
-	campaignId: number
 	tabletopCharacterId: number
 }
 
-export function queryCharacterLookup({ queryClient, campaignId, tabletopCharacterId }: QueryCharacterLookupProps) {
+export function queryCharacterLookup({ queryClient, tabletopCharacterId }: QueryCharacterLookupProps) {
+	const { campaignId } = useTabletopEnvironmentStore.getState()
+
 	const heroList = queryClient.getQueryData<TabletopHeroesList>([campaignId, 'tabletop', 'hero-list'])
 	const hero = heroList?.find(hero => hero.tabletopCharacterId === tabletopCharacterId)
 	if (hero) return 'HERO'

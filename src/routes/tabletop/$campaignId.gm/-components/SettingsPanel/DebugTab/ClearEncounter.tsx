@@ -1,15 +1,16 @@
 import { Button, Group, Modal, Stack, Text } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
-import { useTabletopContext } from '~/routes/tabletop/-utils/TabletopContext'
+import { useTabletopEnvironmentStore } from '~/routes/tabletop/-hooks/useTabletopEnvironmentStore'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
 import { mutationError } from '~/utils/mutationError'
 
 export default function ClearEncounter() {
-	const { queryClient, campaignId } = useTabletopContext()
+	const { campaignId } = useTabletopEnvironmentStore()
+	const queryClient = useQueryClient()
 
 	const [opened, { open, close }] = useDisclosure(false)
 

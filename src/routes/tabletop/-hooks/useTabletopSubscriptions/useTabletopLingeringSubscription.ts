@@ -1,33 +1,35 @@
+import { useQueryClient } from '@tanstack/react-query'
 import useMountEffect from '~/hooks/useMountEffect'
 import { type Tables } from '~/supabase/databaseTypes'
 import { useSupabase } from '~/supabase/useSupabase'
 import { type TabletopGMEnemyData } from '../../$campaignId.gm/-hooks/tabletopData/useGMTabletopEnemies'
-import getCharacterQueryKey from '../../-utils/getCharacterQueryKey'
+import getQueryKey from '../../-utils/getQueryKey'
 import { lingeringDataFormatter } from '../../-utils/lingeringData'
-import { useTabletopContext } from '../../-utils/TabletopContext'
 import { type TabletopHeroData } from '../tabletopData/useTabletopHeroes'
-import { LOG_SUBSCRIPTION_PAYLOADS } from './useTabletopSubscriptions'
+import { useTabletopEnvironmentStore } from '../useTabletopEnvironmentStore'
+import { LOG_SUBSCRIPTION_PAYLOADS, LOG_SUBSCRIPTION_STATUS, type TabletopSubscriptionProps } from './useTabletopSubscriptions'
 
-export default function useTabletopLingeringSubscription() {
+export default function useTabletopLingeringSubscription({ channelName, table }: TabletopSubscriptionProps) {
 	const { supabase } = useSupabase()
-	const { queryClient, campaignId, role } = useTabletopContext()
+	const queryClient = useQueryClient()
 
 	useMountEffect(() => {
-		const channelName = `tabletop_lingering:${campaignId}`
-		supabase
+		const channel = supabase
 			.channel(channelName)
 			.on('postgres_changes', {
 				event: '*',
 				schema: 'public',
-				table: 'tabletop_lingering'
+				table
 			}, payload => {
 				if (LOG_SUBSCRIPTION_PAYLOADS) console.log(payload)
+
+				const { role } = useTabletopEnvironmentStore.getState()
 
 				switch (payload.eventType) {
 					case 'INSERT': {
 						const insertData = payload.new as Tables<'tabletop_lingering'>
 
-						const { queryKey, characterType } = getCharacterQueryKey({ queryClient, campaignId, tabletopCharacterId: insertData.tt_character_id })
+						const { queryKey, characterType } = getQueryKey({ type: 'character', data: { tabletopCharacterId: insertData.tt_character_id, queryClient } })
 						void queryClient.cancelQueries({ queryKey })
 
 						if (characterType === 'ENEMY' && role !== 'gm') return
@@ -52,7 +54,7 @@ export default function useTabletopLingeringSubscription() {
 					case 'UPDATE': {
 						const updateData = payload.new as Tables<'tabletop_lingering'>
 
-						const { queryKey, characterType } = getCharacterQueryKey({ queryClient, campaignId, tabletopCharacterId: updateData.tt_character_id })
+						const { queryKey, characterType } = getQueryKey({ type: 'character', data: { tabletopCharacterId: updateData.tt_character_id, queryClient } })
 						void queryClient.cancelQueries({ queryKey })
 
 						if (characterType === 'ENEMY' && role !== 'gm') return
@@ -73,7 +75,7 @@ export default function useTabletopLingeringSubscription() {
 					case 'DELETE': {
 						const deleteData = payload.old as Tables<'tabletop_lingering'>
 
-						const { queryKey, characterType } = getCharacterQueryKey({ queryClient, campaignId, tabletopCharacterId: deleteData.tt_character_id })
+						const { queryKey, characterType } = getQueryKey({ type: 'character', data: { tabletopCharacterId: deleteData.tt_character_id, queryClient } })
 						void queryClient.cancelQueries({ queryKey })
 
 						if (characterType === 'ENEMY' && role !== 'gm') return
@@ -88,11 +90,8 @@ export default function useTabletopLingeringSubscription() {
 					}
 				}
 			})
-			.subscribe(status => console.log(`${channelName} ${status}`))
+			.subscribe(status => LOG_SUBSCRIPTION_STATUS && console.log(`${channelName} ${status}`))
 
-		return () => {
-			const channel = supabase.channel(channelName)
-			void supabase.removeChannel(channel)
-		}
+		return () => void supabase.removeChannel(channel)
 	})
 }

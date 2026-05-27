@@ -1,2 +1,2 @@
-import TabletopSubscriptions from './useTabletopSubscriptions'
-export default TabletopSubscriptions
+import useTabletopSubscriptions from './useTabletopSubscriptions'
+export default useTabletopSubscriptions

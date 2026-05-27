@@ -1,8 +1,8 @@
 import { Avatar, Group, Stack, Tabs, Title } from '@mantine/core'
+import CharacterLingering from '../CharacterLingering'
+import CharacterStats from '../CharacterStats'
 import CharacterTokens from '../CharacterTokens'
-import HeroLingering from './HeroLingering'
 import HeroRunes from './HeroRunes'
-import HeroStats from './HeroStats'
 import { useHeroWindowContext } from './HeroWindowContext'
 
 export default function Hero() {
@@ -23,9 +23,9 @@ export default function Hero() {
 
 				<Tabs.Panel value='stats'>
 					<Stack>
-						<HeroStats />
+						<CharacterStats />
 						<CharacterTokens />
-						<HeroLingering />
+						<CharacterLingering />
 					</Stack>
 				</Tabs.Panel>
 

@@ -1,22 +1,26 @@
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
-import { useTabletopContext } from '~/routes/tabletop/-utils/TabletopContext'
 import { type TablesInsert } from '~/supabase/databaseTypes'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
 import { type TabletopHeroData } from '~/tt/-hooks/tabletopData/useTabletopHeroes'
 import { type TabletopRoundData } from '~/tt/-hooks/tabletopData/useTabletopRound'
 import { mutationError } from '~/utils/mutationError'
+import { useTabletopEnvironmentStore } from '../../-hooks/useTabletopEnvironmentStore'
+import getQueryKey from '../getQueryKey'
 import { type QuerySyncProps } from './querySync'
 
 export function useStartRound() {
-	const { queryClient, campaignId } = useTabletopContext()
+	const queryClient = useQueryClient()
 
 	return useMutation({
-		mutationFn: () => startRoundAction({ data: { campaignId } }),
+		mutationFn: () => {
+			const { campaignId } = useTabletopEnvironmentStore.getState()
+			return startRoundAction({ data: { campaignId } })
+		},
 		onMutate: () => {
-			startRoundQuerySync({ queryClient, campaignId })
+			startRoundQuerySync({ queryClient })
 		},
 		onError: error => {
 			mutationError(error, 'Failed to start round')
@@ -26,33 +30,39 @@ export function useStartRound() {
 
 type StartRoundQuerySyncProps = QuerySyncProps
 
-export function startRoundQuerySync({ queryClient, campaignId }: StartRoundQuerySyncProps) {
-	void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'hero'] })
-	queryClient.setQueriesData({ queryKey: [campaignId, 'tabletop', 'hero'] }, (oldData: TabletopHeroData) => {
-		return {
-			...oldData,
-			turn: {
-				PRIMARY: {
-					turnType: 'PRIMARY',
-					used: false,
-					order: null
-				},
-				SECONDARY: {
-					turnType: 'SECONDARY',
-					used: false,
-					order: null
+export function startRoundQuerySync({ queryClient }: StartRoundQuerySyncProps) {
+	{
+		const queryKey = getQueryKey({ type: 'hero', data: { tabletopCharacterId: null } })
+		void queryClient.cancelQueries({ queryKey })
+		queryClient.setQueriesData({ queryKey }, (oldData: TabletopHeroData) => {
+			return {
+				...oldData,
+				turn: {
+					PRIMARY: {
+						turnType: 'PRIMARY',
+						used: false,
+						order: null
+					},
+					SECONDARY: {
+						turnType: 'SECONDARY',
+						used: false,
+						order: null
+					}
 				}
-			}
-		} satisfies TabletopHeroData
-	})
+			} satisfies TabletopHeroData
+		})
+	}
 
-	void queryClient.cancelQueries({ queryKey: [campaignId, 'tabletop', 'round'] })
-	queryClient.setQueryData([campaignId, 'tabletop', 'round'], (oldData: TabletopRoundData) => {
-		return {
-			...oldData,
-			round: oldData.round + 1
-		} satisfies TabletopRoundData
-	})
+	{
+		const queryKey = getQueryKey({ type: 'round' })
+		void queryClient.cancelQueries({ queryKey })
+		queryClient.setQueryData(queryKey, (oldData: TabletopRoundData) => {
+			return {
+				...oldData,
+				round: oldData.round + 1
+			} satisfies TabletopRoundData
+		})
+	}
 }
 
 const startRoundSchema = type({

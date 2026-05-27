@@ -1,8 +1,8 @@
 import { useGMTabletopEnemies } from '../../$campaignId.gm/-hooks/tabletopData/useGMTabletopEnemies'
 import { usePlayerTabletopEnemies } from '../../$campaignId.player/-hooks/tabletopData/usePlayerTabletopEnemies'
-import { useTabletopContext } from '../../-utils/TabletopContext'
+import { useTabletopEnvironmentStore } from '../useTabletopEnvironmentStore'
 
 export function useTabletopEnemies() {
-	const { role } = useTabletopContext()
+	const { role } = useTabletopEnvironmentStore()
 	return role === 'gm' ? useGMTabletopEnemies() : usePlayerTabletopEnemies()
 }

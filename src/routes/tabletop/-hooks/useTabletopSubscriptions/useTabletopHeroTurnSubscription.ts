@@ -1,29 +1,29 @@
+import { useQueryClient } from '@tanstack/react-query'
 import useMountEffect from '~/hooks/useMountEffect'
 import { type Tables } from '~/supabase/databaseTypes'
 import { useSupabase } from '~/supabase/useSupabase'
-import { useTabletopContext } from '../../-utils/TabletopContext'
+import getQueryKey from '../../-utils/getQueryKey'
 import { type TabletopHeroData } from '../tabletopData/useTabletopHeroes'
-import { LOG_SUBSCRIPTION_PAYLOADS } from './useTabletopSubscriptions'
+import { LOG_SUBSCRIPTION_PAYLOADS, LOG_SUBSCRIPTION_STATUS, type TabletopSubscriptionProps } from './useTabletopSubscriptions'
 
-export default function useTabletopHeroTurnSubscription() {
+export default function useTabletopHeroTurnSubscription({ channelName, table }: TabletopSubscriptionProps) {
 	const { supabase } = useSupabase()
-	const { queryClient, campaignId } = useTabletopContext()
+	const queryClient = useQueryClient()
 
 	useMountEffect(() => {
-		const channelName = `tabletop_hero_turn:${campaignId}`
-		supabase
+		const channel = supabase
 			.channel(channelName)
 			.on('postgres_changes', {
 				event: '*',
 				schema: 'public',
-				table: 'tabletop_hero_turn'
+				table
 			}, payload => {
 				if (LOG_SUBSCRIPTION_PAYLOADS) console.log(payload)
 
 				switch (payload.eventType) {
 					case 'INSERT': {
 						const insertData = payload.new as Tables<'tabletop_hero_turn'>
-						const queryKey = [campaignId, 'tabletop', 'hero', insertData.tt_character_id]
+						const queryKey = getQueryKey({ type: 'hero', data: { tabletopCharacterId: insertData.tt_character_id } })
 						void queryClient.cancelQueries({ queryKey })
 						queryClient.setQueriesData({ queryKey }, (oldData: TabletopHeroData) => {
 							return {
@@ -42,7 +42,7 @@ export default function useTabletopHeroTurnSubscription() {
 					}
 					case 'UPDATE': {
 						const updateData = payload.new as Tables<'tabletop_hero_turn'>
-						const queryKey = [campaignId, 'tabletop', 'hero', updateData.tt_character_id]
+						const queryKey = getQueryKey({ type: 'hero', data: { tabletopCharacterId: updateData.tt_character_id } })
 						void queryClient.cancelQueries({ queryKey })
 						queryClient.setQueriesData({ queryKey }, (oldData: TabletopHeroData) => {
 							return {
@@ -61,7 +61,7 @@ export default function useTabletopHeroTurnSubscription() {
 					}
 					case 'DELETE': {
 						const deleteData = payload.old as Tables<'tabletop_hero_turn'>
-						const queryKey = [campaignId, 'tabletop', 'hero', deleteData.tt_character_id]
+						const queryKey = getQueryKey({ type: 'hero', data: { tabletopCharacterId: deleteData.tt_character_id } })
 						void queryClient.cancelQueries({ queryKey })
 						queryClient.setQueriesData({ queryKey }, (oldData: TabletopHeroData) => {
 							return {
@@ -84,11 +84,8 @@ export default function useTabletopHeroTurnSubscription() {
 					}
 				}
 			})
-			.subscribe(status => console.log(`${channelName} ${status}`))
+			.subscribe(status => LOG_SUBSCRIPTION_STATUS && console.log(`${channelName} ${status}`))
 
-		return () => {
-			const channel = supabase.channel(channelName)
-			void supabase.removeChannel(channel)
-		}
+		return () => void supabase.removeChannel(channel)
 	})
 }

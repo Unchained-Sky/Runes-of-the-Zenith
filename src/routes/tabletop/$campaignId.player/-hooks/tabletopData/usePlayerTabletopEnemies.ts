@@ -3,7 +3,7 @@ import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { TABLETOP_QUERY_STALE_TIME } from '~/routes/tabletop/-hooks/tabletopData/tabletopDataOptions'
 import { useTabletopEnemyList } from '~/routes/tabletop/-hooks/tabletopData/useTabletopEnemyList'
-import { useTabletopContext } from '~/routes/tabletop/-utils/TabletopContext'
+import { useTabletopEnvironmentStore } from '~/routes/tabletop/-hooks/useTabletopEnvironmentStore'
 import { requireAccount } from '~/supabase/requireAccount'
 import { typedObject } from '~/types/typedObject'
 
@@ -71,13 +71,12 @@ type TabletopPlayerEnemiesData = {
 }
 
 export function usePlayerTabletopEnemies() {
-	const { campaignId } = useTabletopContext()
+	const { campaignId, role } = useTabletopEnvironmentStore()
 	const { data: tabletopCharacterIds } = useTabletopEnemyList()
 	const queries = useQueries({
 		queries: tabletopCharacterIds.map(tabletopCharacterId => tabletopEnemyQueryOptions(campaignId, tabletopCharacterId))
 	})
 
-	const { role } = useTabletopContext()
 	if (role !== 'player') throw new Error('Role is not player')
 
 	const dataTuple = queries

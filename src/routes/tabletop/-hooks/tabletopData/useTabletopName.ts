@@ -1,8 +1,8 @@
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
-import { useTabletopContext } from '~/routes/tabletop/-utils/TabletopContext'
 import { requireAccount } from '~/supabase/requireAccount'
+import { useTabletopEnvironmentStore } from '../useTabletopEnvironmentStore'
 
 const nameLoaderSchema = type({
 	campaignId: 'number'
@@ -31,6 +31,6 @@ export const tabletopNameQueryOptions = (campaignId: number) => queryOptions({
 })
 
 export function useTabletopName() {
-	const { campaignId } = useTabletopContext()
+	const { campaignId } = useTabletopEnvironmentStore()
 	return useSuspenseQuery(tabletopNameQueryOptions(campaignId))
 }

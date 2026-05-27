@@ -39,7 +39,7 @@ const confirmTargetState = {
 
 type OpenActionProps = { tabletopCharacterId: number, tabletopCharacterType: Enums<'character_type'>, runeData: RuneData }
 
-type ConfirmTargetAction = {
+type ConfirmTargetActions = {
 	close: () => void
 	open: ({ tabletopCharacterId, tabletopCharacterType, runeData }: OpenActionProps) => void
 	toggleTarget: (props: { cord: CombatTileCordString } | { tabletopCharacterId: number, characterType: Enums<'character_type'> }) => void
@@ -48,9 +48,9 @@ type ConfirmTargetAction = {
 	backStep: () => void
 }
 
-const actionName = createActionName<ConfirmTargetAction>('confirmTarget')
+const actionName = createActionName<ConfirmTargetActions>('confirmTarget')
 
-const createConfirmWindowActions: Slice<ConfirmTargetStore, ConfirmTargetAction, [DevTools]> = (set, get) => ({
+const createConfirmWindowActions: Slice<ConfirmTargetStore, ConfirmTargetActions, [DevTools]> = (set, get) => ({
 	close: () => {
 		set({
 			opened: false,
@@ -133,7 +133,7 @@ const createConfirmWindowActions: Slice<ConfirmTargetStore, ConfirmTargetAction,
 	}
 })
 
-type ConfirmTargetStore = ConfirmTargetState & ConfirmTargetAction
+type ConfirmTargetStore = ConfirmTargetState & ConfirmTargetActions
 
 export const useConfirmTargetStore = create<ConfirmTargetStore>()(
 	devtools(

@@ -1,24 +1,24 @@
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createServerFn, createServerOnlyFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { type TabletopGMEnemyData } from '~/routes/tabletop/$campaignId.gm/-hooks/tabletopData/useGMTabletopEnemies'
-import { useTabletopContext } from '~/routes/tabletop/-utils/TabletopContext'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
 import { type TabletopEnemyList } from '~/tt/-hooks/tabletopData/useTabletopEnemyList'
 import { mutationError } from '~/utils/mutationError'
 import { type TabletopPlayerEnemyData } from '../../$campaignId.player/-hooks/tabletopData/usePlayerTabletopEnemies'
+import getQueryKey from '../getQueryKey'
 import { type QuerySyncProps } from './querySync'
 
 const DEFAULT_INCREASE_AMOUNT = 1
 
 export function useIncreaseAggression() {
-	const { queryClient, campaignId } = useTabletopContext()
+	const queryClient = useQueryClient()
 
 	return useMutation({
 		mutationFn: increaseAggressionAction,
 		onMutate: ({ data }) => {
-			increaseAggressionQuerySync({ queryClient, campaignId, data })
+			increaseAggressionQuerySync({ queryClient, data })
 		},
 		onError: error => {
 			mutationError(error, 'Failed to increase aggression')
@@ -28,10 +28,9 @@ export function useIncreaseAggression() {
 
 type IncreaseAggressionQuerySyncProps = QuerySyncProps<typeof increaseAggressionSchema>
 
-export function increaseAggressionQuerySync({ queryClient, campaignId, data }: IncreaseAggressionQuerySyncProps) {
+export function increaseAggressionQuerySync({ queryClient, data }: IncreaseAggressionQuerySyncProps) {
 	const syncCharacter = (tabletopCharacterId: number) => {
-		const isGm = queryClient.getQueryData([campaignId, 'tabletop-gm', 'enemy', tabletopCharacterId])
-		const queryKey = isGm ? [campaignId, 'tabletop-gm', 'enemy', tabletopCharacterId] : [campaignId, 'tabletop-player', 'enemy', tabletopCharacterId]
+		const queryKey = getQueryKey({ type: 'enemy', data: { tabletopCharacterId } })
 		void queryClient.cancelQueries({ queryKey })
 		queryClient.setQueryData(queryKey, (oldData: TabletopGMEnemyData | TabletopPlayerEnemyData) => {
 			return {
@@ -51,7 +50,8 @@ export function increaseAggressionQuerySync({ queryClient, campaignId, data }: I
 			syncCharacter(tabletopCharacterId)
 		}
 	} else {
-		const tabletopCharacterIds = queryClient.getQueryData<TabletopEnemyList>([campaignId, 'tabletop', 'enemy-list'])
+		const queryKey = getQueryKey({ type: 'enemy-list' })
+		const tabletopCharacterIds = queryClient.getQueryData<TabletopEnemyList>(queryKey)
 		for (const tabletopCharacterId of tabletopCharacterIds ?? []) {
 			syncCharacter(tabletopCharacterId)
 		}
