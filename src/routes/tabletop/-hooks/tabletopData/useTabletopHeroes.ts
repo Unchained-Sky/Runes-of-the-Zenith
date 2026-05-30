@@ -1,12 +1,13 @@
 import { queryOptions, useSuspenseQueries } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
-import { type RuneData, runeExtraDataSchema } from '~/scripts/data/runes/runeData'
-import { type Enums, type Json, type TablesInsert } from '~/supabase/databaseTypes'
+import { type RuneData } from '~/scripts/data/runes/runeData'
+import { type Enums, type TablesInsert } from '~/supabase/databaseTypes'
+import { lingeringDataFormatter } from '~/supabase/extraDataFormatter/lingeringExtraData'
+import { runeExtraDataFormatter } from '~/supabase/extraDataFormatter/runeExtraData'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireAccount } from '~/supabase/requireAccount'
 import { typedObject } from '~/types/typedObject'
-import { lingeringDataFormatter } from '../../-utils/lingeringData'
 import { useTabletopEnvironmentStore } from '../useTabletopEnvironmentStore'
 import { TABLETOP_QUERY_STALE_TIME } from './tabletopDataOptions'
 import { useTabletopHeroList } from './useTabletopHeroList'
@@ -190,22 +191,6 @@ export type TabletopHeroData = Omit<InternalTabletopHeroData, 'runes'> & {
 		PRIMARY: RuneData[]
 		SECONDARY: RuneData[]
 		PASSIVE: RuneData[]
-	}
-}
-
-type InternalTabletopHeroRuneData = {
-	runeInfo: Omit<RuneData, 'data'> & { data: Json }
-}
-
-const runeExtraDataFormatter = (rune: InternalTabletopHeroRuneData) => {
-	const out = runeExtraDataSchema(rune.runeInfo.data)
-	if (out instanceof type.errors) {
-		throw console.error(out.summary)
-	} else {
-		return {
-			...rune.runeInfo,
-			effect: out
-		}
 	}
 }
 

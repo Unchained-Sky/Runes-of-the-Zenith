@@ -1,7 +1,8 @@
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
-import { type RuneData, type RuneEffectData } from '~/scripts/data/runes/runeData'
+import { type RuneData } from '~/scripts/data/runes/runeData'
 import { type Enums } from '~/supabase/databaseTypes'
+import { type RuneExtraData } from '~/supabase/extraDataFormatter/runeExtraData'
 import { type CombatTileCordString } from '~/types/gameTypes/combatMap'
 import { createActionName, type DevTools, type Slice } from '~/types/storeTypes'
 
@@ -10,7 +11,7 @@ type ConfirmTargetState = {
 	tabletopCharacterId: number
 	tabletopCharacterType: Enums<'character_type'>
 	runeData: RuneData
-	target: RuneEffectData['target'][]
+	target: RuneExtraData['effect'][number]['target'][]
 	currentEffectIndex: number
 	selected: ({
 		tiles: CombatTileCordString[]
