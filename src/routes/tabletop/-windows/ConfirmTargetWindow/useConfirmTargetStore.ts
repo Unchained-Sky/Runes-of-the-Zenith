@@ -1,16 +1,17 @@
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
+import { type EnemyRuneData } from '~/scripts/data/enemies/enemyData'
 import { type RuneData } from '~/scripts/data/runes/runeData'
 import { type Enums } from '~/supabase/databaseTypes'
 import { type RuneExtraData } from '~/supabase/extraDataFormatter/runeExtraData'
 import { type CombatTileCordString } from '~/types/gameTypes/combatMap'
 import { createActionName, type DevTools, type Slice } from '~/types/storeTypes'
 
-type ConfirmTargetState = {
+interface ConfirmTargetCharacterState {
 	opened: true
 	tabletopCharacterId: number
 	tabletopCharacterType: Enums<'character_type'>
-	runeData: RuneData
+	runeData: RuneData | EnemyRuneData
 	target: RuneExtraData['effect'][number]['target'][]
 	currentEffectIndex: number
 	selected: ({
@@ -18,7 +19,19 @@ type ConfirmTargetState = {
 	} | {
 		characters: { tabletopCharacterId: number, characterType: Enums<'character_type'> }[]
 	})[]
-} | {
+}
+
+interface ConfirmTargetHeroState extends ConfirmTargetCharacterState {
+	tabletopCharacterType: 'HERO'
+	runeData: RuneData
+}
+
+interface ConfirmTargetEnemyState extends ConfirmTargetCharacterState {
+	tabletopCharacterType: 'ENEMY'
+	runeData: EnemyRuneData
+}
+
+type ConfirmTargetState = ConfirmTargetHeroState | ConfirmTargetEnemyState | {
 	opened: false
 	tabletopCharacterId: null
 	tabletopCharacterType: null
@@ -38,7 +51,15 @@ const confirmTargetState = {
 	selected: null
 } satisfies ConfirmTargetState
 
-type OpenActionProps = { tabletopCharacterId: number, tabletopCharacterType: Enums<'character_type'>, runeData: RuneData }
+type OpenActionProps = {
+	tabletopCharacterId: number
+	tabletopCharacterType: 'HERO'
+	runeData: RuneData
+} | {
+	tabletopCharacterId: number
+	tabletopCharacterType: 'ENEMY'
+	runeData: EnemyRuneData
+}
 
 type ConfirmTargetActions = {
 	close: () => void
@@ -64,15 +85,27 @@ const createConfirmWindowActions: Slice<ConfirmTargetStore, ConfirmTargetActions
 		} satisfies ConfirmTargetState, ...actionName('close'))
 	},
 	open: ({ tabletopCharacterId, tabletopCharacterType, runeData }) => {
-		set({
-			opened: true,
-			tabletopCharacterId,
-			tabletopCharacterType,
-			runeData,
-			target: runeData.data.effect.map(effect => effect.target),
-			currentEffectIndex: 0,
-			selected: []
-		} satisfies ConfirmTargetState, ...actionName('open'))
+		if (tabletopCharacterType === 'HERO') {
+			set({
+				opened: true,
+				tabletopCharacterId,
+				tabletopCharacterType: 'HERO',
+				runeData,
+				target: runeData.data.effect.map(effect => effect.target),
+				currentEffectIndex: 0,
+				selected: []
+			} satisfies ConfirmTargetState, ...actionName('open'))
+		} else {
+			set({
+				opened: true,
+				tabletopCharacterId,
+				tabletopCharacterType: 'ENEMY',
+				runeData,
+				target: runeData.data.effect.map(effect => effect.target),
+				currentEffectIndex: 0,
+				selected: []
+			} satisfies ConfirmTargetState, ...actionName('open'))
+		}
 	},
 	toggleTarget: props => {
 		const cord = 'cord' in props ? props.cord : null

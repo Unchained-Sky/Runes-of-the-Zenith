@@ -1,7 +1,8 @@
-import { Avatar, Group, Stack, Tabs, Text, Title } from '@mantine/core'
+import { Avatar, Group, Stack, Tabs, Title } from '@mantine/core'
 import CharacterLingering from '../CharacterLingering'
 import CharacterStats from '../CharacterStats'
 import CharacterTokens from '../CharacterTokens'
+import EnemyRunes from './EnemyRunes'
 import { useEnemyWindowContext } from './EnemyWindowContext'
 
 export default function Enemy() {
@@ -29,7 +30,7 @@ export default function Enemy() {
 				</Tabs.Panel>
 
 				<Tabs.Panel value='runes'>
-					<Text>Runes</Text>
+					<EnemyRunes />
 				</Tabs.Panel>
 			</Tabs>
 		</Stack>

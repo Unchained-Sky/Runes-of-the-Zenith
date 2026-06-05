@@ -89,6 +89,7 @@ for (const enemy of enemyData) {
 				.insert({
 					enemy_id: enemyInfo.data.enemy_id,
 					rune_name: rune.name,
+					slot: rune.slot,
 					data: {
 						description: rune.description,
 						effect: rune.effect

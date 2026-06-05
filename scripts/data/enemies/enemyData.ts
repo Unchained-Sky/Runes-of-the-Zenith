@@ -1,4 +1,5 @@
 import { type Compendium } from '~/scripts/data/compendiumTypes'
+import { type Enums } from '~/supabase/databaseTypes'
 import { type RuneExtraData } from '~/supabase/extraDataFormatter/runeExtraData'
 import { type Character } from '~/types/gameTypes/character'
 import marauder from './base/marauder'
@@ -9,16 +10,27 @@ export type Enemy = Character & {
 	stats: {
 		aggression: number
 	}
-	runes: EnemyRune[]
+	runes: EnemyRuneData[]
 }
 
-export type EnemyRune = {
+type EnemyInternal = Omit<Enemy, 'runes'> & {
+	runes: EnemyRuneDataInternal[]
+}
+
+type EnemyRuneDataInternal = {
 	name: string
 	description: string
+	slot: Enums<'rune_slot'>
 	effect: RuneExtraData['effect']
 }
 
-export type CompendiumEnemy = Enemy & Compendium
+export type EnemyRuneData = {
+	name: string
+	slot: Enums<'rune_slot'>
+	data: RuneExtraData
+}
+
+export type CompendiumEnemy = EnemyInternal & Compendium
 
 const base = [
 	marauder,

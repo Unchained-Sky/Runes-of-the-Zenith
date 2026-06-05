@@ -2,6 +2,8 @@ import { queryOptions, useQueries } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { useTabletopEnvironmentStore } from '~/routes/tabletop/-hooks/useTabletopEnvironmentStore'
+import { type EnemyRuneData } from '~/scripts/data/enemies/enemyData'
+import { enemyRuneExtraDataFormatter } from '~/supabase/extraDataFormatter/enemyRuneExtraData'
 import { lingeringDataFormatter } from '~/supabase/extraDataFormatter/lingeringExtraData'
 import { requireAccount } from '~/supabase/requireAccount'
 import { TABLETOP_QUERY_STALE_TIME } from '~/tt/-hooks/tabletopData/tabletopDataOptions'
@@ -33,11 +35,15 @@ const enemyLoader = createServerFn({ method: 'GET' })
 							maxMovement: max_movement,
 							critChance: crit_chance
 						),
-						aggression
+						aggression,
+						enemyRune: enemy_rune_info (
+							name: rune_name,
+							slot,
+							data
+						)
 					),
 					currentAggression: current_aggression
 				),
-
 				tile: tabletop_tiles (
 					q,
 					r,
@@ -69,6 +75,22 @@ const enemyLoader = createServerFn({ method: 'GET' })
 		const { tabletopEnemy } = data
 		if (!tabletopEnemy) throw new Error('Tabletop enemy not found')
 
+		const runes = tabletopEnemy.enemyInfo.enemyRune
+			.map(enemyRuneExtraDataFormatter)
+			.reduce<Record<EnemyRuneData['slot'], EnemyRuneData[]>>((acc, curr) => {
+				return {
+					...acc,
+					[curr.slot]: [
+						...acc[curr.slot],
+						curr
+					]
+				}
+			}, {
+				PRIMARY: [],
+				SECONDARY: [],
+				PASSIVE: []
+			})
+
 		const lingering = data.lingering.map(lingeringDataFormatter)
 
 		return {
@@ -94,6 +116,7 @@ const enemyLoader = createServerFn({ method: 'GET' })
 				currentAggression: tabletopEnemy.currentAggression
 			},
 			pos: data.tile[0] ? [data.tile[0].q, data.tile[0].r, data.tile[0].s] : null,
+			runes,
 			tokens: data.token,
 			lingering
 		}

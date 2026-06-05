@@ -20,6 +20,7 @@ export default {
 		{
 			name: 'Attack 1',
 			description: 'Attack an enemy',
+			slot: 'PRIMARY',
 			effect: [{
 				range: 1,
 				damage: {
@@ -34,6 +35,7 @@ export default {
 		{
 			name: 'Attack 2',
 			description: 'Attack an enemy',
+			slot: 'PRIMARY',
 			effect: [{
 				range: 2,
 				damage: {
@@ -48,6 +50,7 @@ export default {
 		{
 			name: 'Attack 3',
 			description: 'Attack an enemy',
+			slot: 'PRIMARY',
 			effect: [{
 				range: 6,
 				damage: {
@@ -63,6 +66,7 @@ export default {
 		{
 			name: 'Attack 4',
 			description: 'Attack an enemy',
+			slot: 'PASSIVE',
 			effect: [{
 				range: 1,
 				damage: {

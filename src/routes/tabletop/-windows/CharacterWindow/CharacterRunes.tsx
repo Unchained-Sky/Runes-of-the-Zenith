@@ -2,48 +2,88 @@ import { ActionIcon, Card, Collapse, Group, List, Stack, Text, Title } from '@ma
 import { useDisclosure } from '@mantine/hooks'
 import { IconChevronDown, IconFlame } from '@tabler/icons-react'
 import { Fragment, type ReactNode } from 'react'
-import { useArchetypeQuery } from '~/hooks/data/useArchetypeQuery'
+import { type EnemyRuneData } from '~/scripts/data/enemies/enemyData'
 import { type RuneData } from '~/scripts/data/runes/runeData'
 import { type Enums } from '~/supabase/databaseTypes'
-import { useConfirmTargetStore } from '~/tt/-windows/ConfirmTargetWindow/useConfirmTargetStore'
 import { titleCase } from '~/utils/stringCase'
-import { useHeroWindowContext } from './HeroWindowContext'
+import { type TabletopGMEnemyData } from '../../$campaignId.gm/-hooks/tabletopData/useGMTabletopEnemies'
+import { type TabletopHeroData } from '../../-hooks/tabletopData/useTabletopHeroes'
+import { useConfirmTargetStore } from '../ConfirmTargetWindow/useConfirmTargetStore'
+import useCharacterWindowContext from './useCharacterWindowContext'
 
-type SlotProps = {
-	slot: Enums<'rune_slot'>
+type RuneCardProps = {
+	title: Enums<'rune_slot'>
 	children: ReactNode
 }
 
-export function Slot({ slot, children }: SlotProps) {
+export function RuneCard({ title, children }: RuneCardProps) {
 	return (
 		<Card component={Stack} bg='dark.5'>
-			<Title order={4}>{titleCase(slot)}</Title>
+			<Title order={4}>{titleCase(title)}</Title>
 			{children}
 		</Card>
 	)
 }
 
-type ActionProps = {
-	runeData: RuneData
+type CharacterRuneProps = {
+	runeData: RuneData | EnemyRuneData
 	inlineDescription?: ReactNode
 }
 
-export function Action({ runeData, inlineDescription }: ActionProps) {
-	const heroData = useHeroWindowContext()
+export function CharacterRune({ runeData, inlineDescription }: CharacterRuneProps) {
+	const characterData = useCharacterWindowContext()
 
+	const assertRuneType = (_runeData: RuneData | EnemyRuneData): _runeData is RuneData => {
+		return characterData.characterType === 'HERO'
+	}
+
+	switch (characterData.characterType) {
+		case 'HERO': {
+			if (!assertRuneType(runeData)) return null
+			return <CharacterRuneInner characterType='HERO' characterData={characterData} runeData={runeData} inlineDescription={inlineDescription} />
+		}
+		case 'ENEMY': {
+			return <CharacterRuneInner characterType='ENEMY' characterData={characterData} runeData={runeData} inlineDescription={inlineDescription} />
+		}
+	}
+}
+
+type CharacterRuneInnerProps = ({
+	characterType: 'HERO'
+	characterData: TabletopHeroData & { characterType: 'HERO' }
+	runeData: RuneData
+} | {
+	characterType: 'ENEMY'
+	characterData: TabletopGMEnemyData & { characterType: 'ENEMY' }
+	runeData: EnemyRuneData
+}) & {
+	inlineDescription?: ReactNode
+}
+
+function CharacterRuneInner({ characterType, characterData, runeData, inlineDescription }: CharacterRuneInnerProps) {
 	const open = useConfirmTargetStore(state => state.open)
 
 	const targetRune = () => {
-		open({
-			tabletopCharacterId: heroData.tabletopCharacterId,
-			tabletopCharacterType: 'HERO',
-			runeData
-		})
+		if (characterType === 'HERO') {
+			open({
+				tabletopCharacterId: characterData.tabletopCharacterId,
+				tabletopCharacterType: 'HERO',
+				runeData
+			})
+		} else {
+			open({
+				tabletopCharacterId: characterData.tabletopCharacterId,
+				tabletopCharacterType: 'ENEMY',
+				runeData
+			})
+		}
 	}
 
 	const [opened, { toggle }] = useDisclosure(false)
 
-	const usedTurn = runeData.slot === 'PASSIVE' ? false : heroData.turn[runeData.slot].used
+	const usedTurn = characterType === 'HERO' && runeData.slot !== 'PASSIVE'
+		? characterData.turn[runeData.slot].used
+		: false
 
 	return (
 		<Stack>
@@ -118,34 +158,4 @@ function DamageValue({ value, color }: DamageValueProps) {
 	return value
 		? <Text span c={color} size='sm'>{value.flat}+{value.scale}%</Text>
 		: null
-}
-
-type RunesProps = {
-	runes: RuneData[]
-}
-
-export function Runes({ runes }: RunesProps) {
-	const subarchetypes = useArchetypeQuery()
-
-	return runes.length
-		? runes.map(runeData => {
-			const subarchetype = subarchetypes[runeData.subarchetype]
-			return (
-				<Action
-					key={runeData.name}
-					runeData={runeData}
-					inlineDescription={(
-						<>
-							<Stack gap={0}>
-								<Text>{runeData.name}</Text>
-								<Text size='xs'>{subarchetype.damageType} / {subarchetype.archetype} / {runeData.subarchetype}</Text>
-							</Stack>
-							<Text>{runeData.durability}</Text>
-							<Text>{runeData.data.resolve}</Text>
-						</>
-					)}
-				/>
-			)
-		})
-		: <Text fs='italic'>None</Text>
 }
