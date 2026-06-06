@@ -81,9 +81,12 @@ function CharacterRuneInner({ characterType, characterData, runeData, inlineDesc
 
 	const [opened, { toggle }] = useDisclosure(false)
 
-	const usedTurn = characterType === 'HERO' && runeData.slot !== 'PASSIVE'
-		? characterData.turn[runeData.slot].used
-		: false
+	const usedTurn = (() => {
+		if (runeData.slot === 'PASSIVE') return false
+		return characterType === 'HERO'
+			? characterData.turn[runeData.slot].used
+			: runeData.slot === 'PRIMARY' && characterData.tabletopStats.usedPrimary
+	})()
 
 	return (
 		<Stack>

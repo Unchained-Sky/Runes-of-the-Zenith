@@ -101,6 +101,7 @@ export const UNSAFE_updateAggressionAction = createServerOnlyFn(async ({ target,
 			.from('tabletop_characters')
 			.select('tabletopCharacterId: tt_character_id')
 			.eq('campaign_id', target.campaignId)
+			.eq('character_type', 'ENEMY')
 		if (error) throw new Error(error.message, { cause: error })
 
 		return data.map(character => character.tabletopCharacterId)

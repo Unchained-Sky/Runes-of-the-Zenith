@@ -6,11 +6,13 @@ import { type TabletopGMEnemyData } from '../../$campaignId.gm/-hooks/tabletopDa
 import { type TabletopPlayerEnemyData } from '../../$campaignId.player/-hooks/tabletopData/usePlayerTabletopEnemies'
 import getQueryKey from '../../-utils/getQueryKey'
 import { type TabletopEnemyList } from '../tabletopData/useTabletopEnemyList'
+import { useTabletopEnvironmentStore } from '../useTabletopEnvironmentStore'
 import { LOG_SUBSCRIPTION_PAYLOADS, LOG_SUBSCRIPTION_STATUS, type TabletopSubscriptionProps } from './useTabletopSubscriptions'
 
 export default function useTabletopEnemySubscription({ channelName, table }: TabletopSubscriptionProps) {
 	const { supabase } = useSupabase()
 	const queryClient = useQueryClient()
+	const role = useTabletopEnvironmentStore(state => state.role)
 
 	useMountEffect(() => {
 		const channel = supabase
@@ -38,15 +40,34 @@ export default function useTabletopEnemySubscription({ channelName, table }: Tab
 
 						const queryKey = getQueryKey({ type: 'enemy', data: { tabletopCharacterId: updateData.tt_character_id } })
 						void queryClient.cancelQueries({ queryKey })
-						queryClient.setQueriesData({ queryKey }, (oldData: TabletopGMEnemyData | TabletopPlayerEnemyData) => {
-							return {
-								...oldData,
-								tabletopStats: {
-									...oldData.tabletopStats,
-									currentAggression: updateData.current_aggression
-								}
-							} satisfies TabletopGMEnemyData | TabletopPlayerEnemyData
-						})
+
+						switch (role) {
+							case 'gm': {
+								queryClient.setQueriesData({ queryKey }, (oldData: TabletopGMEnemyData) => {
+									return {
+										...oldData,
+										tabletopStats: {
+											...oldData.tabletopStats,
+											currentAggression: updateData.current_aggression,
+											usedPrimary: updateData.used_primary
+										}
+									} satisfies TabletopGMEnemyData
+								})
+								break
+							}
+							case 'player': {
+								queryClient.setQueriesData({ queryKey }, (oldData: TabletopPlayerEnemyData) => {
+									return {
+										...oldData,
+										tabletopStats: {
+											...oldData.tabletopStats,
+											currentAggression: updateData.current_aggression
+										}
+									} satisfies TabletopPlayerEnemyData
+								})
+								break
+							}
+						}
 						break
 					}
 					case 'DELETE': {

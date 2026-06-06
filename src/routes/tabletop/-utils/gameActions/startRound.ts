@@ -10,6 +10,7 @@ import { mutationError } from '~/utils/mutationError'
 import { useTabletopEnvironmentStore } from '../../-hooks/useTabletopEnvironmentStore'
 import getQueryKey from '../getQueryKey'
 import { type QuerySyncProps } from './querySync'
+import { UNSAFE_updateEnemyPrimary, updateEnemyPrimarySync } from './updateEnemyPrimary'
 
 export function useStartRound() {
 	const queryClient = useQueryClient()
@@ -62,6 +63,11 @@ export function startRoundQuerySync({ queryClient }: StartRoundQuerySyncProps) {
 				round: oldData.round + 1
 			} satisfies TabletopRoundData
 		})
+	}
+
+	{
+		const { campaignId } = useTabletopEnvironmentStore.getState()
+		updateEnemyPrimarySync({ queryClient, data: { usedPrimary: false, campaignId } })
 	}
 }
 
@@ -139,4 +145,6 @@ export const startRoundAction = createServerFn({ method: 'POST' })
 				.eq('campaign_id', campaignId)
 			if (updateError) throw new Error(updateError.message, { cause: updateError })
 		}
+
+		await UNSAFE_updateEnemyPrimary({ usedPrimary: false, campaignId })
 	})

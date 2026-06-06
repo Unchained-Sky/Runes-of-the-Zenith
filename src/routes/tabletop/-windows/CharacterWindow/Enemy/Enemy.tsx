@@ -2,7 +2,7 @@ import { Avatar, Group, Stack, Tabs, Title } from '@mantine/core'
 import CharacterLingering from '../CharacterLingering'
 import CharacterStats from '../CharacterStats'
 import CharacterTokens from '../CharacterTokens'
-import EnemyAggression from './EnemyAggression'
+import EnemyAggression from './EnemyTurn'
 import EnemyRunes from './EnemyRunes'
 import { useEnemyWindowContext } from './EnemyWindowContext'
 

@@ -42,7 +42,8 @@ const enemyLoader = createServerFn({ method: 'GET' })
 							data
 						)
 					),
-					currentAggression: current_aggression
+					currentAggression: current_aggression,
+					usedPrimary: used_primary
 				),
 				tile: tabletop_tiles (
 					q,
@@ -113,7 +114,8 @@ const enemyLoader = createServerFn({ method: 'GET' })
 				shield: data.shield,
 				trauma: data.trauma,
 				movement: data.movement,
-				currentAggression: tabletopEnemy.currentAggression
+				currentAggression: tabletopEnemy.currentAggression,
+				usedPrimary: tabletopEnemy.usedPrimary
 			},
 			pos: data.tile[0] ? [data.tile[0].q, data.tile[0].r, data.tile[0].s] : null,
 			runes,
