@@ -4,8 +4,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { useTabletopEnvironmentStore } from '~/routes/tabletop/-hooks/useTabletopEnvironmentStore'
-import { resetAggressionAction, resetAggressionQuerySync } from '~/routes/tabletop/-utils/gameActions/resetAggression'
 import { startRoundAction, startRoundQuerySync } from '~/routes/tabletop/-utils/gameActions/startRound'
+import { UNSAFE_updateAggressionAction, updateAggressionQuerySync } from '~/routes/tabletop/-utils/gameActions/updateAggression'
 import getQueryKey from '~/routes/tabletop/-utils/getQueryKey'
 import { getServiceClient } from '~/supabase/getServiceClient'
 import { requireGM } from '~/supabase/requireGM'
@@ -35,11 +35,12 @@ export default function ResetRounds() {
 
 			startRoundQuerySync({ queryClient })
 
-			enemyList.forEach(tabletopCharacterId => {
-				resetAggressionQuerySync({
-					queryClient,
-					data: { tabletopCharacterId }
-				})
+			updateAggressionQuerySync({
+				queryClient,
+				data: {
+					target: { tabletopCharacterIds: enemyList },
+					amount: { absolute: 0 }
+				}
 			})
 		},
 		onError: error => {
@@ -101,7 +102,10 @@ const resetRoundsAction = createServerFn({ method: 'POST' })
 			if (error) throw new Error(error.message, { cause: error })
 
 			for (const { tabletopCharacterId } of data) {
-				await resetAggressionAction({ data: { tabletopCharacterId } })
+				await UNSAFE_updateAggressionAction({
+					target: { tabletopCharacterIds: [tabletopCharacterId] },
+					amount: { absolute: 0 }
+				})
 			}
 		}
 	})

@@ -59,7 +59,7 @@ function EnemyWindow({ opened, onClose, tabletopCharacterId }: CharacterWindowPr
 			id={`character-ENEMY-${tabletopCharacterId}`}
 			opened={opened}
 			onClose={onClose}
-			title={`Character: ${1 + 1}`}
+			title={enemyData.enemyName}
 		>
 			<EnemyWindowContext value={enemyData}>
 				<Enemy />

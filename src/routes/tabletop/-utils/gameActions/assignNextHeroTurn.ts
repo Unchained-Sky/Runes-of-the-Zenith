@@ -8,8 +8,8 @@ import { mutationError } from '~/utils/mutationError'
 import { useTabletopEnvironmentStore } from '../../-hooks/useTabletopEnvironmentStore'
 import { hasCharacterPermission } from '../characterPermission'
 import getQueryKey from '../getQueryKey'
-import { increaseAggressionQuerySync, UNSAFE_increaseAggressionAction } from './increaseAggression'
 import { type QuerySyncProps } from './querySync'
+import { UNSAFE_updateAggressionAction, updateAggressionQuerySync } from './updateAggression'
 
 const findNextOrder = (array: { order: number | null }[]) => Math.max(0, ...array.flatMap(({ order }) => order ? [order] : [])) + 1
 
@@ -47,7 +47,7 @@ export function assignNextHeroTurnQuerySync({ queryClient, data }: AssignNextTur
 	})
 
 	const { campaignId } = useTabletopEnvironmentStore.getState()
-	increaseAggressionQuerySync({ queryClient, data: { campaignId } })
+	updateAggressionQuerySync({ queryClient, data: { target: { campaignId }, amount: { relative: -1 } } })
 }
 
 const assignNextHeroTurnSchema = type({
@@ -85,5 +85,8 @@ export const assignNextHeroTurnAction = createServerFn({ method: 'POST' })
 			if (error) throw new Error(error.message, { cause: error })
 		}
 
-		await UNSAFE_increaseAggressionAction({ campaignId })
+		await UNSAFE_updateAggressionAction({
+			target: { tabletopCharacterIds: [tabletopCharacterId] },
+			amount: { relative: -1 }
+		})
 	})
