@@ -20,7 +20,9 @@ export default {
 		{
 			name: 'Attack 1',
 			description: 'Attack an enemy',
+			damageType: 'STRENGTH',
 			slot: 'PRIMARY',
+			durability: 'REINFORCED',
 			effect: [{
 				range: 1,
 				damage: {
@@ -35,7 +37,9 @@ export default {
 		{
 			name: 'Attack 2',
 			description: 'Attack an enemy',
+			damageType: 'STRENGTH',
 			slot: 'PRIMARY',
+			durability: 'FRAGILE',
 			effect: [{
 				range: 2,
 				damage: {
@@ -50,7 +54,9 @@ export default {
 		{
 			name: 'Attack 3',
 			description: 'Attack an enemy',
-			slot: 'PRIMARY',
+			damageType: 'STRENGTH',
+			slot: 'SECONDARY',
+			durability: 'REINFORCED',
 			effect: [{
 				range: 6,
 				damage: {
@@ -66,7 +72,9 @@ export default {
 		{
 			name: 'Attack 4',
 			description: 'Attack an enemy',
+			damageType: 'STRENGTH',
 			slot: 'PASSIVE',
+			durability: 'REINFORCED',
 			effect: [{
 				range: 1,
 				damage: {

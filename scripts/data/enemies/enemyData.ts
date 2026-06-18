@@ -20,13 +20,17 @@ type EnemyInternal = Omit<Enemy, 'runes'> & {
 type EnemyRuneDataInternal = {
 	name: string
 	description: string
+	damageType: Enums<'damage_type'>
 	slot: Enums<'rune_slot'>
+	durability: Enums<'rune_durability'>
 	effect: RuneExtraData['effect']
 }
 
 export type EnemyRuneData = {
 	name: string
+	damageType: Enums<'damage_type'>
 	slot: Enums<'rune_slot'>
+	durability: Enums<'rune_durability'>
 	data: RuneExtraData
 }
 

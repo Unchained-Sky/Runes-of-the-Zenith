@@ -38,7 +38,9 @@ const enemyLoader = createServerFn({ method: 'GET' })
 						aggression,
 						enemyRune: enemy_rune_info (
 							name: rune_name,
+							damageType: damage_type,
 							slot,
+							durability,
 							data
 						)
 					),

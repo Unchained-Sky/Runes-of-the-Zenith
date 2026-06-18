@@ -1,4 +1,4 @@
-import { Stack, Text } from '@mantine/core'
+import { Group, Stack, Text } from '@mantine/core'
 import { type EnemyRuneData } from '~/scripts/data/enemies/enemyData'
 import { CharacterRune, RuneCard } from '../CharacterRunes'
 import { useEnemyWindowContext } from './EnemyWindowContext'
@@ -32,7 +32,15 @@ function Runes({ runes }: RunesProps) {
 				<CharacterRune
 					key={runeData.name}
 					runeData={runeData}
-					inlineDescription={runeData.name}
+					inlineDescription={(
+						<Group flex={1} justify='space-between'>
+							<Text>{runeData.name}</Text>
+							<Stack gap={0}>
+								<Text ta='right' size='sm'>{runeData.durability}</Text>
+								<Text ta='right' size='xs'>{runeData.damageType}</Text>
+							</Stack>
+						</Group>
+					)}
 				/>
 			)
 		})

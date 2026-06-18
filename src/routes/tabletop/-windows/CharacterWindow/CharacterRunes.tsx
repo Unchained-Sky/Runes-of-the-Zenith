@@ -40,10 +40,25 @@ export function CharacterRune({ runeData, inlineDescription }: CharacterRuneProp
 	switch (characterData.characterType) {
 		case 'HERO': {
 			if (!assertRuneType(runeData)) return null
-			return <CharacterRuneInner characterType='HERO' characterData={characterData} runeData={runeData} inlineDescription={inlineDescription} />
+			return (
+				<CharacterRuneInner
+					characterType='HERO'
+					characterData={characterData}
+					runeData={runeData}
+					inlineDescription={inlineDescription}
+				/>
+			)
 		}
 		case 'ENEMY': {
-			return <CharacterRuneInner characterType='ENEMY' characterData={characterData} runeData={runeData} inlineDescription={inlineDescription} />
+			if (assertRuneType(runeData)) return null
+			return (
+				<CharacterRuneInner
+					characterType='ENEMY'
+					characterData={characterData}
+					runeData={runeData}
+					inlineDescription={inlineDescription}
+				/>
+			)
 		}
 	}
 }
@@ -91,7 +106,7 @@ function CharacterRuneInner({ characterType, characterData, runeData, inlineDesc
 	return (
 		<Stack>
 			<Group justify='space-between'>
-				<Group>
+				<Group flex={1}>
 					<ActionIcon variant='subtle' disabled={usedTurn} onClick={targetRune}>
 						<IconFlame />
 					</ActionIcon>

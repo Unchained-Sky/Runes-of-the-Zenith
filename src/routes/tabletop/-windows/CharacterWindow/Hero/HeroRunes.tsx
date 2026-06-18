@@ -1,4 +1,4 @@
-import { Stack, Text, Title } from '@mantine/core'
+import { Group, Stack, Text, Title } from '@mantine/core'
 import baseRunes from '~/data/baseRunes'
 import { useArchetypeQuery } from '~/hooks/data/useArchetypeQuery'
 import { type RuneData } from '~/scripts/data/runes/runeData'
@@ -48,14 +48,13 @@ function Runes({ runes }: RunesProps) {
 					key={runeData.name}
 					runeData={runeData}
 					inlineDescription={(
-						<>
+						<Group flex={1} justify='space-between'>
+							<Text>[{runeData.data.resolve}] {runeData.name}</Text>
 							<Stack gap={0}>
-								<Text>{runeData.name}</Text>
-								<Text size='xs'>{subarchetype.damageType} / {subarchetype.archetype} / {runeData.subarchetype}</Text>
+								<Text ta='right' size='sm'>{runeData.durability}</Text>
+								<Text ta='right' size='xs'>{subarchetype.damageType} / {subarchetype.archetype} / {runeData.subarchetype}</Text>
 							</Stack>
-							<Text>{runeData.durability}</Text>
-							<Text>{runeData.data.resolve}</Text>
-						</>
+						</Group>
 					)}
 				/>
 			)
