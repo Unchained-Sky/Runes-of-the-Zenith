@@ -31,22 +31,20 @@ function CharacterChips() {
 	return (
 		<>
 			<Text>Characters</Text>
-			<Chip.Group multiple>
-				<Group>
-					{ownedHeroes.map(hero => {
-						return (
-							<Chip
-								key={hero.tabletopCharacterId}
-								value={hero.tabletopCharacterId.toString()}
-								checked={opened[`character-HERO-${hero.tabletopCharacterId}`]}
-								onChange={() => toggleWindow(`character-HERO-${hero.tabletopCharacterId}`)}
-							>
-								{hero.heroName}
-							</Chip>
-						)
-					})}
-				</Group>
-			</Chip.Group>
+			<Group>
+				{ownedHeroes.map(hero => {
+					return (
+						<Chip
+							key={hero.tabletopCharacterId}
+							value={hero.tabletopCharacterId.toString()}
+							checked={opened[`character-HERO-${hero.tabletopCharacterId}`]}
+							onChange={() => toggleWindow(`character-HERO-${hero.tabletopCharacterId}`)}
+						>
+							{hero.heroName}
+						</Chip>
+					)
+				})}
+			</Group>
 		</>
 	)
 }
@@ -58,24 +56,22 @@ function GameChips() {
 	return (
 		<>
 			<Text>Game</Text>
-			<Chip.Group multiple>
-				<Group>
-					<Chip
-						value='rounds'
-						checked={opened.round}
-						onChange={() => toggleWindow('round')}
-					>
-						Rounds
-					</Chip>
-					<Chip
-						value='damageSimulation'
-						checked={opened.damageSimulation}
-						onChange={() => toggleWindow('damageSimulation')}
-					>
-						Damage Simulation
-					</Chip>
-				</Group>
-			</Chip.Group>
+			<Group>
+				<Chip
+					value='rounds'
+					checked={opened.round}
+					onChange={() => toggleWindow('round')}
+				>
+					Rounds
+				</Chip>
+				<Chip
+					value='damageSimulation'
+					checked={opened.damageSimulation}
+					onChange={() => toggleWindow('damageSimulation')}
+				>
+					Damage Simulation
+				</Chip>
+			</Group>
 		</>
 	)
 }
