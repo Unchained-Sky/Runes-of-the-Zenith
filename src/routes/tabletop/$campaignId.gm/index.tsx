@@ -70,9 +70,9 @@ function RouteComponent() {
 
 	return (
 		<DragDrop>
+			<Windows />
 			<CombatGridTabletopGM />
 			<SettingsPanel />
-			<Windows />
 		</DragDrop>
 	)
 }

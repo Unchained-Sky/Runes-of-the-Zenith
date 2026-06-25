@@ -6,7 +6,7 @@ export type CustomWindowProps = {
 }
 
 export const DEFAULT_WINDOW_PROPS = {
-	defaultX: 316,
+	defaultX: 16,
 	defaultY: 16,
 	maxHeight: '100vh',
 	resizable: 'both',

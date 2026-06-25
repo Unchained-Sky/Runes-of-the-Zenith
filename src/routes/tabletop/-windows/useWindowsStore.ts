@@ -21,6 +21,8 @@ const windowState = {
 
 type WindowsActions = {
 	toggleWindow: (windowName: WindowName) => void
+	openWindow: (windowName: WindowName) => void
+	closeWindow: (windowName: WindowName) => void
 }
 
 const actionName = createActionName<WindowsActions>('windows')
@@ -33,6 +35,22 @@ const createWindowActions: Slice<WindowsStore, WindowsActions, [DevTools]> = (se
 				[windowName]: !state.opened[windowName]
 			}
 		}), ...actionName('toggleWindow'))
+	},
+	openWindow: windowName => {
+		set(state => ({
+			opened: {
+				...state.opened,
+				[windowName]: true
+			}
+		}), ...actionName('openWindow'))
+	},
+	closeWindow: windowName => {
+		set(state => ({
+			opened: {
+				...state.opened,
+				[windowName]: false
+			}
+		}), ...actionName('closeWindow'))
 	}
 })
 

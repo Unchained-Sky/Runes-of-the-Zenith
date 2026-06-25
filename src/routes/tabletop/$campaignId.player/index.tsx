@@ -62,9 +62,9 @@ function RouteComponent() {
 
 	return (
 		<DragDrop>
+			<Windows />
 			<CombatGridTabletopPlayer />
 			<Sidebar />
-			<Windows />
 		</DragDrop>
 	)
 }

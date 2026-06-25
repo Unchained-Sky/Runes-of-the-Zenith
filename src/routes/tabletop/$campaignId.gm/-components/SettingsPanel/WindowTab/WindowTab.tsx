@@ -90,24 +90,22 @@ function GameChips() {
 	return (
 		<>
 			<Text>Game</Text>
-			<Chip.Group multiple>
-				<Group>
-					<Chip
-						value='rounds'
-						checked={opened.round}
-						onChange={() => toggleWindow('round')}
-					>
-						Rounds
-					</Chip>
-					<Chip
-						value='damageSimulation'
-						checked={opened.damageSimulation}
-						onChange={() => toggleWindow('damageSimulation')}
-					>
-						Damage Simulation
-					</Chip>
-				</Group>
-			</Chip.Group>
+			<Group>
+				<Chip
+					value='rounds'
+					checked={opened.round}
+					onChange={() => toggleWindow('round')}
+				>
+					Rounds
+				</Chip>
+				<Chip
+					value='damageSimulation'
+					checked={opened.damageSimulation}
+					onChange={() => toggleWindow('damageSimulation')}
+				>
+					Damage Simulation
+				</Chip>
+			</Group>
 		</>
 	)
 }
