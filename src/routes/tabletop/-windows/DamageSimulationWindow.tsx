@@ -1,6 +1,6 @@
 import { Window } from '@gfazioli/mantine-window'
 import { LineChart } from '@mantine/charts'
-import { Button, Divider, Group, NumberInput, Select, Stack, type NumberInputProps } from '@mantine/core'
+import { Button, Divider, Group, NumberInput, Select, Stack, Tabs, type NumberInputProps } from '@mantine/core'
 import { createFormContext } from '@mantine/form'
 import { useMemo, useState } from 'react'
 import { type Enums } from '~/supabase/databaseTypes'
@@ -16,6 +16,8 @@ const NUMBER_INPUT_PROPS = {
 	min: int2.floor,
 	max: int2.ceil
 } satisfies NumberInputProps
+
+const SECTION_HEIGHT = 140
 
 type FormValues = {
 	presets: {
@@ -85,19 +87,34 @@ export default function DamageSimulationWindow({ opened, onClose }: CustomWindow
 			opened={opened}
 			onClose={onClose}
 			defaultWidth={480}
-			defaultHeight={800}
-			minHeight={480}
-			resizable='vertical'
+			defaultHeight={640}
+			resizable='none'
 			title='Damage Simulation'
 		>
 			<FormProvider form={form}>
-				<Stack>
-					<Presets />
-					<AttackerStats />
-					<AttackStats />
-					<DefenderStats />
-					<Results />
-				</Stack>
+				<Tabs defaultValue='presets'>
+					<Tabs.List mb='md'>
+						<Tabs.Tab value='presets'>Presets</Tabs.Tab>
+						<Tabs.Tab value='attackerStats'>Attacker Stats</Tabs.Tab>
+						<Tabs.Tab value='attackStats'>Attack Stats</Tabs.Tab>
+						<Tabs.Tab value='defenderStats'>Defender Stats</Tabs.Tab>
+					</Tabs.List>
+
+					<Tabs.Panel value='presets'>
+						<Presets />
+					</Tabs.Panel>
+					<Tabs.Panel value='attackerStats'>
+						<AttackerStats />
+					</Tabs.Panel>
+					<Tabs.Panel value='attackStats'>
+						<AttackStats />
+					</Tabs.Panel>
+					<Tabs.Panel value='defenderStats'>
+						<DefenderStats />
+					</Tabs.Panel>
+				</Tabs>
+
+				<Results />
 			</FormProvider>
 		</Window>
 	)
@@ -125,9 +142,52 @@ function Presets() {
 		}
 	}), [heroesData, ownedHeroes])
 
+	form.watch('presets.enemyPreset', ({ value }) => {
+		const preset = getEnemyPreset(value)
+		form.setValues({
+			defenderStats: {
+				intDef: preset.int,
+				dexDef: preset.dex,
+				strDef: preset.str
+			}
+		})
+	})
+
+	form.watch('presets.attackPreset', ({ value: tValue }) => {
+		const value = tValue as 'custom' | `${number}__${Enums<'rune_slot'>}__${string}`
+		if (value === 'custom') return
+
+		const [tabletopCharacterId, runeSlot, runeName] = typedSplit(value, '__')
+		const heroData = heroesData[tabletopCharacterId]
+		if (!heroData) return
+
+		form.setValues({
+			attackerStats: {
+				int: heroData.stats.int,
+				dex: heroData.stats.dex,
+				str: heroData.stats.str,
+				critChance: heroData.stats.critChance
+			}
+		})
+
+		const runeData = heroData.runes[runeSlot].find(rune => rune.name === runeName)
+		if (!runeData) return
+
+		const runeDamage = runeData.data.effect[0]?.damage
+		if (!runeDamage) return
+
+		form.setValues({
+			attackStats: {
+				int: [runeDamage.mainStats.int?.flat ?? 0, runeDamage.mainStats.int?.scale ?? 0],
+				dex: [runeDamage.mainStats.dex?.flat ?? 0, runeDamage.mainStats.dex?.scale ?? 0],
+				str: [runeDamage.mainStats.str?.flat ?? 0, runeDamage.mainStats.str?.scale ?? 0],
+				accuracy: runeDamage.accuracy
+			}
+		})
+	})
+
 	return (
-		<>
-			<Divider label='Presets' />
+		<Stack h={SECTION_HEIGHT}>
 			<Select
 				label='Enemy Preset'
 				placeholder='Pick preset'
@@ -152,7 +212,7 @@ function Presets() {
 				key={form.key('presets.attackPreset')}
 				{...form.getInputProps('presets.attackPreset')}
 			/>
-		</>
+		</Stack>
 	)
 }
 
@@ -180,8 +240,7 @@ function AttackerStats() {
 	}
 
 	return (
-		<>
-			<Divider label='Attacker Stats' />
+		<Stack h={SECTION_HEIGHT}>
 			<Group grow>
 				<NumberInput
 					{...NUMBER_INPUT_PROPS}
@@ -214,46 +273,19 @@ function AttackerStats() {
 					value={selectedHero}
 					onChange={setSelectedHero}
 				/>
-				<Button variant='default' flex={1} onClick={copyHeroStats}>Copy Hero Stats</Button>
+				<Button variant='default' flex={1} onClick={copyHeroStats} disabled={!selectedHero}>Copy Hero Stats</Button>
 			</Group>
-		</>
+		</Stack>
 	)
 }
 
 function AttackStats() {
 	const form = useFormContext()
 
-	const { data: heroesData } = useTabletopHeroes()
-
-	form.watch('presets.attackPreset', ({ value: tValue }) => {
-		const value = tValue as 'custom' | `${number}__${Enums<'rune_slot'>}__${string}`
-		if (value === 'custom') return
-
-		const [tabletopCharacterId, runeSlot, runeName] = typedSplit(value, '__')
-		const heroData = heroesData[tabletopCharacterId]
-		if (!heroData) return
-
-		const runeData = heroData.runes[runeSlot].find(rune => rune.name === runeName)
-		if (!runeData) return
-
-		const runeDamage = runeData.data.effect[0]?.damage
-		if (!runeDamage) return
-
-		form.setValues({
-			attackStats: {
-				int: [runeDamage.mainStats.int?.flat ?? 0, runeDamage.mainStats.int?.scale ?? 0],
-				dex: [runeDamage.mainStats.dex?.flat ?? 0, runeDamage.mainStats.dex?.scale ?? 0],
-				str: [runeDamage.mainStats.str?.flat ?? 0, runeDamage.mainStats.str?.scale ?? 0],
-				accuracy: runeDamage.accuracy
-			}
-		})
-	})
-
 	const isCustom = form.values.presets.attackPreset === 'custom'
 
 	return (
-		<>
-			<Divider label='Attack Stats' />
+		<Stack h={SECTION_HEIGHT}>
 			<Group grow align='start'>
 				<Stack>
 					<NumberInput
@@ -311,29 +343,17 @@ function AttackStats() {
 					{...form.getInputProps('attackStats.accuracy')}
 				/>
 			</Group>
-		</>
+		</Stack>
 	)
 }
 
 function DefenderStats() {
 	const form = useFormContext()
 
-	form.watch('presets.enemyPreset', ({ value }) => {
-		const preset = getEnemyPreset(value)
-		form.setValues({
-			defenderStats: {
-				intDef: preset.int,
-				dexDef: preset.dex,
-				strDef: preset.str
-			}
-		})
-	})
-
 	const isCustom = form.values.presets.enemyPreset === 'custom'
 
 	return (
-		<>
-			<Divider label='Defender Stats' />
+		<Stack h={SECTION_HEIGHT}>
 			<Group grow>
 				<NumberInput
 					{...NUMBER_INPUT_PROPS}
@@ -357,7 +377,7 @@ function DefenderStats() {
 					{...form.getInputProps('defenderStats.strDef')}
 				/>
 			</Group>
-		</>
+		</Stack>
 	)
 }
 
@@ -368,29 +388,36 @@ function Results() {
 
 	const [parsedResults, setParsedResults] = useState<{ damage: number, count: number, percentage: number }[]>([])
 
+	const handleReset = () => {
+		setParsedResults([])
+		form.reset()
+	}
+
 	const handleSubmit = () => {
 		const results: Record<number, number> = {}
 
 		for (let i = 0; i < n; i++) {
+			const values = form.getValues()
+
 			const result = damageCalculation({
 				attack: {
 					damageType: {
-						int: form.values.attackStats.int,
-						dex: form.values.attackStats.dex,
-						str: form.values.attackStats.str
+						int: values.attackStats.int,
+						dex: values.attackStats.dex,
+						str: values.attackStats.str
 					},
-					accuracy: form.values.attackStats.accuracy
+					accuracy: values.attackStats.accuracy
 				},
 				attackerStats: {
-					int: form.values.attackerStats.int,
-					dex: form.values.attackerStats.dex,
-					str: form.values.attackerStats.str,
-					critChance: form.values.attackerStats.critChance
+					int: values.attackerStats.int,
+					dex: values.attackerStats.dex,
+					str: values.attackerStats.str,
+					critChance: values.attackerStats.critChance
 				},
 				defenderStats: {
-					intDef: form.values.defenderStats.intDef,
-					dexDef: form.values.defenderStats.dexDef,
-					strDef: form.values.defenderStats.strDef
+					intDef: values.defenderStats.intDef,
+					dexDef: values.defenderStats.dexDef,
+					strDef: values.defenderStats.strDef
 				}
 			})
 
@@ -406,12 +433,7 @@ function Results() {
 	}
 
 	return (
-		<>
-			<Divider label='Results' />
-			<Group>
-				<Button variant='default' type='reset' onClick={form.reset}>Reset All</Button>
-				<Button flex={1} type='submit' onClick={handleSubmit}>Simulate</Button>
-			</Group>
+		<Stack mt='md'>
 			<LineChart
 				h={300}
 				data={parsedResults}
@@ -424,6 +446,10 @@ function Results() {
 				yAxisLabel='Percentage Chance'
 				gridAxis='xy'
 			/>
-		</>
+			<Group>
+				<Button variant='default' type='reset' onClick={handleReset}>Reset All</Button>
+				<Button flex={1} type='submit' onClick={handleSubmit}>Simulate</Button>
+			</Group>
+		</Stack>
 	)
 }
