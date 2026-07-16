@@ -48,6 +48,10 @@ const heroLoader = createServerFn({ method: 'GET' })
 						)
 					)
 				),
+				runeState: tabletop_rune_state (
+					runeName: rune_name,
+					runeState: rune_state
+				),
 				tile: tabletop_tiles (
 					q,
 					r,
@@ -85,12 +89,16 @@ const heroLoader = createServerFn({ method: 'GET' })
 
 		const runes = tabletopHero.heroInfo.heroRune
 			.map(runeExtraDataFormatter)
-			.reduce<Record<RuneData['slot'], RuneData[]>>((acc, curr) => {
+			.reduce<Record<RuneData['slot'], TabletopRuneData[]>>((acc, curr) => {
+				const currentDurability = data.runeState.find(rune => rune.runeName === curr.name)?.runeState ?? null
 				return {
 					...acc,
 					[curr.slot]: [
 						...acc[curr.slot],
-						curr
+						{
+							...curr,
+							currentDurability
+						} satisfies TabletopRuneData
 					]
 				}
 			}, {
@@ -185,12 +193,16 @@ const tabletopHeroQueryOptions = (campaignId: number, tabletopCharacterId: numbe
 	staleTime: TABLETOP_QUERY_STALE_TIME
 })
 
+export type TabletopRuneData = RuneData & {
+	currentDurability: Enums<'rune_durability'> | null
+}
+
 type InternalTabletopHeroData = NonNullable<Awaited<ReturnType<typeof heroLoader>>>
 export type TabletopHeroData = Omit<InternalTabletopHeroData, 'runes'> & {
 	runes: {
-		PRIMARY: RuneData[]
-		SECONDARY: RuneData[]
-		PASSIVE: RuneData[]
+		PRIMARY: TabletopRuneData[]
+		SECONDARY: TabletopRuneData[]
+		PASSIVE: TabletopRuneData[]
 	}
 }
 

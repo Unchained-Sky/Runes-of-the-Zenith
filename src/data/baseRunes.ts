@@ -1,4 +1,5 @@
-import { type RuneData, type RuneDataInternal } from '~/scripts/data/runes/runeData'
+import { type TabletopRuneData } from '~/routes/tabletop/-hooks/tabletopData/useTabletopHeroes'
+import { type RuneDataInternal } from '~/scripts/data/runes/runeData'
 import { runeDataFormatter } from '~/scripts/data/runes/runeFormatter'
 import { typedObject } from '~/types/typedObject'
 
@@ -80,13 +81,14 @@ type BaseRuneNames = typeof baseRunes[number]['name']
 
 const formatted = runeDataFormatter(baseRunes, 'BASE')
 
-export default typedObject.fromEntries(formatted.map<[BaseRuneNames, RuneData]>(rune => [
+export default typedObject.fromEntries(formatted.map<[BaseRuneNames, TabletopRuneData]>(rune => [
 	rune.rune_name as BaseRuneNames,
 	{
 		name: rune.rune_name,
 		slot: rune.slot,
 		durability: rune.durability,
 		subarchetype: rune.subarchetype,
-		data: rune.data
-	}
+		data: rune.data,
+		currentDurability: null
+	} satisfies TabletopRuneData
 ]))

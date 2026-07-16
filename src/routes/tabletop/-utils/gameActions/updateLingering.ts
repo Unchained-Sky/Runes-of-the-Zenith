@@ -3,8 +3,8 @@ import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { type TablesUpdate } from '~/supabase/databaseTypes'
 import { getServiceClient } from '~/supabase/getServiceClient'
-import { characterType } from '~/types/gameTypes/character'
 import { mutationError } from '~/utils/mutationError'
+import { type TabletopGMEnemyData } from '../../$campaignId.gm/-hooks/tabletopData/useGMTabletopEnemies'
 import { type TabletopHeroData } from '../../-hooks/tabletopData/useTabletopHeroes'
 import { hasCharacterPermission } from '../characterPermission'
 import getQueryKey from '../getQueryKey'
@@ -28,7 +28,7 @@ type UpdateLingeringQuerySyncProps = QuerySyncProps<typeof updateLingeringSchema
 
 export function updateLingeringQuerySync({ queryClient, data }: UpdateLingeringQuerySyncProps) {
 	const queryKey = getQueryKey({ type: 'character', data: { tabletopCharacterId: data.tabletopCharacterId, queryClient } })
-	queryClient.setQueriesData({ queryKey }, (oldData: TabletopHeroData) => {
+	queryClient.setQueriesData({ queryKey }, (oldData: TabletopHeroData | TabletopGMEnemyData) => {
 		const lingeringEffects = structuredClone(oldData.lingering)
 		data.lingeringEffects.forEach(lingering => {
 			if (lingering.remainingTime) {
@@ -42,13 +42,12 @@ export function updateLingeringQuerySync({ queryClient, data }: UpdateLingeringQ
 		return {
 			...oldData,
 			lingering: lingeringEffects
-		} satisfies TabletopHeroData
+		} satisfies TabletopHeroData | TabletopGMEnemyData
 	})
 }
 
 const updateLingeringSchema = type({
 	tabletopCharacterId: 'number',
-	characterType,
 	lingeringEffects: type({
 		lingeringId: 'number',
 		remainingTime: 'number'

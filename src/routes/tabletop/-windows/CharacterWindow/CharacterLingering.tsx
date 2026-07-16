@@ -101,7 +101,7 @@ type UpdateLingeringEffectProps = {
 }
 
 function UpdateLingeringEffect({ lingering }: UpdateLingeringEffectProps) {
-	const { tabletopCharacterId, characterType } = useCharacterWindowContext()
+	const { tabletopCharacterId } = useCharacterWindowContext()
 
 	const [value, setValue] = useState(lingering.remainingTime)
 
@@ -118,7 +118,6 @@ function UpdateLingeringEffect({ lingering }: UpdateLingeringEffectProps) {
 							updateLingering.mutate({
 								data: {
 									tabletopCharacterId,
-									characterType,
 									lingeringEffects: [
 										{
 											lingeringId: lingering.lingeringId,

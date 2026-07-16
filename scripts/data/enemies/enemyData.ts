@@ -1,6 +1,6 @@
 import { type Compendium } from '~/scripts/data/compendiumTypes'
 import { type Enums } from '~/supabase/databaseTypes'
-import { type RuneExtraData } from '~/supabase/extraDataFormatter/runeExtraData'
+import { type EnemyRuneExtraData } from '~/supabase/extraDataFormatter/enemyRuneExtraData'
 import { type Character } from '~/types/gameTypes/character'
 import marauder from './base/marauder'
 import zombeast from './base/zombeast'
@@ -23,7 +23,7 @@ type EnemyRuneDataInternal = {
 	damageType: Enums<'damage_type'>
 	slot: Enums<'rune_slot'>
 	durability: Enums<'rune_durability'>
-	effect: RuneExtraData['effect']
+	effect: EnemyRuneExtraData['effect']
 }
 
 export type EnemyRuneData = {
@@ -31,7 +31,7 @@ export type EnemyRuneData = {
 	damageType: Enums<'damage_type'>
 	slot: Enums<'rune_slot'>
 	durability: Enums<'rune_durability'>
-	data: RuneExtraData
+	data: EnemyRuneExtraData
 }
 
 export type CompendiumEnemy = EnemyInternal & Compendium

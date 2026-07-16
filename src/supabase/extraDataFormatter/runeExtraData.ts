@@ -47,12 +47,12 @@ export const runeExtraDataFormatter = (rune: { runeInfo: Omit<RuneData, 'data'> 
 	const out = runeExtraDataSchema(rune.runeInfo.data)
 	if (out instanceof type.errors) {
 		throw console.error(out.summary)
-	} else {
-		return {
-			...rune.runeInfo,
-			effect: out
-		}
 	}
+
+	return {
+		...rune.runeInfo,
+		data: out
+	} satisfies RuneData
 }
 
 export type RuneExtraData = typeof runeExtraDataSchema.infer

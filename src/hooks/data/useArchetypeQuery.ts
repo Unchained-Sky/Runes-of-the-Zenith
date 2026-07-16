@@ -12,7 +12,7 @@ const archetypeQueryAction = createServerFn({ method: 'GET' })
 			.select('*')
 		if (error) throw new Error(error.message, { cause: error })
 
-		return data.reduce<Test>((acc, curr) => {
+		return data.reduce<Subarchtype>((acc, curr) => {
 			return {
 				...acc,
 				[curr.subarchetype]: {
@@ -20,10 +20,10 @@ const archetypeQueryAction = createServerFn({ method: 'GET' })
 					damageType: curr.damage_type
 				}
 			}
-		}, {} as Test)
+		}, {} as Subarchtype)
 	})
 
-type Test = Record<Enums<'subarchetype'>, {
+type Subarchtype = Record<Enums<'subarchetype'>, {
 	archetype: Enums<'archetype'>
 	damageType: Enums<'damage_type'>
 }>

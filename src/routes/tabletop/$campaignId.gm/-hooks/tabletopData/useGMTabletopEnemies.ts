@@ -3,6 +3,7 @@ import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
 import { useTabletopEnvironmentStore } from '~/routes/tabletop/-hooks/useTabletopEnvironmentStore'
 import { type EnemyRuneData } from '~/scripts/data/enemies/enemyData'
+import { type Enums } from '~/supabase/databaseTypes'
 import { enemyRuneExtraDataFormatter } from '~/supabase/extraDataFormatter/enemyRuneExtraData'
 import { lingeringDataFormatter } from '~/supabase/extraDataFormatter/lingeringExtraData'
 import { requireAccount } from '~/supabase/requireAccount'
@@ -47,6 +48,10 @@ const enemyLoader = createServerFn({ method: 'GET' })
 					currentAggression: current_aggression,
 					usedPrimary: used_primary
 				),
+				runeState: tabletop_rune_state (
+					runeName: rune_name,
+					runeState: rune_state
+				),
 				tile: tabletop_tiles (
 					q,
 					r,
@@ -80,12 +85,16 @@ const enemyLoader = createServerFn({ method: 'GET' })
 
 		const runes = tabletopEnemy.enemyInfo.enemyRune
 			.map(enemyRuneExtraDataFormatter)
-			.reduce<Record<EnemyRuneData['slot'], EnemyRuneData[]>>((acc, curr) => {
+			.reduce<Record<EnemyRuneData['slot'], TabletopEnemyRuneData[]>>((acc, curr) => {
+				const currentDurability = data.runeState.find(rune => rune.runeName === curr.name)?.runeState ?? null
 				return {
 					...acc,
 					[curr.slot]: [
 						...acc[curr.slot],
-						curr
+						{
+							...curr,
+							currentDurability
+						} satisfies TabletopEnemyRuneData
 					]
 				}
 			}, {
@@ -131,6 +140,10 @@ const tabletopEnemyQueryOptions = (campaignId: number, tabletopCharacterId: numb
 	queryFn: () => enemyLoader({ data: { tabletopCharacterId } }),
 	staleTime: TABLETOP_QUERY_STALE_TIME
 })
+
+export type TabletopEnemyRuneData = EnemyRuneData & {
+	currentDurability: Enums<'rune_durability'> | null
+}
 
 export type TabletopGMEnemyData = NonNullable<Awaited<ReturnType<typeof enemyLoader>>>
 type TabletopGMEnemiesData = {

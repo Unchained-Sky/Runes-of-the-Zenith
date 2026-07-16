@@ -1,6 +1,6 @@
 import { Window } from '@gfazioli/mantine-window'
 import { LineChart } from '@mantine/charts'
-import { Button, Divider, Group, NumberInput, Select, Stack, Tabs, type NumberInputProps } from '@mantine/core'
+import { Button, Group, NumberInput, Select, Stack, Tabs, type NumberInputProps } from '@mantine/core'
 import { createFormContext } from '@mantine/form'
 import { useMemo, useState } from 'react'
 import { type Enums } from '~/supabase/databaseTypes'

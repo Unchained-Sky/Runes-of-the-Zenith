@@ -1,5 +1,5 @@
 import { Group, Stack, Text } from '@mantine/core'
-import { type EnemyRuneData } from '~/scripts/data/enemies/enemyData'
+import { type TabletopEnemyRuneData } from '~/routes/tabletop/$campaignId.gm/-hooks/tabletopData/useGMTabletopEnemies'
 import { CharacterRune, RuneCard } from '../CharacterRunes'
 import { useEnemyWindowContext } from './EnemyWindowContext'
 
@@ -22,7 +22,7 @@ export default function EnemyRunes() {
 }
 
 type RunesProps = {
-	runes: EnemyRuneData[]
+	runes: TabletopEnemyRuneData[]
 }
 
 function Runes({ runes }: RunesProps) {
@@ -36,7 +36,14 @@ function Runes({ runes }: RunesProps) {
 						<Group flex={1} justify='space-between'>
 							<Text>{runeData.name}</Text>
 							<Stack gap={0}>
-								<Text ta='right' size='sm'>{runeData.durability}</Text>
+								{runeData.currentDurability
+									? (
+										<Text ta='right' size='sm'>
+											{`${runeData.currentDurability} `}
+											<Text span c='dimmed'>{runeData.durability}</Text>
+										</Text>
+									)
+									: <Text ta='right' size='sm'>{runeData.durability}</Text>}
 								<Text ta='right' size='xs'>{runeData.damageType}</Text>
 							</Stack>
 						</Group>

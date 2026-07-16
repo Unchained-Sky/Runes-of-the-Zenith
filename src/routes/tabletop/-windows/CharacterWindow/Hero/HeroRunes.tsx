@@ -1,7 +1,7 @@
 import { Group, Stack, Text, Title } from '@mantine/core'
 import baseRunes from '~/data/baseRunes'
 import { useArchetypeQuery } from '~/hooks/data/useArchetypeQuery'
-import { type RuneData } from '~/scripts/data/runes/runeData'
+import { type TabletopRuneData } from '~/routes/tabletop/-hooks/tabletopData/useTabletopHeroes'
 import { CharacterRune, RuneCard } from '../CharacterRunes'
 import { useHeroWindowContext } from './HeroWindowContext'
 
@@ -34,7 +34,7 @@ export default function HeroRunes() {
 }
 
 type RunesProps = {
-	runes: RuneData[]
+	runes: TabletopRuneData[]
 }
 
 function Runes({ runes }: RunesProps) {
@@ -51,7 +51,14 @@ function Runes({ runes }: RunesProps) {
 						<Group flex={1} justify='space-between'>
 							<Text>[{runeData.data.resolve}] {runeData.name}</Text>
 							<Stack gap={0}>
-								<Text ta='right' size='sm'>{runeData.durability}</Text>
+								{runeData.currentDurability
+									? (
+										<Text ta='right' size='sm'>
+											{`${runeData.currentDurability} `}
+											<Text span c='dimmed'>{runeData.durability}</Text>
+										</Text>
+									)
+									: <Text ta='right' size='sm'>{runeData.durability}</Text>}
 								<Text ta='right' size='xs'>{subarchetype.damageType} / {subarchetype.archetype} / {runeData.subarchetype}</Text>
 							</Stack>
 						</Group>

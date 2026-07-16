@@ -12,12 +12,12 @@ export const enemyRuneExtraDataFormatter = (rune: Omit<EnemyRuneData, 'data'> & 
 	const out = enemyRuneExtraDataSchema(rune.data)
 	if (out instanceof type.errors) {
 		throw console.error(out.summary)
-	} else {
-		return {
-			...rune,
-			effect: out
-		}
 	}
+
+	return {
+		...rune,
+		data: out
+	} satisfies EnemyRuneData
 }
 
 export type EnemyRuneExtraData = typeof enemyRuneExtraDataSchema.infer
