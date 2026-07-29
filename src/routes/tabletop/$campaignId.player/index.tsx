@@ -56,7 +56,11 @@ export const Route = createFileRoute('/tabletop/$campaignId/player/')({
 
 function RouteComponent() {
 	const { campaignId } = Route.useLoaderData()
-	useTabletopEnvironmentStore(state => state.setup)({ campaignId, role: 'player', route: '/tabletop/$campaignId/player/' })
+	useTabletopEnvironmentStore(state => state.setup)({
+		campaignId,
+		role: 'player',
+		route: '/tabletop/$campaignId/player/'
+	})
 
 	useTabletopSubscriptions(campaignId)
 

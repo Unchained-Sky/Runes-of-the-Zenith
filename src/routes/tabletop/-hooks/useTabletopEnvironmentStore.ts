@@ -4,8 +4,12 @@ import { createActionName, type DevTools, type Slice } from '~/types/storeTypes'
 
 type TabletopEnvironmentState = {
 	campaignId: number
-	role: 'gm' | 'player'
-	route: '/tabletop/$campaignId/gm/' | '/tabletop/$campaignId/player/'
+	role: 'gm'
+	route: '/tabletop/$campaignId/gm/'
+} | {
+	campaignId: number
+	role: 'player'
+	route: '/tabletop/$campaignId/player/'
 }
 
 const tabletopEnvironmentState = {
@@ -22,12 +26,8 @@ const actionName = createActionName<TabletopEnvironmentActions>('tabletopEnviron
 
 const createTabletopEnvironmentActions: Slice<TabletopEnvironmentStore, TabletopEnvironmentActions, [DevTools]> = (set, get) => ({
 	setup: environment => {
-		if (get().campaignId !== -1) return
-		set({
-			campaignId: environment.campaignId,
-			role: environment.role,
-			route: environment.route
-		}, ...actionName('setup'))
+		if (get().campaignId === environment.campaignId) return
+		set(environment, ...actionName('setup'))
 	}
 })
 
