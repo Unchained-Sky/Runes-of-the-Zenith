@@ -10,6 +10,7 @@
     "vite:serve": "npm run vite:build && vite preview",
     "lint:oxlint": "oxlint --type-aware --type-check",
     "lint:types": "tsc --noEmit",
+    "lint:spelling": "codebook-lsp lint src/",
     "supabase:login": "supabase login",
     "supabase:types": "supabase gen types typescript --project-id kttsshgvhhwzwjhwiesz > src/supabase/databaseTypes.d.ts",
     "db:encounter": "bun run ./scripts/sync/encounterSync.ts",

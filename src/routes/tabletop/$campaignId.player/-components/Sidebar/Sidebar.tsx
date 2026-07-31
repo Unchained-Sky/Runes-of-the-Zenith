@@ -7,9 +7,9 @@ export default function Sidebar() {
 		<Box
 			miw={360}
 			pos='absolute'
-			top={0}
+			bottom={0}
 			right={0}
-			h='100vh'
+			h='calc(100vh - 60px)'
 			bg='dark.6'
 			p='md'
 		>

@@ -3,7 +3,7 @@ import CSS_MANTINE_CHARTS from '@mantine/charts/styles.css?url'
 import CSS_MANTINE from '@mantine/core/styles.css?url'
 import CSS_MANTINE_DROPZONE from '@mantine/dropzone/styles.css?url'
 import CSS_MANTINE_NOTIFICATIONS from '@mantine/notifications/styles.css?url'
-import CSS_NAVBAR from '~/components/Navbar/Navbar.css?url'
+import CSS_NAVBAR from '~/components/AppShell/Navbar.css?url'
 import CSS_FONT from '~/styles/font.css?url'
 
 export const stylesheets = [

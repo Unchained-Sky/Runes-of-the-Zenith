@@ -1,18 +1,24 @@
-import { Box, Collapse, type ElementProps, Group, type PolymorphicComponentProps, ThemeIcon, UnstyledButton, type UnstyledButtonProps } from '@mantine/core'
+import { ScrollArea, Box, Collapse, type ElementProps, Group, type PolymorphicComponentProps, ThemeIcon, UnstyledButton, type UnstyledButtonProps } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { IconChevronRight } from '@tabler/icons-react'
 import { Link, type LinkProps } from '@tanstack/react-router'
 import { Fragment } from 'react'
 import { iconSize } from '~/utils/iconSize'
-import { type NavLink, type NestedLink } from './navbarLinks'
+import { navbarLinks, type NestedLink, type NavLink } from './navbarLinks'
 
-function isNestedLink(navLink: NavLink): navLink is NestedLink {
-	return Object.hasOwn(navLink, 'links')
+export default function Links() {
+	return (
+		<ScrollArea flex='1' pt='md'>
+			{
+				navbarLinks.map(navbarLink => {
+					return <LinkGroup key={navbarLink.label} {...navbarLink} />
+				})
+			}
+		</ScrollArea>
+	)
 }
 
-type ButtonProps = ElementProps<'button', keyof UnstyledButtonProps>
-
-export default function LinkGroup(navLink: NavLink) {
+function LinkGroup(navLink: NavLink) {
 	const { label, icon: Icon } = navLink
 
 	const [opened, { toggle }] = useDisclosure(false)
@@ -70,3 +76,9 @@ export default function LinkGroup(navLink: NavLink) {
 		</Fragment>
 	)
 }
+
+function isNestedLink(navLink: NavLink): navLink is NestedLink {
+	return Object.hasOwn(navLink, 'links')
+}
+
+type ButtonProps = ElementProps<'button', keyof UnstyledButtonProps>

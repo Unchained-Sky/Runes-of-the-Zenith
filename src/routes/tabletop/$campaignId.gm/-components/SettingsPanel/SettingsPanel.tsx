@@ -13,9 +13,9 @@ export default function SettingsPanel() {
 		<Box
 			w={620}
 			pos='absolute'
-			top={0}
+			bottom={0}
 			right={0}
-			h='100vh'
+			h='calc(100vh - 60px)'
 			bg='dark.6'
 			p='md'
 		>
@@ -47,10 +47,11 @@ export default function SettingsPanel() {
 				</Tabs.List>
 
 				{/*
+					60px = appshell header
 					36px = tab list
 					32px = padding
 				*/}
-				<ScrollArea h='calc(100vh - 36px - 32px)'>
+				<ScrollArea h='calc(100vh - 60px - 36px - 32px)'>
 					<Tabs.Panel value='units'>
 						<UnitsTab />
 					</Tabs.Panel>

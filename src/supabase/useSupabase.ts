@@ -16,6 +16,6 @@ export const useSupabase = () => {
 		}).catch(console.error)
 	}, [supabase])
 
-	if (!supabase) throw new Error('Supabase is not initialized')
+	if (!supabase) throw new Error('Supabase is not initialised')
 	return { supabase, userId }
 }

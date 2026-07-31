@@ -549,7 +549,7 @@
           }
         ],
         "react/only-export-components": [
-          "warn",
+          "off",
           {
             "allowConstantExport": true,
             "allowExportNames": ["meta", "links", "headers", "loader", "action"]

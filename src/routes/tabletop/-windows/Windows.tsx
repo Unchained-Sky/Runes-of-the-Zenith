@@ -17,6 +17,7 @@ export default function Windows() {
 	return (
 		<Window.Group
 			zIndexStrategy='normalize'
+			initialZIndex={101}
 			style={{
 				position: 'absolute',
 				inset: 0

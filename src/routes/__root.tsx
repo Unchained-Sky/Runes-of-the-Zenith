@@ -1,13 +1,13 @@
-import { Box, Group, mantineHtmlProps } from '@mantine/core'
+import { Group, mantineHtmlProps } from '@mantine/core'
 import { createBrowserClient } from '@supabase/ssr'
 import { type QueryClient } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { HeadContent, Outlet, Scripts, createRootRouteWithContext } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 import { useState, type ReactNode } from 'react'
+import AppShell from '~/components/AppShell'
 import { DefaultCatchBoundary } from '~/components/DefaultCatchBoundary'
 import Mantine from '~/components/Mantine'
-import Navbar from '~/components/Navbar'
 import { stylesheets } from '~/styles/stylesheets'
 import { type Database } from '~/supabase/databaseTypes'
 import { getSupabaseClientEnv } from '~/supabase/supabaseEnv'
@@ -73,10 +73,7 @@ function RootLayout({ children }: { children: ReactNode }) {
 	return (
 		<Mantine>
 			<Group align='flex-start' gap={0}>
-				<Navbar />
-				<Box component='main' flex='1' p='md' pos='relative' mih='100vh'>
-					{children}
-				</Box>
+				<AppShell main={children} />
 			</Group>
 		</Mantine>
 	)
