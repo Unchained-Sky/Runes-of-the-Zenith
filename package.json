@@ -13,6 +13,8 @@
     "lint:spelling": "codebook-lsp lint src/",
     "supabase:login": "supabase login",
     "supabase:types": "supabase gen types typescript --project-id kttsshgvhhwzwjhwiesz > src/supabase/databaseTypes.d.ts",
+    "supabase:schema": "supabase db dump --file ./supabase/schema_backup.sql",
+    "supabase:data": "supabase db dump --data-only --file ./supabase/data_backup.sql",
     "db:encounter": "bun run ./scripts/sync/encounterSync.ts",
     "db:enemy": "bun run ./scripts/sync/enemySync.ts",
     "db:map": "bun run ./scripts/sync/mapSync.ts",
