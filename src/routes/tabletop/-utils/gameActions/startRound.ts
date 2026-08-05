@@ -20,6 +20,9 @@ export function useStartRound() {
 			const { campaignId } = useTabletopEnvironmentStore.getState()
 			return startRoundAction({ data: { campaignId } })
 		},
+		scope: {
+			id: 'tabletop-start-round'
+		},
 		onMutate: () => {
 			startRoundQuerySync({ queryClient })
 		},

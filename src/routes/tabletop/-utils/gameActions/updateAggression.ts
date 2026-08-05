@@ -16,6 +16,9 @@ export function useUpdateAggression() {
 
 	return useMutation({
 		mutationFn: updateAggressionAction,
+		scope: {
+			id: 'tabletop-update-aggression'
+		},
 		onMutate: ({ data }) => {
 			updateAggressionQuerySync({ queryClient, data })
 		},
@@ -39,9 +42,17 @@ export const updateAggressionQuerySync = ({ queryClient, data }: UpdateAggressio
 		const queryKey = getQueryKey({ type: 'enemy', data: { tabletopCharacterId } })
 		void queryClient.cancelQueries({ queryKey })
 		queryClient.setQueryData(queryKey, (oldData: TabletopGMEnemyData | TabletopPlayerEnemyData) => {
-			const updatedAggression = 'relative' in data.amount
-				? Math.max(0, oldData.tabletopStats.currentAggression + data.amount.relative)
-				: data.amount.absolute
+			const updatedAggression = (() => {
+				if ('absolute' in data.amount) {
+					return data.amount.absolute
+				} else if ('relative' in data.amount) {
+					return Math.max(0, oldData.tabletopStats.currentAggression + data.amount.relative)
+				} else if ('reset' in data.amount) {
+					return 'stats' in oldData ? oldData.stats.aggression : oldData.tabletopStats.currentAggression
+				}
+				throw new Error('Unknown amount type')
+			})()
+
 			return {
 				...oldData,
 				tabletopStats: {
@@ -68,15 +79,13 @@ const updateAggressionSchema = type({
 			campaignId: 'number'
 		}
 	),
-	amount: type(
-		{
-			relative: 'number'
-		},
-		'|',
-		{
-			absolute: 'number'
-		}
-	)
+	amount: type({
+		absolute: 'number'
+	}).or({
+		relative: 'number'
+	}).or({
+		reset: 'true'
+	})
 })
 
 const updateAggressionAction = createServerFn({ method: 'POST' })
@@ -94,7 +103,7 @@ const updateAggressionAction = createServerFn({ method: 'POST' })
 export const UNSAFE_updateAggressionAction = createServerOnlyFn(async ({ target, amount }: typeof updateAggressionSchema.infer) => {
 	const serviceClient = getServiceClient()
 
-	const getTargets = async () => {
+	const targets = await (async () => {
 		if ('tabletopCharacterIds' in target) return target.tabletopCharacterIds
 
 		const { data, error } = await serviceClient
@@ -105,9 +114,7 @@ export const UNSAFE_updateAggressionAction = createServerOnlyFn(async ({ target,
 		if (error) throw new Error(error.message, { cause: error })
 
 		return data.map(character => character.tabletopCharacterId)
-	}
-
-	const targets = await getTargets()
+	})()
 
 	if ('absolute' in amount) {
 		const { error } = await serviceClient
@@ -117,7 +124,7 @@ export const UNSAFE_updateAggressionAction = createServerOnlyFn(async ({ target,
 			} satisfies TablesUpdate<'tabletop_enemy'>)
 			.in('tt_character_id', targets)
 		if (error) throw new Error(error.message, { cause: error })
-	} else {
+	} else if ('relative' in amount) {
 		for (const tabletopCharacterId of targets) {
 			const { data, error } = await serviceClient
 				.from('tabletop_enemy')
@@ -133,6 +140,31 @@ export const UNSAFE_updateAggressionAction = createServerOnlyFn(async ({ target,
 					current_aggression: Math.max(0, data.current_aggression + amount.relative)
 				} satisfies TablesUpdate<'tabletop_enemy'>)
 				.eq('tt_character_id', tabletopCharacterId)
+				.limit(1)
+				.single()
+			if (updateError) throw new Error(updateError.message, { cause: updateError })
+		}
+	} else if ('reset' in amount) {
+		for (const tabletopCharacterId of targets) {
+			const { data, error } = await serviceClient
+				.from('enemy_info')
+				.select(`
+					aggression,
+					tabletop_enemy!inner()
+				`)
+				.eq('tabletop_enemy.tt_character_id', tabletopCharacterId)
+				.limit(1)
+				.single()
+			if (error) throw new Error(error.message, { cause: error })
+
+			const { error: updateError } = await serviceClient
+				.from('tabletop_enemy')
+				.update({
+					current_aggression: data.aggression
+				})
+				.eq('tt_character_id', tabletopCharacterId)
+				.limit(1)
+				.single()
 			if (updateError) throw new Error(updateError.message, { cause: updateError })
 		}
 	}

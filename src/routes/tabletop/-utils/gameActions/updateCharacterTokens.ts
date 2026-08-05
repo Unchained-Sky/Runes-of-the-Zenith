@@ -17,6 +17,9 @@ export function useUpdateCharacterTokens() {
 
 	return useMutation({
 		mutationFn: updateCharacterTokenAction,
+		scope: {
+			id: 'tabletop-update-character-token'
+		},
 		onMutate: ({ data }) => {
 			updateCharacterTokensQuerySync({ queryClient, data })
 		},

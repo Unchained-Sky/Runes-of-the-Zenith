@@ -28,7 +28,7 @@ export default function EnemyAggression() {
 							size='compact-md'
 							onClick={() => updateAggression.mutate({ data: {
 								target: { tabletopCharacterIds: [enemyData.tabletopCharacterId] },
-								amount: { absolute: 0 }
+								amount: { reset: true }
 							} })}
 						>
 							Reset

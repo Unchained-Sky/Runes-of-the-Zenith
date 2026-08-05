@@ -6,6 +6,8 @@ import { type CombatTileCordString } from '~/types/gameTypes/combatMap'
 import { useTabletopEnemies } from '../../-hooks/tabletopData/useTabletopEnemies'
 import { useTabletopHeroes } from '../../-hooks/tabletopData/useTabletopHeroes'
 import { useConfirmTargetStore } from './useConfirmTargetStore'
+import { useUpdateEnemyPrimary } from '../../-utils/gameActions/updateEnemyPrimary'
+import { useUpdateAggression } from '../../-utils/gameActions/updateAggression'
 
 export default function ConfirmTargetWindow() {
 	const { opened, close, runeData } = useConfirmTargetStore()
@@ -68,19 +70,50 @@ function ConfirmButton() {
 	const { runeData, tabletopCharacterId, tabletopCharacterType, close } = useConfirmTargetStore()
 
 	const assignNextTurn = useAssignNextHeroTurn()
+	const updateEnemyPrimary = useUpdateEnemyPrimary()
+	const updateAggression = useUpdateAggression()
 
 	const confirmTarget = () => {
-		if (tabletopCharacterType === 'HERO') {
-			if (runeData.slot !== 'PASSIVE') {
-				assignNextTurn.mutate({
+		switch (tabletopCharacterType) {
+			case 'HERO': {
+				if (runeData.slot !== 'PASSIVE') {
+					assignNextTurn.mutate({
+						data: {
+							tabletopCharacterId,
+							turnType: runeData.slot
+						}
+					})
+				}
+
+				// CAST RUNE
+
+				break
+			}
+			case 'ENEMY': {
+				if (runeData.slot === 'PRIMARY') {
+					updateEnemyPrimary.mutate({
+						data: {
+							tabletopCharacterId,
+							usedPrimary: true
+						}
+					})
+				}
+
+				updateAggression.mutate({
 					data: {
-						tabletopCharacterId,
-						turnType: runeData.slot
+						target: {
+							tabletopCharacterIds: [tabletopCharacterId]
+						},
+						amount: {
+							reset: true
+						}
 					}
 				})
-			}
 
-			// CAST RUNE
+				// CAST RUNE
+
+				break
+			}
 		}
 
 		close()

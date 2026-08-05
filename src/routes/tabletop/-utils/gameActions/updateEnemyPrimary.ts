@@ -15,6 +15,9 @@ export function useUpdateEnemyPrimary() {
 
 	return useMutation({
 		mutationFn: updateEnemyPrimaryAction,
+		scope: {
+			id: 'tabletop-update-enemy-primary'
+		},
 		onMutate: ({ data }) => {
 			updateEnemyPrimarySync({ queryClient, data })
 		},

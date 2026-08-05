@@ -16,6 +16,9 @@ export function useAddLingering() {
 
 	return useMutation({
 		mutationFn: addLingeringAction,
+		scope: {
+			id: 'tabletop-add-lingering'
+		},
 		onMutate: ({ data }) => {
 			addLingeringQuerySyncMutate({ queryClient, data })
 		},

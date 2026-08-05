@@ -32,6 +32,13 @@ type AssignNextTurnQuerySyncProps = QuerySyncProps<typeof assignNextHeroTurnSche
 export function assignNextHeroTurnQuerySync({ queryClient, data }: AssignNextTurnQuerySyncProps) {
 	const queryKey = getQueryKey({ type: 'hero', data: { tabletopCharacterId: data.tabletopCharacterId } })
 	void queryClient.cancelQueries({ queryKey })
+
+	const heroesQueryKey = getQueryKey({ type: 'hero', data: { tabletopCharacterId: null } })
+	const heroesTurns = queryClient.getQueriesData<TabletopHeroData>({ queryKey: heroesQueryKey })
+		.flatMap(([_, heroData]) => heroData ?? [])
+		.flatMap(heroData => [heroData.turn['PRIMARY'], heroData.turn['SECONDARY']])
+	const nextTurn = findNextOrder(heroesTurns)
+
 	queryClient.setQueriesData({ queryKey }, (oldData: TabletopHeroData) => {
 		const { turn } = oldData
 		return {
@@ -40,6 +47,7 @@ export function assignNextHeroTurnQuerySync({ queryClient, data }: AssignNextTur
 				...turn,
 				[data.turnType]: {
 					...turn[data.turnType],
+					order: nextTurn,
 					used: true
 				}
 			}
@@ -64,7 +72,7 @@ export const assignNextHeroTurnAction = createServerFn({ method: 'POST' })
 			.from('tabletop_hero_turn')
 			.select(`
 				order,
-				tabletop_characters ()
+				tabletop_characters!inner()
 			`)
 			.eq('tabletop_characters.campaign_id', campaignId)
 		if (error) throw new Error(error.message, { cause: error })
@@ -82,11 +90,12 @@ export const assignNextHeroTurnAction = createServerFn({ method: 'POST' })
 				} satisfies TablesUpdate<'tabletop_hero_turn'>)
 				.eq('tt_character_id', tabletopCharacterId)
 				.eq('turn_type', turnType)
+			console.log(error)
 			if (error) throw new Error(error.message, { cause: error })
 		}
 
 		await UNSAFE_updateAggressionAction({
-			target: { tabletopCharacterIds: [tabletopCharacterId] },
+			target: { campaignId: campaignId },
 			amount: { relative: -1 }
 		})
 	})

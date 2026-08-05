@@ -15,6 +15,9 @@ export function useUpdateRuneState() {
 
 	return useMutation({
 		mutationFn: updateRuneStateAction,
+		scope: {
+			id: 'tabletop-update-rune-state'
+		},
 		onMutate: ({ data }) => {
 			updateRuneStateQuerySync({ queryClient, data })
 		},

@@ -15,6 +15,9 @@ export function useUpdateCharacterStats() {
 
 	return useMutation({
 		mutationFn: updateCharacterAction,
+		scope: {
+			id: 'tabletop-update-character'
+		},
 		onMutate: ({ data }) => {
 			updateCharacterStatsQuerySync({ queryClient, data })
 		},
